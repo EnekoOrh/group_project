@@ -12,7 +12,7 @@ This report investigates and compares two optimization techniques: **Particle Sw
 ### 2.1 Algorithms
 *   **Simulated Annealing (SA)**: implemented with a geometric cooling schedule (`temp *= 0.95`).
 *   **Particle Swarm Optimization (PSO)**: implemented with standard velocity update equations. Inertia `w=0.5`.
-*   **Constraints**: Handled using a quadratic penalty function: $F(x) = f(x) + \lambda \cdot (\max(0, g(x)))^2$.
+*   **Constraints**: Handled using a quadratic penalty function: $P(x) = f(x) + R \cdot (\max(0, g(x)))^2$.
 
 ### 2.2 Problems
 *   **Rastrigin**: Highly multimodal, testing global search capability.
@@ -20,7 +20,7 @@ This report investigates and compares two optimization techniques: **Particle Sw
 *   **Constrained Rosenbrock**: Tests ability to adhere to boundaries.
 
 ### 2.3 Experimental Setup
-*   Evaluated over **10 runs** per algorithm/problem.
+*   Evaluated over **30 runs** per algorithm/problem to ensure statistical robustness.
 *   Max iterations: 500.
 *   Metrics: Mean Best Objective Value, Standard Deviation, Execution Time, and **Number of Function Evaluations**.
 
@@ -28,14 +28,16 @@ This report investigates and compares two optimization techniques: **Particle Sw
 
 ### 3.1 Quantitative Summary
 
-| Problem | Algorithm | Mean Best Value | Std Dev | Mean Time (s) | Mean Evals |
-|---|---|---|---|---|---|
-| **Rastrigin** | SA | 2.07e+01 | 1.19e+01 | 0.0121 | 501.0 |
-| | PSO | **9.95e-02** | 2.98e-01 | 0.4704 | 15,030.0 |
-| **Rosenbrock** | SA | 2.33e-02 | 2.20e-02 | 0.0181 | 501.0 |
-| | PSO | **0.00e+00** | 0.00e+00 | 0.5078 | 15,030.0 |
-| **Constrained** | SA | 1.95e-02 | 2.68e-02 | 0.0184 | 501.0 |
-| | PSO | **0.00e+00** | 0.00e+00 | 0.6305 | 15,030.0 |
+| Problem | Algorithm | Mean Best Value | Std Dev | Mean Time (s) | Mean Evals | Success Rate |
+|---|---|---|---|---|---|---|
+| **Rastrigin** | SA | 1.78e+01 | 1.05e+01 | 0.0337 | 501.0 | 0.0% |
+| | PSO | **2.32e-01** | 4.21e-01 | 1.2411 | 15,030.0 | 76.7% |
+| **Rosenbrock** | SA | 1.34e-02 | 1.74e-02 | 0.0460 | 501.0 | 6.7% |
+| | PSO | **0.00e+00** | 0.00e+00 | 0.4694 | 15,030.0 | 100.0% |
+| **Constrained** | SA | 1.50e-02 | 2.13e-02 | 0.0182 | 501.0 | 3.3% |
+| | PSO | **0.00e+00** | 0.00e+00 | 0.5481 | 15,030.0 | 100.0% |
+
+**Data Access**: The full raw dataset for all 180 runs is available in [results/all_experiments_data.csv](results/all_experiments_data.csv).
 
 **Note**: PSO requires significantly more function evaluations per iteration (equal to population size, $N=30$) compared to SA (1 per iteration). This explains the vast difference in run time and solution quality.
 
@@ -45,7 +47,7 @@ This report investigates and compares two optimization techniques: **Particle Sw
 *   **Constrained**: PSO effectively stayed within the feasible region.
 
 ### 3.3 Penalty Function Sensitivity
-We analyzed the effect of the penalty factor $\lambda$ on the *Constrained Rosenbrock* problem using PSO.
+We analyzed the effect of the penalty factor $R$ on the *Constrained Rosenbrock* problem using PSO.
 
 | Penalty Factor | Mean Best Value | Mean Constraint Violation |
 |---|---|---|

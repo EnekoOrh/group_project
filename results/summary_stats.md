@@ -1,22 +1,22 @@
 ## Problem: rastrigin
-| Algorithm | Mean Best Val | Std Dev | Mean Time (s) | Mean Evals |
-|---|---|---|---|---|
-| SA | 2.070167e+01 | 1.187605e+01 | 0.0121 | 501.0 |
-| PSO | 9.949591e-02 | 2.984877e-01 | 0.4704 | 15030.0 |
+| Algorithm | Mean Best Val | Std Dev | Mean Time (s) | Mean Evals | Success Rate |
+|---|---|---|---|---|---|
+| SA | 1.784132e+01 | 1.045155e+01 | 0.0337 | 501.0 | 0.0% |
+| PSO | 2.321571e-01 | 4.208205e-01 | 1.2411 | 15030.0 | 76.7% |
 
 
 ## Problem: rosenbrock
-| Algorithm | Mean Best Val | Std Dev | Mean Time (s) | Mean Evals |
-|---|---|---|---|---|
-| SA | 2.327070e-02 | 2.201896e-02 | 0.0181 | 501.0 |
-| PSO | 0.000000e+00 | 0.000000e+00 | 0.5078 | 15030.0 |
+| Algorithm | Mean Best Val | Std Dev | Mean Time (s) | Mean Evals | Success Rate |
+|---|---|---|---|---|---|
+| SA | 1.341958e-02 | 1.742835e-02 | 0.0460 | 501.0 | 6.7% |
+| PSO | 0.000000e+00 | 0.000000e+00 | 0.4694 | 15030.0 | 100.0% |
 
 
 ## Problem: constrained_rosenbrock
-| Algorithm | Mean Best Val | Std Dev | Mean Time (s) | Mean Evals |
-|---|---|---|---|---|
-| SA | 1.949378e-02 | 2.680456e-02 | 0.0184 | 501.0 |
-| PSO | 0.000000e+00 | 0.000000e+00 | 0.6305 | 15030.0 |
+| Algorithm | Mean Best Val | Std Dev | Mean Time (s) | Mean Evals | Success Rate |
+|---|---|---|---|---|---|
+| SA | 1.504220e-02 | 2.130381e-02 | 0.0182 | 501.0 | 3.3% |
+| PSO | 0.000000e+00 | 0.000000e+00 | 0.5481 | 15030.0 | 100.0% |
 
 
 ## Penalty Sensitivity (Constrained Rosenbrock - PSO)
