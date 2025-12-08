@@ -30,12 +30,12 @@ This report investigates and compares two optimization techniques: **Particle Sw
 
 | Problem | Algorithm | Mean Best Value | Std Dev | Mean Time (s) | Mean Evals |
 |---|---|---|---|---|---|
-| **Rastrigin** | SA | 2.07e+01 | 1.19e+01 | 0.0061 | 501.0 |
-| | PSO | **9.95e-02** | 2.98e-01 | 0.2478 | 15,030.0 |
-| **Rosenbrock** | SA | 2.33e-02 | 2.20e-02 | 0.0074 | 501.0 |
-| | PSO | **0.00e+00** | 0.00e+00 | 0.2653 | 15,030.0 |
-| **Constrained** | SA | 1.95e-02 | 2.68e-02 | 0.0090 | 501.0 |
-| | PSO | **0.00e+00** | 0.00e+00 | 0.3317 | 15,030.0 |
+| **Rastrigin** | SA | 2.07e+01 | 1.19e+01 | 0.0121 | 501.0 |
+| | PSO | **9.95e-02** | 2.98e-01 | 0.4704 | 15,030.0 |
+| **Rosenbrock** | SA | 2.33e-02 | 2.20e-02 | 0.0181 | 501.0 |
+| | PSO | **0.00e+00** | 0.00e+00 | 0.5078 | 15,030.0 |
+| **Constrained** | SA | 1.95e-02 | 2.68e-02 | 0.0184 | 501.0 |
+| | PSO | **0.00e+00** | 0.00e+00 | 0.6305 | 15,030.0 |
 
 **Note**: PSO requires significantly more function evaluations per iteration (equal to population size, $N=30$) compared to SA (1 per iteration). This explains the vast difference in run time and solution quality.
 
@@ -49,10 +49,10 @@ We analyzed the effect of the penalty factor $\lambda$ on the *Constrained Rosen
 
 | Penalty Factor | Mean Best Value | Mean Constraint Violation |
 |---|---|---|
-| 1 | ~0.00 | 1.69e-15 |
+| 1 | 9.86e-33 | 1.69e-15 |
 | 10 | 0.00 | 8.88e-17 |
 | 100 | 0.00 | 0.00 |
-| 1000 | ~0.00 | 6.22e-16 |
+| 1000 | 9.86e-33 | 6.22e-16 |
 | 10000 | 0.00 | 8.88e-16 |
 
 **Observation**: For this specific problem, the constraint boundary is naturally respected or the optima lies safely within/on it such that even low penalty factors are sufficient. Increasing the penalty factor did not destabilize the search, indicating robustness in the PSO implementation.
