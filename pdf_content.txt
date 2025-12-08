@@ -1,0 +1,197 @@
+
+--- PAGE 1 ---
+CRANFIELD UNIVERSITY  
+MSc in Computational & Software Techniques in Engineering  
+APPLICATIONS OF COMPUTATIONAL ENGINEERING DESIGN OPTIMISATION 
+(ESTIA)  
+Group Project, 2025/2026  
+Introduction  
+I, Professor Chris Phillips, am the module leader for the 40-credit Group Project module that you will 
+undertake as part of your MSc with Cranfield University.  I can be contacted by email - I do have a 
+Cranfield email address, but please use chris.phillips@ncl.ac.uk . I can guarantee that I will answer 
+anything sent to this address fairly promptly. You may also contact me via WhatsApp using 
++447879477519. However please see below for further details  of how to contact me.  
+In this assignment  you are required  to work in groups , with  4 students  in each group  – so 5 groups in 
+total . You are allowed to form your own groups, but the number of groups, and the number of 
+students in each group, is fixed . You should establish a person who will be the Lead  Contact  for all 
+groups/students throughout the project . The Lead Contact should identify themself to me at the 
+earliest opportunity, and certainly while you are all visiting Cranfield University, and well before you 
+return to Biarritz . The Lead Contact will need to ensure that the group constraints (number of groups, 
+number of students in each group) are satisfied . 
+Each group should have a Group Lead. Each group should also have a group name based on a theme. 
+This year’s theme is Château in the Loire valley . The Lead Contact  should  inform me of the group 
+compositions  (that is, who is in which group) , who the Group Leads are,  and what the names of the 
+groups are , again, at the earliest opportunity .  
+Any future contact with me (for example, to clarify any aspects of th is group project specification) 
+should normally be through the Lead Contact. Should there arise a need for a n online catch -up session 
+whereby I speak with all Group Leads  together this should be arranged through the Lead Contact. In 
+addition to this, should any Group Lead  wish to contact me individually and directly they are free to 
+do so, but this should only be in relation to a matter that they are unable /unwilling  to feed through 
+the Le ad Contact . Similarly, should any individual wi sh to contact me directly they are again free to do 
+so, but only in relation to a matter that they are unable /unwilling  to feed through their Group Lead.  
+The aim of the assignment is to apply collective knowledge, in particular from the modules you have 
+attended during your MSc studies in the area of design optimisation.  This module has three 
+assessment components/Parts that must be passed individually and collectively. Assessment is 
+entirely through coursework, there is no written examination. Time will be allocated for delivery of 
+the module during the 2 weeks January 26th – February 6th when I will be visiting ESTIA. However , you 
+are expected to work on t he project before, during, and after that period.  
+This Group Project has two components, product and process, and both are important. The product 
+is the solution of a technical problem based on the use of optimisation techniques, and will involve 
+some software development . The process is concerned with how effectively the group works in 
+achieving that product.  
+--- PAGE 2 ---
+The full details of the work to be completed will not be available at the outset. Instead details will be 
+defined from time to time via an update to this document which I will email to the Lead Contact for 
+distribution to the Group Leads, and from there to  all group members. Any times specified in this 
+document are UK times.  
+Although I will try to avoid doing so, I reserve the right to update this document in other ways from 
+time to time, but only where I believe it to be in the interests of students, for example, to clarify what 
+is required. If you spot any bugs/anomalies ple ase raise them through the Lead Contact and ask them 
+to forward details to me as soon as possible.  
+Meetings  
+While this assignment aims at giving you the opportunity, freedom and responsibility to identify what 
+your contributions might  be, a number of tasks are deemed to be standard across all groups.  
+Task, and sub -task,  allocation to individual group members is decided by t he group members 
+themselves and e very group member should track their time commitment to the pr oject starting from 
+their receipt  of the assignme nt up until the  final  submission date. Each group  member is  required  to 
+maintain a log  on a weekly basis, each week ending midnight Sunday . 
+You are required  at the outset to identify the strengths and development opportunities of each group 
+member. To assist you with this you will be provided with two documents, a Skills Matrix and a 
+Strengths Ticklist. Each individual group member must  complete these documents, addressing the 
+topics as frankly as possible, and then share these with the rest of the group. You are also required to 
+undertake , and reflect on,  a free online personality test, such as Myers -Briggs , to determine your 
+personality type . The real Myers -Briggs test costs money, but there are free examples that you can 
+find on the web . These  analyses will help you with your review at the end of the module of how 
+effectively you and the group worked while  completing the technical work.  
+You are required  to take an Agile approach to tackling the technical work , with scrums, stand -ups, etc.  
+You must  hold a meeting of all group members as soon as your group membership has been 
+established, and no later than Friday November 14th 2025. At this meeting you are required to  discuss 
+the Skills Matrix, Strengths Ticklist , and Myers -Briggs test results of all group members , and then 
+allocate  initial  roles  to individuals appropriately. This is not to say that you may  not take on a role for 
+which you have identified a relative weakness as there is an opportunity here to develop that skill. 
+Further a  reallocation is possible at any stage in light of experience  and as  the group project develops.  
+You must also identify appropriate free project management tools that you will employ whilst working 
+on this project.  
+Students are ex pected to be creative, identify their own contributions and carry out the technical and 
+non-technical  work. This is an assignment where you  are encour aged to think 'out of the box'.  
+Formal Submission requirements  
+The formal (summative) assessment of the group a ssignment is based on the following marking 
+scheme:  
+• Part 1: 50% Group Coursework P ortfolio - a collection of document s describing the technical 
+results (the product) that the group  has achieved by addressing  a number of technical Tasks 
+(Tasks 2-4 and 6-7 to be identified below) which will be released via an updated version of this 
+specification from time to time . Each Task will involve the production of a report which should 
+be sent to me by the Group Lead  via email at a time/date specified in the Task. This email 
+--- PAGE 3 ---
+submission is intended primar ily so that I can monitor that you are making progress , although 
+I will endeavour to give some feedback and an indicative /provisional  mark . All reports must  
+subsequently be collated  as a single document, one per group, and submitted by the Group 
+Lead  to Canvas by the deadline specified.  Only in exceptional circumstances should  any 
+changes be made to the se document s between the  first time you send them  to me, and the 
+final Canvas submission. Should you wish to make changes you will need my prior approval, 
+which will not normally be given. Y ou will need to explain why you believe I should consider 
+grant ing your request  
+• Part 2: 3 0% Group Oral P resentation  – this is in two parts. There is an interim  in-person  oral 
+presentation  (Task 5) at which you will present progress made so far. This is worth 10%. A 
+second presentation  (Task 9) is worth 20%, and will be delivered  online  later in the academic 
+year . Each presentation may be in a fairly standard format, but you are strongly encouraged 
+to consider alternatives, such as PechaKucha, or perhaps a mixture. Attendance at the oral 
+presentation s by all group members is compulsory.  The two presentations must be collated 
+as a single document  and submitted by the Group Lead  to Canvas by the deadline specified 
+below . 
+• Part 3 : 20% - this is in two parts. Each group member should write two reflective self-
+assessment s (Task 1 and Task 8), with Task 8 making extensive  reference  back to Task 1.  
+• This is a group project , only one submission per group , by the Group Lead , is required  for each 
+of Part s 1 and 2 . However, each group member is required to submit their own  Part 3 . 
+The Tasks  
+Task 1  (Individual Report)  – released by 20/10 /202 5: 
+This Task requires each student to reflect on their skills and how these might be employed to support 
+the group’s work.  
+For each individual member of the group there must  be an analysis of the strengths/development 
+opportunities of that group member and an initial proposal  of what role(s) they would like to  
+undertake over the duration of the group project . Each group member must  include a discussion of 
+their  personality test (Myers -Briggs or other), Skills Matrix, and Strengths Ticklist, and documents 
+covering these should be attached as appendices.  
+This Task is worth 5%  and contributes to Part 3 above . 
+Individual reports should be collated by the Group Lead who will share them with all group members 
+and then send them as a single document  by email to reach me by midnight 14/11/202 5. 
+Task 2 (Group Report) – released by 20/10 /2025:  
+This Task requires each group to consider how they might make use of the skills of each group member 
+and plan, as much as possible, how the group project is to be tackled.  
+As indicated above , you need to hold a first group meeting on or before November 13th 2025. At this 
+meeting you should discuss the strengths and development opportunities of the group members as 
+identified by all group members in Task 1. F rom that discussion you should propose an agreed initial 
+allocation of roles and responsibilities of each  member . You must also identify the project 
+management tools that you intend to use throughout the length of the group project. You must also 
+identify a provisional tim eline in the form of a GANTT chart which you should refer to, and update, 
+from time to time between the start of the group project and the end. A group report must be 
+produced that  summarises these discussions.  
+--- PAGE 4 ---
+This Task is worth 5% and contributes to Part 1 above.  
+This report should be sent by email to reach me by midnight 21/11/202 5. 
+Task 3 (Group Repor t) – released  by 20/11 /202 5: 
+This Task requires you to investigate further the unconstrained and constrained optimisation 
+techniques that have been introduced as part of your Cranfield degree. It is likely to involve some 
+coding, and will involve the production of a detailed report de scribing your findings.  
+As part of your coursework for the Computational Optimisation Design module you studied at 
+Cranfield you were required to minimise the Griewank Function by using  a stochastic scheme such as 
+Simulated Annealing or Particle Swarm Optimisation. In th is and  following tasks you are required to 
+investigate techniques of unconstrained and constrained nonlinear optimisation, but you can choose 
+to write code from scratch, use code you have already written, or make use of publicly available source 
+code. The credit you get will be the same, whichever approach you take, but you will, naturally, be 
+expected to acknowledge the authorship of any code you make use of that is not your own. It is 
+important that  you have full access to the source code , not ‘black box’ routines.  
+Using both the Particle Swarm and the Simulated Annealing techniques , solve three optimisation 
+problems ( covering both constrained and unconstrained) of your choice ( but NOT related to a cooling 
+tower , and NOT one that you studied for your Computational Optimisation Design coursework ) and 
+summarise your results. You are required to compare  the performance of these  methods. One way of 
+measuring performance is to count the number of evaluations of the objective function  on the 
+assumption that , for a suitably ‘complicated’ objective function,  each such evaluation is expensive in 
+terms of time. Use this measure, and any other appropriate measures (e.g. elapsed time) , to compare 
+performance. You must  include graphical representations of your results.  
+In this, and subsequent, tasks, if you are employing a penalty function to ensure that constraints are 
+met you should experiment with various multiplying constants to see what effect, if any, they have on 
+ensuring that any constraints are satisfied.  
+This Task is worth 10% and contributes to Part 1 above.  
+This report should be sent by email to reach me by midnight 12/12 /2026.  
+Task 4 (Group Report) – released by 11/12/2025:  
+This Task is similar to Task 3 but involves the investigation of different optimisation techniques.  
+This Task is worth 1 0% and contributes to Part 1 above . 
+This report should be sent by email to r each me by midnight 23/01/202 6. 
+Task 5 (Group Presentation) – released  by 23/01/202 6: 
+This Task requires you to present a summary of your findings so far.  
+The presentation part of this Task is worth 10% and contributes to Part 2 above.  
+You do not need to send anything to me by email in response to this Task.  
+Task 6 (Group Report) – released by 23/01/202 6: 
+This Task requires you to apply the optimisation techniques employed in Task 3 and Task 4 to a 
+specified optimisation problem.  
+--- PAGE 5 ---
+This Task is worth 2 0% and contributes to Part 1 above . 
+This report should be sent by email to reach me by midnight 06/03 /202 6. 
+Task 7 (Group Report) – released by 05/03 /2026:   
+This Task will involve the use of ABAQUS.  
+This Task is worth 5% and contributes to Part 1 above.  
+This report should be sent by email to reach me by midnight 26/03/2026.  
+Task 8 (Individual Report)  – released  by 25/03 /202 6:  
+This Task will require each group member to reflect on their, and the group’s, performance over the 
+past few months . Timesheets covering the time you have spent on the group project should be 
+attached as appendices.  
+This Task is worth 15% and contributes to Part 3 above . 
+You do not need to send anything to me by email in response to this Task.  
+Task 9 (Group Presentation) – released by 25/03 /2026: 
+This Task requires you to give a presentation describing the work you have done on the group Project.  
+This Task is worth 20% and contributes to Part 2 above.  
+You do not need to send anything to me by email in response to this Task.  
+Deadlines:  
+For each group, the Group Lead  should submit 2 documents, one for each of Part 1  and Part 2 . Each 
+group member should additionally submit  their  own Part 3 . The deadline for the submission of Parts 
+1, 2 and 3 is 9:30 am UK time Friday  May  15th 2026. 
+ 
+Chris Phillips  
+Last updated 16/11 /202 5 
+ 
+ 
+ 
+ 
+ 
+ 
