@@ -1,0 +1,8 @@
+| Problem | Algorithm | Mean Best | Std Dev | Mean Time | Success Rate |
+|---|---|---|---|---|---|
+| constrained_rosenbrock | PSO | 4.5671e-02 | 3.1210e-18 | 0.2233 | 0.0% |
+| constrained_rosenbrock | SA | 4.6214e-02 | 3.6758e-04 | 0.1845 | 0.0% |
+| rastrigin | PSO | 2.3216e-01 | 4.2801e-01 | 0.1539 | 76.7% |
+| rastrigin | SA | 1.7834e+01 | 1.0630e+01 | 0.1211 | 0.0% |
+| rosenbrock | PSO | 0.0000e+00 | 0.0000e+00 | 0.1766 | 100.0% |
+| rosenbrock | SA | 1.1972e-05 | 8.8129e-06 | 0.1376 | 100.0% |

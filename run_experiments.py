@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from test_functions import PROBLEM_CONFIG
 from optimization_algorithms import SimulatedAnnealing, ParticleSwarm
+from plot_surfaces import generate_3d_plot # Import plotting function
 
 # Ensure results directory exists
 os.makedirs("results", exist_ok=True)
@@ -65,10 +66,6 @@ def interpolate_history(histories, common_x):
         evals = np.array([h[0] for h in hist])
         vals = np.array([h[1] for h in hist])
         
-        # We assume monotonic improvement, so step function is appropriate, 
-        # but linear interp is smoother for visualization. 
-        # Given it's "best so far", step function (filling forward) logic is implicitly what happens between checks.
-        # But np.interp is fine for convergence trends.
         interp_y = np.interp(common_x, evals, vals)
         interpolated_vals.append(interp_y)
         
@@ -76,7 +73,6 @@ def interpolate_history(histories, common_x):
 
 def plot_convergence(res_sa, res_pso, prob_name):
     # Create a common evaluation axis for plotting
-    # From 0 to BUDGET with reasonable resolution (e.g. 100 points)
     common_evals = np.linspace(0, EVALUATION_BUDGET, 200)
     
     # SA Data processing
@@ -100,7 +96,7 @@ def plot_convergence(res_sa, res_pso, prob_name):
     plt.fill_between(common_evals, mean_pso - std_pso, mean_pso + std_pso, color="orange", alpha=0.1)
     
     plt.title(f"Convergence on {prob_name} (Budget: {EVALUATION_BUDGET} Evals)")
-    plt.xlabel("Number of Evaluations (Cost)") # ACADMEICALLY CORRECT AXIS
+    plt.xlabel("Number of Evaluations (Cost)") 
     plt.ylabel("Objective Value (Log Scale)")
     plt.yscale("log")
     plt.legend()
@@ -119,14 +115,14 @@ def run_penalty_sensitivity():
     for pf in penalty_factors:
         vals = []
         violations = []
-        for i in range(10): # Increased to 10 for better stability
+        for i in range(10): 
             algo = ParticleSwarm(
                 func=config["func"],
                 bounds=config["bounds"],
                 dim=config["dim"],
                 seed=i,
                 penalty_factor=pf,
-                max_evals=5000 # Lower budget for sensitivity check is fine
+                max_evals=5000 
             )
             res = algo.solve()
             
@@ -158,7 +154,6 @@ def run_penalty_sensitivity():
 
 def main():
     summary = []
-    # Add metadata to report
     summary.append("# Optimization Experiment Report")
     summary.append(f"**Experiment Budget**: {EVALUATION_BUDGET} Evaluations")
     summary.append("**Method**: Comparison of SA and PSO on equal evaluation cost basis.\n")
@@ -166,6 +161,12 @@ def main():
     all_csv_data = [["Algorithm", "Problem", "Run_ID", "Best_Value", "Time_s", "Evals", "Success"]]
     
     for prob_name, config in PROBLEM_CONFIG.items():
+        # GENERATE 3D PLOT FIRST
+        try:
+            generate_3d_plot(prob_name, config)
+        except Exception as e:
+            print(f"Warning: Could not plot 3D surface for {prob_name}: {e}")
+
         # Run SA
         res_sa, rows_sa = run_single_experiment(SimulatedAnnealing, "SA", prob_name, config)
         all_csv_data.extend(rows_sa)
@@ -174,7 +175,7 @@ def main():
         res_pso, rows_pso = run_single_experiment(ParticleSwarm, "PSO", prob_name, config)
         all_csv_data.extend(rows_pso)
         
-        # Plot
+        # Plot Convergence
         plot_convergence(res_sa, res_pso, prob_name)
         
         # Stats
@@ -189,7 +190,7 @@ def main():
     # Sensitivity
     sens_results = run_penalty_sensitivity()
     summary.append("## Penalty Sensitivity (Constrained Rosenbrock - PSO)")
-    summary.append("| Penalty Factor | Mean Best Val | Mean Violation |")
+    summary.append("| Penalty Factors | Mean Best Val | Mean Violation |")
     summary.append("|---|---|---|")
     for r in sens_results:
         summary.append(f"| {r['penalty']} | {r['mean_val']:.6e} | {r['mean_viol']:.6e} |")
@@ -203,7 +204,7 @@ def main():
         writer = csv.writer(f)
         writer.writerows(all_csv_data)
         
-    print("Experiments completed. Results saved.")
+    print("Experiments completed. 3D Plots, Convergence Plots, and Report saved.")
 
 if __name__ == "__main__":
     main()
