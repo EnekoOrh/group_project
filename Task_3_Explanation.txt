@@ -1,0 +1,55 @@
+TASK 3: EXPLANATION AND BREAKDOWN
+
+1. THE GOAL (What and Why)
+------------------------------------------
+The main goal of Task 3 is to "Investigate Optimization Techniques."
+You are not just solving a math problem; you are conducting a scientific comparison between two specific algorithms: 
+1. Simulated Annealing (SA)
+2. Particle Swarm Optimization (PSO)
+
+Why? The assignment wants you to understand the trade-offs in optimization. No algorithm is perfect. Some are fast but inaccurate; others are accurate but slow (expensive). By comparing them on different problems, you learn which one works best and why.
+
+2. BREAKDOWN (What you actually have to do)
+------------------------------------------
+Here is the plain-english checklist of requirements:
+
+A. Choose 3 Problems:
+   Select three different mathematical functions to optimize. 
+   - They cannot be the "Cooling Tower" problem.
+   - They cannot be the "Griewank" function (from previous modules).
+   - At least one must be "Constrained" (has rules like "x + y < 5").
+   (Note: We selected Rastrigin, Rosenbrock, and Constrained-Rosenbrock, which fits perfectly).
+
+B. Run Experiments:
+   - Solve all 3 problems using Simulated Annealing.
+   - Solve all 3 problems using Particle Swarm Optimization.
+
+C. Measure Performance (The Competition):
+   You need to compare them using specific metrics:
+   - "Number of Evaluations": How many times did the code actually check a solution? This is the "cost" of the algorithm.
+   - "Best Value found": How close to the perfect answer (usually 0) did it get?
+
+D. Penalty Function Analysis:
+   For the constrained problem, you must experiment with the "Penalty Factor" (the number you multiply the error by). 
+   - Try small numbers (1, 10) vs huge numbers (1000, 10000) and see if it helps satisfy the constraint.
+
+E. Visuals:
+   Create graphs (convergence plots) to show how the answer improves over time.
+
+3. INTERPRETATION OF RESULTS (How to read them)
+------------------------------------------
+You have generated a "summary_stats.md" file. Here is how to judge if it is "correct":
+
+A. The "Evaluations" vs "Accuracy" Trade-off:
+   - Your results show PSO finding the perfect answer (0.00), while SA is slightly off (e.g., 0.01 or 17.8).
+   - HOWEVER, your results also show SA used only ~500 evaluations, while PSO used ~15,000.
+   - INTERPRETATION: This result is technically "correct" but it is an "unfair comparison." PSO did 30 times more work, so it naturally got a better answer.
+   - FOR YOUR REPORT: This is a *good* thing to write about. You can explain that "result quality is correlated with computational processing power."
+
+B. The Penalty Sensitivity:
+   - Your results show that when Penalty Factor is low (1), there is a high "Violation" (the answer breaks the rules).
+   - When Penalty Factor is high (10,000), "Violation" is zero.
+   - INTERPRETATION: This is exactly correct. It proves your code works. It means the algorithm "learned" that breaking the rules is too expensive.
+
+C. Conclusion on "Correctness":
+   Yes, your results are correct and logical. They successfully demonstrate the differences between the algorithms and the effect of penalties. You have everything needed for the report.
