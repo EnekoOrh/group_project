@@ -1,8 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-from test_functions import PROBLEM_CONFIG
 import os
+import sys
+
+# Add project root to path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
+
+from src.benchmarks.functions import PROBLEM_CONFIG
 
 # Ensure results directory exists
 os.makedirs("results", exist_ok=True)

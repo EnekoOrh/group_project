@@ -54,6 +54,7 @@ class SimulatedAnnealing(OptimizationAlgorithm):
         
         # History now stores tuples: (eval_count, best_value)
         history = [(self.n_evals, best_val)]
+        trajectory = [current_x.copy()]
         temp = self.temp_init
         
         iteration = 0
@@ -80,13 +81,15 @@ class SimulatedAnnealing(OptimizationAlgorithm):
                 break
                 
             history.append((self.n_evals, best_val))
+            trajectory.append(current_x.copy()) # Track current state
             temp *= self.cooling_rate
             
         end_time = time.time()
         return {
             "best_x": best_x,
             "best_val": best_val,
-            "history": history, 
+            "history": history,
+            "trajectory": np.array(trajectory),
             "time": end_time - start_time,
             "n_evals": self.n_evals
         }
@@ -131,6 +134,7 @@ class ParticleSwarm(OptimizationAlgorithm):
         global_best_val = personal_best_val[global_best_idx]
         
         history = [(self.n_evals, global_best_val)]
+        trajectory = [global_best_x.copy()]
         
         iteration = 0
         while self.n_evals < self.max_evals and iteration < self.max_iter:
@@ -162,12 +166,14 @@ class ParticleSwarm(OptimizationAlgorithm):
                         global_best_x = particles_x[p]
             
             history.append((self.n_evals, global_best_val))
+            trajectory.append(global_best_x.copy()) # Track global best position
             
         end_time = time.time()
         return {
             "best_x": global_best_x,
             "best_val": global_best_val,
             "history": history,
+            "trajectory": np.array(trajectory),
             "time": end_time - start_time,
             "n_evals": self.n_evals
         }

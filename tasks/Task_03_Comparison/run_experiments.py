@@ -1,11 +1,15 @@
-
 import os
 import csv
 import numpy as np
 import matplotlib.pyplot as plt
-from test_functions import PROBLEM_CONFIG
-from optimization_algorithms import SimulatedAnnealing, ParticleSwarm
-from plot_surfaces import generate_3d_plot # Import plotting function
+import sys
+
+# Add project root to path to allow importing from src
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
+
+from src.benchmarks.functions import PROBLEM_CONFIG
+from src.algorithms.stochastics import SimulatedAnnealing, ParticleSwarm
+from src.visualization.plotting import generate_3d_plot # Import plotting function
 
 # Ensure results directory exists
 os.makedirs("results", exist_ok=True)
