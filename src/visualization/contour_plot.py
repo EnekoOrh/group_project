@@ -55,7 +55,7 @@ def plot_contour_trajectory(func, bounds, trajectories, prob_name):
     plt.colorbar(cp, label=z_label)
     
     # 3. Trajectories
-    colors = {"BFGS": "red", "PSO": "orange", "SA": "white"}
+    colors = {"BFGS": "red", "PSO": "orange", "SA": "magenta"}
     styles = {"BFGS": "-", "PSO": "--", "SA": ":"}
     
     for name, traj in trajectories.items():
@@ -63,8 +63,13 @@ def plot_contour_trajectory(func, bounds, trajectories, prob_name):
             continue
             
         # Plot Path
+        # Calculate final value for label
+        final_val = func(traj[-1])
+        if isinstance(final_val, tuple):
+            final_val = final_val[0]
+            
         plt.plot(traj[:, 0], traj[:, 1], 
-                 label=name, 
+                 label=f"{name} ({final_val:.2e})", 
                  color=colors.get(name, "black"), 
                  linestyle=styles.get(name, "-"),
                  linewidth=1.5,

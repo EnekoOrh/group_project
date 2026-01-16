@@ -17,3 +17,17 @@
     -   *Efficiency*: BFGS stops automatically when gradient $\approx 0$ (~200 evals), whereas pure stochastic methods exhaust the full budget (10k evals).
     -   *Interpretation*: The "short line" for BFGS in plots represents efficiency (solved quickly), not premature failure (unless it stopped at a high cost value like in Rastrigin).
 - **"Over The Top" Feature**: Implemented `plot_contour_trajectory.py` to visualize the spatial search path on filled contours. Successfully demonstrated BFGS "sprinting" vs PSO "teleporting".
+
+## 2026-01-16: Unified Execution
+- **Objective**: Ensure reproducibility and ease of use for the professor/user.
+- **Action**: Created `run_project.py` to unify execution of Task 3 and Task 4.
+    -   *Features*: Task selection (`--task 3|4|all`) and automated cleanup of `results/` folders.
+    -   *Benefit*: A single command (`python run_project.py`) now regenerates all data and plots from scratch, guaranteeing "fresh" results.
+
+## 2026-01-16: Refinement & Validation
+- **Visualization Standardization**: Unifying plotting styles across Task 3 and 4.
+    -   *Colors*: BFGS (Red), SA (Magenta/Pink), PSO (Orange).
+    -   *Metrics*: Added final/mean objective values directly to plot legends.
+- **Robustness Check**: Implemented `--random` seeding in `run_project.py` to verify data freshness.
+- **Explicit Seeding**: Added `--seed <int>` argument to `run_project.py` for fully deterministic reproducibility.
+- **BFGS Bounds**: Confirmed that BFGS exceeding search bounds is expected behavior for unconstrained optimization on valley-like functions (Rosenbrock).

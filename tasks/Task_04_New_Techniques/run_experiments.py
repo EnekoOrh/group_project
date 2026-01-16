@@ -12,6 +12,7 @@ from src.benchmarks.functions import PROBLEM_CONFIG
 from src.algorithms.stochastics import SimulatedAnnealing, ParticleSwarm
 from src.algorithms.deterministic import BFGS
 from src.visualization.contour_plot import plot_contour_trajectory
+from src.visualization.plotting import plot_3d_trajectory
 
 # Constants
 EVALUATION_BUDGET = 10000 # Increased to match Task 3 for fair long-run comparison
@@ -34,9 +35,9 @@ def plot_log_log_comparison(res_bfgs, res_pso, res_sa, prob_name):
     xp, yp = extract_xy(get_best_hist(res_pso))
     xs, ys = extract_xy(get_best_hist(res_sa))
     
-    plt.plot(xb, yb, label="BFGS (Deterministic)", color="red", marker="o", markersize=3, linestyle="-")
-    plt.plot(xp, yp, label="PSO (Stochastic)", color="orange", linestyle="-")
-    plt.plot(xs, ys, label="SA (Stochastic)", color="blue", linestyle="-")
+    plt.plot(xb, yb, label=f"BFGS ({yb[-1]:.2e})", color="red", marker="o", markersize=3, linestyle="-")
+    plt.plot(xp, yp, label=f"PSO ({yp[-1]:.2e})", color="orange", linestyle="-")
+    plt.plot(xs, ys, label=f"SA ({ys[-1]:.2e})", color="magenta", linestyle="-")
     
     plt.title(f"Convergence Comparison: {prob_name} (Log-Log Scale)")
     plt.xlabel("Function Evaluations (Log Scale)")
@@ -80,7 +81,7 @@ def plot_early_convergence(res_bfgs, res_pso, res_sa, prob_name):
     
     plt.plot(xb, yb, label="BFGS", color="red", marker="o", markersize=3)
     plt.plot(xp, yp, label="PSO", color="orange")
-    plt.plot(xs, ys, label="SA", color="blue")
+    plt.plot(xs, ys, label="SA", color="magenta")
     
     plt.title(f"Early Convergence: {prob_name} (First {limit} Evals)")
     plt.xlabel("Function Evaluations")
@@ -93,8 +94,12 @@ def plot_early_convergence(res_bfgs, res_pso, res_sa, prob_name):
     plt.savefig(f"tasks/Task_04_New_Techniques/results/{prob_name}_early_convergence.png")
     plt.close()
 
-def run_batch(AlgoClass, name, config, **kwargs):
-    print(f"Running {name} on {config['name']}...")
+import argparse
+
+# ... (Imports remain the same)
+
+def run_batch(AlgoClass, name, config, seed_offset=0, **kwargs):
+    print(f"Running {name} on {config['name']} (Seed Offset: {seed_offset})...")
     best_vals = []
     times = []
     evals = []
@@ -108,7 +113,7 @@ def run_batch(AlgoClass, name, config, **kwargs):
             bounds=config["bounds"],
             dim=config["dim"],
             max_evals=EVALUATION_BUDGET,
-            seed=i,
+            seed=i + seed_offset,
             **kwargs
         )
         res = algo.solve()
@@ -127,9 +132,16 @@ def run_batch(AlgoClass, name, config, **kwargs):
     }
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--seed-offset", type=int, default=0, help="Offset to add to random seeds")
+    args = parser.parse_args()
+    
+    seed_offset = args.seed_offset
+
     probs = ["rastrigin", "rosenbrock"] # Only unconstrained for BFGS comparison
     
     summary = ["# Task 4 Experiment Summary"]
+    summary.append(f"**Seed Offset**: {seed_offset}")
     
     
     # Store raw rows for CSV
@@ -152,15 +164,15 @@ def main():
                 ])
 
         # 1. Run BFGS
-        res_bfgs = run_batch(BFGS, "BFGS", config, tol=1e-6)
+        res_bfgs = run_batch(BFGS, "BFGS", config, seed_offset=seed_offset, tol=1e-6)
         process_res("BFGS", res_bfgs)
         
         # 2. Run PSO
-        res_pso = run_batch(ParticleSwarm, "PSO", config)
+        res_pso = run_batch(ParticleSwarm, "PSO", config, seed_offset=seed_offset)
         process_res("PSO", res_pso)
         
         # 3. Run SA
-        res_sa = run_batch(SimulatedAnnealing, "SA", config)
+        res_sa = run_batch(SimulatedAnnealing, "SA", config, seed_offset=seed_offset)
         process_res("SA", res_sa)
         
         # 4. Plot
@@ -178,6 +190,7 @@ def main():
             "SA": get_best_traj(res_sa)
         }
         plot_contour_trajectory(config["func"], config["bounds"], trajectories, p_name)
+        plot_3d_trajectory(config["func"], config["bounds"], trajectories, p_name)
         
         # 5. Stats
         summary.append(f"\n## Problem: {p_name}")
