@@ -57,4 +57,17 @@ python run_project.py --seed 12345
 
 *   Python 3.x
 *   NumPy
+*   NumPy
 *   Matplotlib
+*   Plotly (for interactive HTML plots)
+
+## Visualizations
+
+### Interactive 3D Trajectories (`.html`)
+The framework now generates interactive 3D surface plots for Task 4. 
+- **Location**: `tasks/Task_04_New_Techniques/results/*.html`
+- **Features**: Rotate, zoom, and inspect exact convergence paths of BFGS, PSO, and SA.
+- **Colors**: 
+    - **BFGS** (Red)
+    - **PSO** (Orange)
+    - **SA** (Magenta)

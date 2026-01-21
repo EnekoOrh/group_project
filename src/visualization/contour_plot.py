@@ -38,7 +38,11 @@ def plot_contour_trajectory(func, bounds, trajectories, prob_name):
     Z = np.zeros_like(X)
     for i in range(X.shape[0]):
         for j in range(X.shape[1]):
-            Z[i, j] = func([X[i, j], Y[i, j]])
+            val = func([X[i, j], Y[i, j]])
+            if isinstance(val, tuple):
+                Z[i, j] = val[0]
+            else:
+                Z[i, j] = val
             
     # Apply Log Scale for Z if range is huge (like Rosenbrock)
     if "rosenbrock" in prob_name.lower():

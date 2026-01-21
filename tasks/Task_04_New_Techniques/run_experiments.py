@@ -12,7 +12,7 @@ from src.benchmarks.functions import PROBLEM_CONFIG
 from src.algorithms.stochastics import SimulatedAnnealing, ParticleSwarm
 from src.algorithms.deterministic import BFGS
 from src.visualization.contour_plot import plot_contour_trajectory
-from src.visualization.plotting import plot_3d_trajectory
+from src.visualization.plotting import plot_3d_trajectory, plot_3d_trajectory_interactive
 
 # Avoid hardcoded paths - make robust to execution location
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -196,6 +196,7 @@ def main():
             }
             plot_contour_trajectory(config["func"], config["bounds"], trajectories, p_name)
             plot_3d_trajectory(config["func"], config["bounds"], trajectories, p_name)
+            plot_3d_trajectory_interactive(config["func"], config["bounds"], trajectories, p_name)
 
             # Stats
             summary.append(f"\n## Problem: {p_name}")
@@ -211,74 +212,76 @@ def main():
 
         # --- CONSTRAINED RUNS (BFGS ONLY - EXPERIMENT) ---
         else:
-            print(f"--- Running Penalty Experiments on {p_name} ---")
-            penalty_factors = [1, 10, 100, 1000, 10000]
+            print(f"--- Running Constrained Comparison Experiments on {p_name} ---")
             
-            summary.append(f"\n## Problem: {p_name} (Constrained BFGS Analysis)")
-            summary.append("| Penalty Factor | Mean Total Cost | Mean Evals |")
-            summary.append("|---|---|---|")
+            # Use a fixed high penalty factor for comparison
+            r = 1000 
+            print(f"Using Fixed Penalty Factor: {r}")
 
-            for r in penalty_factors:
-                print(f"  > Penalty Factor: {r}")
-                
-                # Create wrapper for this specific r
-                def penalized_func(x, grad=False):
-                    from src.benchmarks.functions import penalty_function
-                    # Note: We are not handling gradients for penalty yet in simple wrapper
-                    # If BFGS requests gradient, this wrapper might fail if functions.py doesn't support it 
-                    # But rosenbrock DOES support grad. 
-                    # Let's assume for this specific experiment we use numerical approximation 
-                    # OR we accept that BFGS might struggle if grad is wrong.
-                    # HOWEVER, deterministic.py BFGS expects grad=True.
-                    # Simple fix: We will rely on BFGS to just work with values if we wrap it, 
-                    # OR we need a gradient-aware penalty wrapper.
-                    # For now, let's use the objective ONLY if grad is False, 
-                    # But wait, BFGS needs gradients. 
-                    # We will use valid grad for the objective part and ignore constraint gradient 
-                    # OR (better) use numerical gradient if analytic is hard.
-                    # To keep it simple: We reuse the EXISTING penalty_function structure
-                    
-                    val, violation = config["func"](x)
-                    cost = val + r * (violation**2)
-                    
-                    # Hack: Return 0 gradient to force FD approximation if the algo supports it? 
-                    # No, our BFGS expects explicit gradient.
-                    # If we don't provide it, we crash. 
-                    # We must provide a gradient.
-                    
-                    # Gradient of Penalty: 2 * r * violation * grad(violation)
-                    # Violation = sum(x^2) - 1. Grad(Violation) = 2x
-                    # This is specific to Constrained Rosenbrock.
-                    
-                    if grad:
-                         _, g_obj = PROBLEM_CONFIG["rosenbrock"]["func"](x, grad=True)
-                         if violation > 0:
-                             g_constr = 2 * x 
-                             g_total = g_obj + r * 2 * violation * g_constr
-                         else:
-                             g_total = g_obj
-                         return cost, g_total
-                         
-                    return cost
+            summary.append(f"\n## Problem: {p_name} (Constrained Comparison)")
+            summary.append("| Algorithm | Mean Best (Penalized) | Mean Evals | Mean Time |")
+            summary.append("|---|---|---|---|")
 
-                # Create a temporary config for this run
-                temp_config = config.copy()
-                temp_config["func"] = penalized_func
+            # Create wrapper for this specific r
+            def penalized_func(x, grad=False):
+                # Re-import inside function not strictly needed if at top, but safe given prior context
+                val, violation = config["func"](x)
+                cost = val + r * (violation**2)
                 
-                # Run BFGS
-                res_r = run_batch(BFGS, f"BFGS_r{r}", temp_config, seed_offset=seed_offset)
-                process_res(f"BFGS_r{r}", res_r, penalty_factor=r)
-                
-                mean_best = np.mean(res_r["best_vals"])
-                mean_evals = np.mean(res_r["evals"])
-                summary.append(f"| {r} | {mean_best:.4e} | {mean_evals:.1f} |")
-                
-                # Decompose one result for detail tracking
-                # Just take the last run's best x
-                last_x = res_r["times"] # Dummy read using correct key
-                # We need to manually recalc the breakdown
-                # x_best = ... (we didn't store x_best in run_batch return dict efficiently)
-                # But we have trajectories? No, we have best_vals.
+                if grad:
+                        _, g_obj = PROBLEM_CONFIG["rosenbrock"]["func"](x, grad=True)
+                        if violation > 0:
+                            g_constr = 2 * x 
+                            g_total = g_obj + r * 2 * violation * g_constr
+                        else:
+                            g_total = g_obj
+                        return cost, g_total
+                        
+                return cost
+
+            # Create a temporary config for this run
+            temp_config = config.copy()
+            temp_config["func"] = penalized_func
+            
+            # 1. Run BFGS
+            res_bfgs = run_batch(BFGS, "BFGS", temp_config, seed_offset=seed_offset, tol=1e-6)
+            process_res("BFGS", res_bfgs, penalty_factor=r)
+            
+            # 2. Run PSO
+            res_pso = run_batch(ParticleSwarm, "PSO", temp_config, seed_offset=seed_offset)
+            process_res("PSO", res_pso, penalty_factor=r)
+            
+            # 3. Run SA
+            res_sa = run_batch(SimulatedAnnealing, "SA", temp_config, seed_offset=seed_offset)
+            process_res("SA", res_sa, penalty_factor=r)
+            
+            # Comparison Plot (Log-Log)
+            plot_log_log_comparison(res_bfgs, res_pso, res_sa, p_name)
+
+            # Stats
+            def row(name, r):
+                return f"| {name} | {np.mean(r['best_vals']):.2e} | {np.mean(r['evals']):.1f} | {np.mean(r['times']):.4f} |"
+            
+            summary.append(row("BFGS", res_bfgs))
+            summary.append(row("PSO", res_pso))
+            summary.append(row("SA", res_sa))
+
+            # Capture trajectories for plotting (Standard Colors automatically handled by keys)
+            def get_best_traj(results):
+                best_idx = np.argmin(results["best_vals"])
+                return results["trajectories"][best_idx]
+            
+            constrained_trajectories = {
+                "BFGS": get_best_traj(res_bfgs),
+                "PSO": get_best_traj(res_pso),
+                "SA": get_best_traj(res_sa)
+            }
+
+            # Plot trajectories for constrained runs
+            print(f"Generating plots for {p_name}...")
+            plot_contour_trajectory(config["func"], config["bounds"], constrained_trajectories, p_name)
+            plot_3d_trajectory(config["func"], config["bounds"], constrained_trajectories, p_name)
+            plot_3d_trajectory_interactive(config["func"], config["bounds"], constrained_trajectories, p_name)
 
     with open(os.path.join(RESULTS_DIR, "summary.md"), "w") as f:
         f.write("\n".join(summary))

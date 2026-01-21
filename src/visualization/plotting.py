@@ -164,3 +164,115 @@ def plot_3d_trajectory(func, bounds, trajectories, prob_name):
     plt.savefig(output_file, dpi=300)
     plt.close()
     print(f"Saved 3D trajectory to {output_file}")
+
+def plot_3d_trajectory_interactive(func, bounds, trajectories, prob_name):
+    """
+    Generates an interactive 3D surface plot with optimization trajectories overlaid using Plotly.
+    Saves as an HTML file.
+    """
+    try:
+        import plotly.graph_objects as go
+    except ImportError:
+        print("Plotly not installed. Skipping interactive plot.")
+        return
+
+    print(f"Generating Interactive 3D plot for {prob_name}...")
+    
+    # 1. Setup Grid
+    if len(bounds) == 2 and isinstance(bounds[0], (int, float)):
+        x_min, x_max = bounds[0], bounds[1]
+        y_min, y_max = bounds[0], bounds[1]
+    else:
+        x_min, x_max = bounds[0][0], bounds[0][1]
+        y_min, y_max = bounds[1][0], bounds[1][1]
+        
+    x = np.linspace(x_min, x_max, 100)
+    y = np.linspace(y_min, y_max, 100)
+    X, Y = np.meshgrid(x, y)
+    
+    Z = np.zeros_like(X)
+    for i in range(X.shape[0]):
+        for j in range(X.shape[1]):
+            val = func([X[i, j], Y[i, j]])
+            if isinstance(val, tuple):
+                Z[i, j] = val[0]
+            else:
+                Z[i, j] = val
+
+    # 2. Create Plotly Figure
+    fig = go.Figure()
+
+    # Surface
+    fig.add_trace(go.Surface(z=Z, x=X, y=Y, colorscale='Viridis', opacity=0.8, name='Surface'))
+
+    # 3. Add Trajectories
+    colors = {"BFGS": "red", "PSO": "orange", "SA": "magenta"}
+
+    for name, traj in trajectories.items():
+        if traj is None or len(traj) == 0:
+            continue
+            
+        traj_z = []
+        for point in traj:
+            val = func(point)
+            if isinstance(val, tuple):
+                traj_z.append(val[0])
+            else:
+                traj_z.append(val)
+        traj_z = np.array(traj_z)
+        
+        # Lift slightly
+        lift = (np.max(Z) - np.min(Z)) * 0.01
+        
+        fig.add_trace(go.Scatter3d(
+            x=traj[:, 0], y=traj[:, 1], z=traj_z + lift,
+            mode='lines+markers',
+            name=name,
+            line=dict(color=colors.get(name, "black"), width=4),
+            marker=dict(size=4)
+        ))
+        
+        # Start/End markers
+        fig.add_trace(go.Scatter3d(
+            x=[traj[0, 0]], y=[traj[0, 1]], z=[traj_z[0] + lift],
+            mode='markers',
+            name=f'{name} Start',
+            marker=dict(size=6, color=colors.get(name, "black"), symbol='x')
+        ))
+        fig.add_trace(go.Scatter3d(
+            x=[traj[-1, 0]], y=[traj[-1, 1]], z=[traj_z[-1] + lift],
+            mode='markers',
+            name=f'{name} End',
+            marker=dict(size=6, color=colors.get(name, "black"), symbol='circle')
+        ))
+
+    fig.update_layout(
+        title=f"3D Trajectory - {prob_name}",
+        scene=dict(
+            xaxis_title='X',
+            yaxis_title='Y',
+            zaxis_title='Objective Value'
+        ),
+        width=1200,
+        height=800,
+        margin=dict(l=0, r=0, b=0, t=50) # Tight layout
+    )
+    
+    # Save HTML
+    # Use robust path logic similar to run_experiments if possible, 
+    # but here we rely on the caller or default to local results if running from root.
+    # We will try to save to the known Task 4 results dir if it exists, else local results.
+    
+    # Check if we are in Task 4 context based on known structure
+    # Hardcoded best-effort path based on project structure knowledge
+    target_dir = os.path.join(os.path.dirname(__file__), "../../tasks/Task_04_New_Techniques/results")
+    if not os.path.exists(target_dir):
+        # Fallback to local results
+        target_dir = "results"
+        
+    os.makedirs(target_dir, exist_ok=True)
+    output_file = os.path.join(target_dir, f"{prob_name}_trajectory_Interactive.html")
+    
+    fig.write_html(output_file)
+    print(f"Saved Interactive 3D plot to {output_file}")
+

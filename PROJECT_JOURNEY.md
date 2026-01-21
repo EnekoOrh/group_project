@@ -31,3 +31,11 @@
 - **Robustness Check**: Implemented `--random` seeding in `run_project.py` to verify data freshness.
 - **Explicit Seeding**: Added `--seed <int>` argument to `run_project.py` for fully deterministic reproducibility.
 - **BFGS Bounds**: Confirmed that BFGS exceeding search bounds is expected behavior for unconstrained optimization on valley-like functions (Rosenbrock).
+
+## 2026-01-21: Task 4 - Advanced Techniques & Visualization
+- **Implemented**: Deterministic optimization using **BFGS** (Quasi-Newton method) with analytic gradients.
+- **Developed**: Constrained optimization support for BFGS using a **Penalty Method** wrapper.
+- **Visualized**: Created **Interactive 3D Trajectory Plots** using Plotly (`.html` output), allowing real-time exploration of the optimization path on the fitness landscape.
+- **Compared**: Benchmarked BFGS against PSO and SA on Unconstrained (Rastrigin, Rosenbrock) and Constrained (Constrained Rosenbrock) problems.
+- **Refined**: Standardized color schemes across all plots (BFGS=Red, PSO=Orange, SA=Magenta) for consistent academic reporting.
+- **Robustness**: Fixed output path handling to ensure scripts run correctly from any directory.
