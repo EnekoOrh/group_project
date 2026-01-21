@@ -59,11 +59,11 @@ All mandatory experiments (Unconstrained + Constrained + Penalty Analysis) have 
 *   **Purpose**: Present the evidence.
 
 #### 4.1 Case 1: Unimodal Efficiency (Rosenbrock)
-*   **Observation**: BFGS converges extremely fast.
+*   **Observation**: BFGS converges significantly faster than stochastic methods.
 *   **Evidence**:
-    *   Table Row: BFGS (~700 evals) vs PSO (10,000 evals).
+    *   Table Row: BFGS (~705 evals) vs PSO (10,020 evals).
     *   Figure: `rosenbrock_log_log_comparison.png`.
-*   **Analysis**: The Log-Log plot shows BFGS dropping vertically (super-linear rate), while PSO drifts slowly. This confirms the dominance of gradient methods on smooth valleys.
+*   **Analysis**: The Log-Log plot shows BFGS dropping quickly (linear/super-linear rate), while PSO drifts. BFGS achieves a decent solution ($8.46 \times 10^{-2}$) in <10% of the budget used by PSO. Note that BFGS stopped early due to the gradient norm condition ($<10^{-6}$), explaining why it didn't grind down to machine precision like an infinite run might.
 
 #### 4.2 Case 2: Multimodal Trap (Rastrigin)
 *   **Observation**: BFGS fails significantly.
