@@ -14,6 +14,11 @@ from src.algorithms.deterministic import BFGS
 from src.visualization.contour_plot import plot_contour_trajectory
 from src.visualization.plotting import plot_3d_trajectory
 
+# Avoid hardcoded paths - make robust to execution location
+script_dir = os.path.dirname(os.path.abspath(__file__))
+RESULTS_DIR = os.path.join(script_dir, "results")
+os.makedirs(RESULTS_DIR, exist_ok=True)
+
 # Constants
 EVALUATION_BUDGET = 10000 # Increased to match Task 3 for fair long-run comparison
 RUNS = 20 
@@ -47,8 +52,7 @@ def plot_log_log_comparison(res_bfgs, res_pso, res_sa, prob_name):
     plt.legend()
     plt.grid(True, which="both", alpha=0.3)
     
-    os.makedirs("tasks/Task_04_New_Techniques/results", exist_ok=True)
-    plt.savefig(f"tasks/Task_04_New_Techniques/results/{prob_name}_log_log_comparison.png")
+    plt.savefig(os.path.join(RESULTS_DIR, f"{prob_name}_log_log_comparison.png"))
     plt.close()
 
 def plot_early_convergence(res_bfgs, res_pso, res_sa, prob_name):
@@ -90,8 +94,7 @@ def plot_early_convergence(res_bfgs, res_pso, res_sa, prob_name):
     plt.legend()
     plt.grid(True, which="both", alpha=0.3)
     
-    os.makedirs("tasks/Task_04_New_Techniques/results", exist_ok=True)
-    plt.savefig(f"tasks/Task_04_New_Techniques/results/{prob_name}_early_convergence.png")
+    plt.savefig(os.path.join(RESULTS_DIR, f"{prob_name}_early_convergence.png"))
     plt.close()
 
 import argparse
@@ -204,14 +207,14 @@ def main():
         summary.append(row("PSO", res_pso))
         summary.append(row("SA", res_sa))
         
-    with open("tasks/Task_04_New_Techniques/results/summary.md", "w") as f:
+    with open(os.path.join(RESULTS_DIR, "summary.md"), "w") as f:
         f.write("\n".join(summary))
         
-    with open("tasks/Task_04_New_Techniques/results/task4_raw.csv", "w", newline='') as f:
+    with open(os.path.join(RESULTS_DIR, "task4_raw.csv"), "w", newline='') as f:
         writer = csv.writer(f)
         writer.writerows(all_rows)
         
-    print("Done. Results saved to tasks/Task_04_New_Techniques/results/")
+    print(f"Done. Results saved to {RESULTS_DIR}")
 
 if __name__ == "__main__":
     main()

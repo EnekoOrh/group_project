@@ -12,7 +12,9 @@ from src.algorithms.stochastics import SimulatedAnnealing, ParticleSwarm
 from src.visualization.plotting import generate_3d_plot # Import plotting function
 
 # Ensure results directory exists
-os.makedirs("results", exist_ok=True)
+script_dir = os.path.dirname(os.path.abspath(__file__))
+RESULTS_DIR = os.path.join(script_dir, "results")
+os.makedirs(RESULTS_DIR, exist_ok=True)
 
 # ACADEMIC STANDARD: Evaluation Budget
 # Using a fixed evaluation budget ensures fair comparison.
@@ -110,7 +112,7 @@ def plot_convergence(res_sa, res_pso, prob_name):
     plt.legend()
     plt.grid(True, which="both", ls="-", alpha=0.2)
     
-    plt.savefig(f"results/{prob_name}_convergence.png")
+    plt.savefig(os.path.join(RESULTS_DIR, f"{prob_name}_convergence.png"))
     plt.close()
 
 def run_penalty_sensitivity():
@@ -155,7 +157,7 @@ def run_penalty_sensitivity():
     plt.xlabel("Penalty Factor (Log Scale)")
     plt.ylabel("Mean Constraint Violation")
     plt.grid(True)
-    plt.savefig("results/penalty_sensitivity.png")
+    plt.savefig(os.path.join(RESULTS_DIR, "penalty_sensitivity.png"))
     plt.close()
     
     return results
@@ -207,11 +209,11 @@ def main():
     # For now, leaving sensitivity as is or updating it? Let's update it for consistency.
     
     # Write summary
-    with open("results/summary_stats.md", "w") as f:
+    with open(os.path.join(RESULTS_DIR, "summary_stats.md"), "w") as f:
         f.write("\n".join(summary))
         
     # Write CSV
-    with open("results/all_experiments_data.csv", "w", newline='') as f:
+    with open(os.path.join(RESULTS_DIR, "all_experiments_data.csv"), "w", newline='') as f:
         writer = csv.writer(f)
         writer.writerows(all_csv_data)
         

@@ -1,10 +1,15 @@
 
 import csv
+import os
 import statistics
 
 def main():
     data = {}
-    with open('results/all_experiments_data.csv', 'r') as f:
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    results_dir = os.path.join(script_dir, "results")
+    
+    csv_file = os.path.join(results_dir, 'all_experiments_data.csv')
+    with open(csv_file, 'r') as f:
         reader = csv.DictReader(f)
         for row in reader:
             key = (row['Problem'], row['Algorithm'])
@@ -14,7 +19,8 @@ def main():
             data[key]['time'].append(float(row['Time_s']))
             data[key]['success'].append(1 if row['Success'] == 'True' else 0)
 
-    with open('stats_output_clean.txt', 'w', encoding='utf-8') as outfile:
+    output_file = os.path.join(results_dir, 'stats_output_clean.txt')
+    with open(output_file, 'w', encoding='utf-8') as outfile:
         outfile.write("| Problem | Algorithm | Mean Best | Std Dev | Mean Time | Success Rate |\n")
         outfile.write("|---|---|---|---|---|---|\n")
         
