@@ -10,9 +10,10 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"
 from src.benchmarks.functions import PROBLEM_CONFIG
 
 # Ensure results directory exists
-os.makedirs("results", exist_ok=True)
+# Result directory creation will be handled by individual functions based on provided output_dir
 
-def generate_3d_plot(prob_name, config):
+
+def generate_3d_plot(prob_name, config, output_dir="results"):
     print(f"Generating 3D plot for {prob_name}...")
     
     # Extract config
@@ -64,7 +65,8 @@ def generate_3d_plot(prob_name, config):
     
     fig.colorbar(surf, shrink=0.5, aspect=5)
     
-    output_file = f"results/{prob_name}_3d_surface.png"
+    os.makedirs(output_dir, exist_ok=True)
+    output_file = os.path.join(output_dir, f"{prob_name}_3d_surface.png")
     plt.savefig(output_file, dpi=300)
     plt.close()
     print(f"Saved to {output_file}")
@@ -79,7 +81,7 @@ def main():
 if __name__ == "__main__":
     main()
 
-def plot_3d_trajectory(func, bounds, trajectories, prob_name):
+def plot_3d_trajectory(func, bounds, trajectories, prob_name, output_dir="results"):
     """
     Generates a 3D surface plot with optimization trajectories overlaid.
     """
@@ -158,14 +160,13 @@ def plot_3d_trajectory(func, bounds, trajectories, prob_name):
     
     fig.colorbar(surf, shrink=0.5, aspect=10)
     
-    output_dir = "tasks/Task_04_New_Techniques/results"
     os.makedirs(output_dir, exist_ok=True)
     output_file = os.path.join(output_dir, f"{prob_name}_trajectory_3d.png")
     plt.savefig(output_file, dpi=300)
     plt.close()
     print(f"Saved 3D trajectory to {output_file}")
 
-def plot_3d_trajectory_interactive(func, bounds, trajectories, prob_name):
+def plot_3d_trajectory_interactive(func, bounds, trajectories, prob_name, output_dir="results"):
     """
     Generates an interactive 3D surface plot with optimization trajectories overlaid using Plotly.
     Saves as an HTML file.
@@ -259,19 +260,8 @@ def plot_3d_trajectory_interactive(func, bounds, trajectories, prob_name):
     )
     
     # Save HTML
-    # Use robust path logic similar to run_experiments if possible, 
-    # but here we rely on the caller or default to local results if running from root.
-    # We will try to save to the known Task 4 results dir if it exists, else local results.
-    
-    # Check if we are in Task 4 context based on known structure
-    # Hardcoded best-effort path based on project structure knowledge
-    target_dir = os.path.join(os.path.dirname(__file__), "../../tasks/Task_04_New_Techniques/results")
-    if not os.path.exists(target_dir):
-        # Fallback to local results
-        target_dir = "results"
-        
-    os.makedirs(target_dir, exist_ok=True)
-    output_file = os.path.join(target_dir, f"{prob_name}_trajectory_Interactive.html")
+    os.makedirs(output_dir, exist_ok=True)
+    output_file = os.path.join(output_dir, f"{prob_name}_trajectory_Interactive.html")
     
     fig.write_html(output_file)
     print(f"Saved Interactive 3D plot to {output_file}")

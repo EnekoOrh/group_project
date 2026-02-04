@@ -180,7 +180,7 @@ def main():
     for prob_name, config in PROBLEM_CONFIG.items():
         # GENERATE 3D PLOT FIRST
         try:
-            generate_3d_plot(prob_name, config)
+            generate_3d_plot(prob_name, config, output_dir=RESULTS_DIR)
         except Exception as e:
             print(f"Warning: Could not plot 3D surface for {prob_name}: {e}")
 

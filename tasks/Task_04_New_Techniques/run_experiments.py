@@ -194,9 +194,9 @@ def main():
                 "PSO": get_best_traj(res_pso),
                 "SA": get_best_traj(res_sa)
             }
-            plot_contour_trajectory(config["func"], config["bounds"], trajectories, p_name)
-            plot_3d_trajectory(config["func"], config["bounds"], trajectories, p_name)
-            plot_3d_trajectory_interactive(config["func"], config["bounds"], trajectories, p_name)
+            plot_contour_trajectory(config["func"], config["bounds"], trajectories, p_name, output_dir=RESULTS_DIR)
+            plot_3d_trajectory(config["func"], config["bounds"], trajectories, p_name, output_dir=RESULTS_DIR)
+            plot_3d_trajectory_interactive(config["func"], config["bounds"], trajectories, p_name, output_dir=RESULTS_DIR)
 
             # Stats
             summary.append(f"\n## Problem: {p_name}")
@@ -279,9 +279,9 @@ def main():
 
             # Plot trajectories for constrained runs
             print(f"Generating plots for {p_name}...")
-            plot_contour_trajectory(config["func"], config["bounds"], constrained_trajectories, p_name)
-            plot_3d_trajectory(config["func"], config["bounds"], constrained_trajectories, p_name)
-            plot_3d_trajectory_interactive(config["func"], config["bounds"], constrained_trajectories, p_name)
+            plot_contour_trajectory(config["func"], config["bounds"], constrained_trajectories, p_name, output_dir=RESULTS_DIR)
+            plot_3d_trajectory(config["func"], config["bounds"], constrained_trajectories, p_name, output_dir=RESULTS_DIR)
+            plot_3d_trajectory_interactive(config["func"], config["bounds"], constrained_trajectories, p_name, output_dir=RESULTS_DIR)
 
     with open(os.path.join(RESULTS_DIR, "summary.md"), "w") as f:
         f.write("\n".join(summary))

@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
-def plot_contour_trajectory(func, bounds, trajectories, prob_name):
+def plot_contour_trajectory(func, bounds, trajectories, prob_name, output_dir="results"):
     """
     Generates a 2D filled contour plot of the function and overlays the search trajectories.
     
@@ -12,6 +12,7 @@ def plot_contour_trajectory(func, bounds, trajectories, prob_name):
         bounds: List of [min, max] for each dimension (assumes 2D).
         trajectories: Dict of {AlgoName: trajectory_array}.
         prob_name: Name of the problem (for title/filename).
+        output_dir: Directory to save the plot.
     """
     if len(bounds) != 2:
         print("Contour plot only supported for 2D problems.")
@@ -90,6 +91,7 @@ def plot_contour_trajectory(func, bounds, trajectories, prob_name):
     plt.ylabel("x2")
     plt.legend()
     
-    os.makedirs("tasks/Task_04_New_Techniques/results", exist_ok=True)
-    plt.savefig(f"tasks/Task_04_New_Techniques/results/{prob_name}_trajectory_contour.png", dpi=300)
+    os.makedirs(output_dir, exist_ok=True)
+    output_path = os.path.join(output_dir, f"{prob_name}_trajectory_contour.png")
+    plt.savefig(output_path, dpi=300)
     plt.close()
