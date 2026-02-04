@@ -2,11 +2,49 @@
 
 A comparative study of optimization algorithms (Simulated Annealing, Particle Swarm Optimization, and BFGS) applied to standard benchmarks (Rastrigin, Rosenbrock) and engineering problems.
 
+## Project Structure
+
+```text
+.
+├── src/                    # Core algorithms and utilities
+│   ├── algorithms/         # SA, PSO, BFGS implementations
+│   ├── benchmarks/         # Optimization functions (Rastrigin, etc.)
+│   └── visualization/      # Plotting helpers
+├── tasks/                  # Task-specific configurations and experiments
+│   ├── Task_03_Comparison/ # Stochastic comparison scripts
+│   └── Task_04_New_Techniques/ # Gradient-based & advanced viz scripts
+├── run_project.py          # Universal entry point
+├── requirements.txt        # Project dependencies
+├── setup_env.sh            # Setup script (Mac/Linux)
+└── setup_env.bat           # Setup script (Windows)
+```
+
 ## Quick Start
 
-The project includes a unified runner script `run_project.py` to easily execute experiments and regenerate results.
+### 1. Setup Environment
+First, create the virtual environment and install dependencies using the provided script.
 
-### Running Tasks
+**Mac/Linux:**
+```bash
+# Make script executable (first time only)
+chmod +x setup_env.sh
+
+# Run setup
+./setup_env.sh
+
+# Activate environment
+source .venv/bin/activate
+```
+
+**Windows:**
+```cmd
+setup_env.bat
+.venv\Scripts\activate
+```
+
+### 2. Running Tasks
+
+The project includes a unified runner script `run_project.py`.
 
 To run the entire project (Task 3 and Task 4):
 ```bash
@@ -45,18 +83,9 @@ To use a specific seed (for reproducibility):
 python run_project.py --seed 12345
 ```
 
-## Structure
-
-*   `src/`: Core implementation of algorithms and benchmarks.
-*   `tasks/`: Task-specific scripts and reports.
-    *   `Task_03_Comparison/`: Initial stochastic methods comparison.
-    *   `Task_04_New_Techniques/`: Implementation of BFGS and advanced visualizations.
-*   `run_project.py`: Main entry point.
-
 ## Requirements
 
 *   Python 3.x
-*   NumPy
 *   NumPy
 *   Matplotlib
 *   Plotly (for interactive HTML plots)
