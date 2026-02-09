@@ -12,7 +12,8 @@ A comparative study of optimization algorithms (Simulated Annealing, Particle Sw
 │   └── visualization/      # Plotting helpers
 ├── tasks/                  # Task-specific configurations and experiments
 │   ├── Task_03_Comparison/ # Stochastic comparison scripts
-│   └── Task_04_New_Techniques/ # Gradient-based & advanced viz scripts
+│   ├── Task_04_New_Techniques/ # Gradient-based & advanced viz scripts
+│   └── Task_06_Cooling_Tower/ # Cooling tower optimization + report generator
 ├── run_project.py          # Universal entry point
 ├── requirements.txt        # Project dependencies
 ├── setup_env.sh            # Setup script (Mac/Linux)
@@ -46,7 +47,7 @@ setup_env.bat
 
 The project includes a unified runner script `run_project.py`.
 
-To run the entire project (Task 3 and Task 4):
+To run the entire project (Task 3, Task 4, and Task 6):
 ```bash
 python run_project.py
 ```
@@ -63,6 +64,10 @@ or
 ```bash
 python run_project.py --task 4
 ```
+or
+```bash
+python run_project.py --task 6
+```
 
 ### Automatic Cleanup
 By default, the script **deletes** the old `results` directory for the target task before running to ensure data freshness.
@@ -71,6 +76,29 @@ To disable this behavior (e.g., to keep old results):
 ```bash
 python run_project.py --task 4 --no-clean
 ```
+
+### Task 6 Direct Runner
+Task 6 can also be run directly:
+
+```bash
+python tasks/Task_06_Cooling_Tower/run_experiments.py
+```
+
+Useful options:
+
+```bash
+# Run only S1 and S7 with fewer runs and skip 3D figures
+python tasks/Task_06_Cooling_Tower/run_experiments.py --runs 2 --scenarios S1,S7 --no-3d
+```
+
+Task 6 outputs are written to:
+
+- `tasks/Task_06_Cooling_Tower/results/raw_runs.csv`
+- `tasks/Task_06_Cooling_Tower/results/scenario_summary.csv`
+- `tasks/Task_06_Cooling_Tower/results/algorithm_summary.csv`
+- `tasks/Task_06_Cooling_Tower/results/scenario_definitions.json`
+- `tasks/Task_06_Cooling_Tower/results/figures/*.png`
+- `tasks/Task_06_Cooling_Tower/Report.md`
 
 ### Global Seeding
 To force fresh data generation with a new random seed:

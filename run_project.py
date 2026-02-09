@@ -48,8 +48,8 @@ def run_script(script_path):
 
 def main():
     parser = argparse.ArgumentParser(description="Run Group Project Experiments and Generate Results")
-    parser.add_argument("--task", type=str, choices=["3", "4", "all"], default="all",
-                        help="Specify which task to run (3, 4, or all)")
+    parser.add_argument("--task", type=str, choices=["3", "4", "6", "all"], default="all",
+                        help="Specify which task to run (3, 4, 6, or all)")
     parser.add_argument("--no-clean", action="store_true", 
                         help="Skip cleaning the results directory before running")
     
@@ -82,13 +82,17 @@ def main():
         "4": {
             "dir": os.path.join(base_dir, "tasks", "Task_04_New_Techniques"),
             "script": "run_experiments.py"
+        },
+        "6": {
+            "dir": os.path.join(base_dir, "tasks", "Task_06_Cooling_Tower"),
+            "script": "run_experiments.py"
         }
     }
     
     # Determine which tasks to run
     tasks_to_run = []
     if args.task == "all":
-        tasks_to_run = ["3", "4"]
+        tasks_to_run = ["3", "4", "6"]
     else:
         tasks_to_run = [args.task]
         
