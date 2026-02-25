@@ -1,5 +1,5 @@
 
-Generated: 2026-02-06 21:26
+Generated: 2026-02-25 19:19
 
 
 \chapter{Objective}
@@ -133,9 +133,9 @@ S8 & joint & 10 & 90000 & 39.3 & 27.4 & Joint constructability-aware design with
 \hline
 \textbf{Algorithm} & \textbf{Total Runs} & \textbf{Mean Area} & \textbf{Mean Rel Vol Err} & \textbf{Mean Evals} & \textbf{Mean Time (s)} & \textbf{Feasibility Rate} \\
 \hline
-SA & 80 & 7814.56 & 5.277e-04 & 11500.0 & 0.5448 & 71.2\% \\
-PSO & 80 & 8264.80 & 1.698e-02 & 11500.0 & 0.5803 & 50.0\% \\
-BFGS & 80 & 7850.64 & 4.018e-04 & 4227.9 & 0.2061 & 72.5\% \\
+SA & 80 & 7814.56 & 5.277e-04 & 11500.0 & 0.5373 & 71.2\% \\
+PSO & 80 & 8264.80 & 1.698e-02 & 11500.0 & 0.5744 & 50.0\% \\
+BFGS & 80 & 7850.64 & 4.018e-04 & 4227.9 & 0.2097 & 72.5\% \\
 \hline
 \end{tabular}%
 }
@@ -164,9 +164,9 @@ BFGS & 80 & 7850.64 & 4.018e-04 & 4227.9 & 0.2061 & 72.5\% \\
 \hline
 \textbf{Algorithm} & \textbf{Mean Area} & \textbf{Std Area} & \textbf{Mean Rel Vol Err} & \textbf{Mean Evals} & \textbf{Mean Time (s)} & \textbf{Feasibility Rate} \\
 \hline
-BFGS & 7782.01 & 0.00 & 1.537e-03 & 3302.6 & 0.1651 & 0.0\% \\
-PSO & 7950.10 & 201.50 & 1.571e-02 & 10000.0 & 0.5382 & 20.0\% \\
-SA & 7781.85 & 4.69 & 1.246e-03 & 10000.0 & 0.5088 & 50.0\% \\
+BFGS & 7782.01 & 0.00 & 1.537e-03 & 3302.6 & 0.1629 & 0.0\% \\
+PSO & 7950.10 & 201.50 & 1.571e-02 & 10000.0 & 0.5322 & 20.0\% \\
+SA & 7781.85 & 4.69 & 1.246e-03 & 10000.0 & 0.5033 & 50.0\% \\
 \hline
 \end{tabular}%
 }
@@ -194,6 +194,14 @@ SA & 7781.85 & 4.69 & 1.246e-03 & 10000.0 & 0.5088 & 50.0\% \\
 \end{figure}
 
 
+Feasibility of the shown 3D towers (same selected runs as profile overlay):
+
+\begin{itemize}
+\item SA: \textbackslash{}textbf\{FEASIBLE\} - passes volume (3.037e-04 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+\item PSO: \textbackslash{}textbf\{FEASIBLE\} - passes volume (2.407e-04 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+\item BFGS: \textbackslash{}textbf\{INFEASIBLE\} - fails volume (1.537e-03 > 1.000e-03). visualized run is lowest penalized objective among infeasible runs.
+\end{itemize}
+
 
 \section{S2}
 
@@ -207,9 +215,9 @@ SA & 7781.85 & 4.69 & 1.246e-03 & 10000.0 & 0.5088 & 50.0\% \\
 \hline
 \textbf{Algorithm} & \textbf{Mean Area} & \textbf{Std Area} & \textbf{Mean Rel Vol Err} & \textbf{Mean Evals} & \textbf{Mean Time (s)} & \textbf{Feasibility Rate} \\
 \hline
-BFGS & 8051.30 & 532.40 & 1.485e-04 & 3945.5 & 0.1574 & 100.0\% \\
-PSO & 9352.84 & 524.78 & 6.536e-02 & 10000.0 & 0.4444 & 40.0\% \\
-SA & 7753.26 & 9.27 & 5.492e-05 & 10000.0 & 0.4173 & 100.0\% \\
+BFGS & 8051.30 & 532.40 & 1.485e-04 & 3945.5 & 0.1556 & 100.0\% \\
+PSO & 9352.84 & 524.78 & 6.536e-02 & 10000.0 & 0.4390 & 40.0\% \\
+SA & 7753.26 & 9.27 & 5.492e-05 & 10000.0 & 0.4092 & 100.0\% \\
 \hline
 \end{tabular}%
 }
@@ -237,6 +245,14 @@ SA & 7753.26 & 9.27 & 5.492e-05 & 10000.0 & 0.4173 & 100.0\% \\
 \end{figure}
 
 
+Feasibility of the shown 3D towers (same selected runs as profile overlay):
+
+\begin{itemize}
+\item SA: \textbackslash{}textbf\{FEASIBLE\} - passes volume (1.686e-05 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+\item PSO: \textbackslash{}textbf\{FEASIBLE\} - passes volume (2.663e-04 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+\item BFGS: \textbackslash{}textbf\{FEASIBLE\} - passes volume (1.899e-06 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+\end{itemize}
+
 
 \section{S3}
 
@@ -250,9 +266,9 @@ SA & 7753.26 & 9.27 & 5.492e-05 & 10000.0 & 0.4173 & 100.0\% \\
 \hline
 \textbf{Algorithm} & \textbf{Mean Area} & \textbf{Std Area} & \textbf{Mean Rel Vol Err} & \textbf{Mean Evals} & \textbf{Mean Time (s)} & \textbf{Feasibility Rate} \\
 \hline
-BFGS & 7926.31 & 300.48 & 1.541e-04 & 2904.7 & 0.1189 & 100.0\% \\
-PSO & 8258.12 & 351.80 & 2.509e-05 & 10000.0 & 0.4407 & 90.0\% \\
-SA & 7753.02 & 21.36 & 3.424e-05 & 10000.0 & 0.4156 & 100.0\% \\
+BFGS & 7926.31 & 300.48 & 1.541e-04 & 2904.7 & 0.1227 & 100.0\% \\
+PSO & 8258.12 & 351.80 & 2.509e-05 & 10000.0 & 0.4378 & 90.0\% \\
+SA & 7753.02 & 21.36 & 3.424e-05 & 10000.0 & 0.4124 & 100.0\% \\
 \hline
 \end{tabular}%
 }
@@ -280,6 +296,14 @@ SA & 7753.02 & 21.36 & 3.424e-05 & 10000.0 & 0.4156 & 100.0\% \\
 \end{figure}
 
 
+Feasibility of the shown 3D towers (same selected runs as profile overlay):
+
+\begin{itemize}
+\item SA: \textbackslash{}textbf\{FEASIBLE\} - passes volume (5.257e-06 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+\item PSO: \textbackslash{}textbf\{FEASIBLE\} - passes volume (1.211e-06 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+\item BFGS: \textbackslash{}textbf\{FEASIBLE\} - passes volume (1.900e-06 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+\end{itemize}
+
 
 \section{S4}
 
@@ -293,9 +317,9 @@ SA & 7753.02 & 21.36 & 3.424e-05 & 10000.0 & 0.4156 & 100.0\% \\
 \hline
 \textbf{Algorithm} & \textbf{Mean Area} & \textbf{Std Area} & \textbf{Mean Rel Vol Err} & \textbf{Mean Evals} & \textbf{Mean Time (s)} & \textbf{Feasibility Rate} \\
 \hline
-BFGS & 7779.85 & 0.00 & 8.915e-04 & 4101.4 & 0.2142 & 100.0\% \\
-PSO & 8269.55 & 447.60 & 3.272e-02 & 10000.0 & 0.5666 & 0.0\% \\
-SA & 7783.18 & 14.88 & 1.557e-03 & 10000.0 & 0.5289 & 20.0\% \\
+BFGS & 7779.85 & 0.00 & 8.915e-04 & 4101.4 & 0.2508 & 100.0\% \\
+PSO & 8269.55 & 447.60 & 3.272e-02 & 10000.0 & 0.5619 & 0.0\% \\
+SA & 7783.18 & 14.88 & 1.557e-03 & 10000.0 & 0.5240 & 20.0\% \\
 \hline
 \end{tabular}%
 }
@@ -323,6 +347,14 @@ SA & 7783.18 & 14.88 & 1.557e-03 & 10000.0 & 0.5289 & 20.0\% \\
 \end{figure}
 
 
+Feasibility of the shown 3D towers (same selected runs as profile overlay):
+
+\begin{itemize}
+\item SA: \textbackslash{}textbf\{FEASIBLE\} - passes volume (3.986e-05 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+\item PSO: \textbackslash{}textbf\{INFEASIBLE\} - fails volume (2.086e-03 > 1.000e-03). visualized run is lowest penalized objective among infeasible runs.
+\item BFGS: \textbackslash{}textbf\{FEASIBLE\} - passes volume (8.915e-04 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+\end{itemize}
+
 
 \section{S5}
 
@@ -336,9 +368,9 @@ SA & 7783.18 & 14.88 & 1.557e-03 & 10000.0 & 0.5289 & 20.0\% \\
 \hline
 \textbf{Algorithm} & \textbf{Mean Area} & \textbf{Std Area} & \textbf{Mean Rel Vol Err} & \textbf{Mean Evals} & \textbf{Mean Time (s)} & \textbf{Feasibility Rate} \\
 \hline
-BFGS & 7742.56 & 0.00 & 2.331e-06 & 4164.2 & 0.1605 & 100.0\% \\
-PSO & 7796.77 & 32.30 & 1.128e-04 & 10000.0 & 0.4224 & 90.0\% \\
-SA & 7757.25 & 6.61 & 3.902e-05 & 10000.0 & 0.3972 & 100.0\% \\
+BFGS & 7742.56 & 0.00 & 2.331e-06 & 4164.2 & 0.1625 & 100.0\% \\
+PSO & 7796.77 & 32.30 & 1.128e-04 & 10000.0 & 0.4147 & 90.0\% \\
+SA & 7757.25 & 6.61 & 3.902e-05 & 10000.0 & 0.3880 & 100.0\% \\
 \hline
 \end{tabular}%
 }
@@ -366,6 +398,14 @@ SA & 7757.25 & 6.61 & 3.902e-05 & 10000.0 & 0.3972 & 100.0\% \\
 \end{figure}
 
 
+Feasibility of the shown 3D towers (same selected runs as profile overlay):
+
+\begin{itemize}
+\item SA: \textbackslash{}textbf\{FEASIBLE\} - passes volume (7.754e-06 <= 1.000e-03), height (1.602e-04 <= 1.000e-03).
+\item PSO: \textbackslash{}textbf\{FEASIBLE\} - passes volume (4.870e-07 <= 1.000e-03), height (6.591e-05 <= 1.000e-03).
+\item BFGS: \textbackslash{}textbf\{FEASIBLE\} - passes volume (2.331e-06 <= 1.000e-03), height (8.747e-05 <= 1.000e-03).
+\end{itemize}
+
 
 \section{S6}
 
@@ -379,9 +419,9 @@ SA & 7757.25 & 6.61 & 3.902e-05 & 10000.0 & 0.3972 & 100.0\% \\
 \hline
 \textbf{Algorithm} & \textbf{Mean Area} & \textbf{Std Area} & \textbf{Mean Rel Vol Err} & \textbf{Mean Evals} & \textbf{Mean Time (s)} & \textbf{Feasibility Rate} \\
 \hline
-BFGS & 7741.72 & 0.00 & 2.071e-06 & 1402.6 & 0.0560 & 100.0\% \\
-PSO & 7913.68 & 146.68 & 5.923e-04 & 10000.0 & 0.4250 & 90.0\% \\
-SA & 7825.77 & 33.17 & 6.569e-05 & 10000.0 & 0.3995 & 100.0\% \\
+BFGS & 7741.72 & 0.00 & 2.071e-06 & 1402.6 & 0.0551 & 100.0\% \\
+PSO & 7913.68 & 146.68 & 5.923e-04 & 10000.0 & 0.4184 & 90.0\% \\
+SA & 7825.77 & 33.17 & 6.569e-05 & 10000.0 & 0.3880 & 100.0\% \\
 \hline
 \end{tabular}%
 }
@@ -409,6 +449,14 @@ SA & 7825.77 & 33.17 & 6.569e-05 & 10000.0 & 0.3995 & 100.0\% \\
 \end{figure}
 
 
+Feasibility of the shown 3D towers (same selected runs as profile overlay):
+
+\begin{itemize}
+\item SA: \textbackslash{}textbf\{FEASIBLE\} - passes volume (1.478e-05 <= 1.000e-03), height (8.960e-05 <= 1.000e-03).
+\item PSO: \textbackslash{}textbf\{FEASIBLE\} - passes volume (2.557e-05 <= 1.000e-03), height (5.838e-05 <= 1.000e-03).
+\item BFGS: \textbackslash{}textbf\{FEASIBLE\} - passes volume (2.071e-06 <= 1.000e-03), height (8.632e-05 <= 1.000e-03).
+\end{itemize}
+
 
 \section{S7}
 
@@ -422,9 +470,9 @@ SA & 7825.77 & 33.17 & 6.569e-05 & 10000.0 & 0.3995 & 100.0\% \\
 \hline
 \textbf{Algorithm} & \textbf{Mean Area} & \textbf{Std Area} & \textbf{Mean Rel Vol Err} & \textbf{Mean Evals} & \textbf{Mean Time (s)} & \textbf{Feasibility Rate} \\
 \hline
-BFGS & 7968.31 & 369.60 & 6.476e-05 & 7000.9 & 0.3292 & 80.0\% \\
-PSO & 8608.62 & 174.56 & 4.144e-04 & 16000.0 & 0.7790 & 70.0\% \\
-SA & 8160.14 & 281.40 & 1.305e-04 & 16000.0 & 0.7315 & 100.0\% \\
+BFGS & 7968.31 & 369.60 & 6.476e-05 & 7000.9 & 0.3242 & 80.0\% \\
+PSO & 8608.62 & 174.56 & 4.144e-04 & 16000.0 & 0.7688 & 70.0\% \\
+SA & 8160.14 & 281.40 & 1.305e-04 & 16000.0 & 0.7203 & 100.0\% \\
 \hline
 \end{tabular}%
 }
@@ -452,6 +500,14 @@ SA & 8160.14 & 281.40 & 1.305e-04 & 16000.0 & 0.7315 & 100.0\% \\
 \end{figure}
 
 
+Feasibility of the shown 3D towers (same selected runs as profile overlay):
+
+\begin{itemize}
+\item SA: \textbackslash{}textbf\{FEASIBLE\} - passes volume (1.717e-04 <= 1.000e-03), height (4.769e-04 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+\item PSO: \textbackslash{}textbf\{FEASIBLE\} - passes volume (6.824e-05 <= 1.000e-03), height (9.218e-05 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+\item BFGS: \textbackslash{}textbf\{FEASIBLE\} - passes volume (1.890e-06 <= 1.000e-03), height (8.481e-05 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+\end{itemize}
+
 
 \section{S8}
 
@@ -465,9 +521,9 @@ SA & 8160.14 & 281.40 & 1.305e-04 & 16000.0 & 0.7315 & 100.0\% \\
 \hline
 \textbf{Algorithm} & \textbf{Mean Area} & \textbf{Std Area} & \textbf{Mean Rel Vol Err} & \textbf{Mean Evals} & \textbf{Mean Time (s)} & \textbf{Feasibility Rate} \\
 \hline
-BFGS & 7813.08 & 0.46 & 4.146e-04 & 7001.0 & 0.4476 & 0.0\% \\
-PSO & 7968.67 & 348.77 & 2.087e-02 & 16000.0 & 1.0261 & 0.0\% \\
-SA & 7701.98 & 32.24 & 1.093e-03 & 16000.0 & 0.9600 & 0.0\% \\
+BFGS & 7813.08 & 0.46 & 4.146e-04 & 7001.0 & 0.4441 & 0.0\% \\
+PSO & 7968.67 & 348.77 & 2.087e-02 & 16000.0 & 1.0223 & 0.0\% \\
+SA & 7701.98 & 32.24 & 1.093e-03 & 16000.0 & 0.9536 & 0.0\% \\
 \hline
 \end{tabular}%
 }
@@ -494,6 +550,14 @@ SA & 7701.98 & 32.24 & 1.093e-03 & 16000.0 & 0.9600 & 0.0\% \\
 \caption{S8 3D towers}
 \end{figure}
 
+
+Feasibility of the shown 3D towers (same selected runs as profile overlay):
+
+\begin{itemize}
+\item SA: \textbackslash{}textbf\{INFEASIBLE\} - fails height (2.220e-03 > 1.000e-03). visualized run is lowest penalized objective among infeasible runs.
+\item PSO: \textbackslash{}textbf\{INFEASIBLE\} - fails volume (1.192e-03 > 1.000e-03), height (1.597e-02 > 1.000e-03), shape (6.460e-03 > 1.000e-06). visualized run is lowest penalized objective among infeasible runs.
+\item BFGS: \textbackslash{}textbf\{INFEASIBLE\} - fails height (2.684e-03 > 1.000e-03), shape (2.649e-03 > 1.000e-06). visualized run is lowest penalized objective among infeasible runs.
+\end{itemize}
 
 \chapter{Key Findings}
 
@@ -543,9 +607,9 @@ Scenario S8 remains the principal bottleneck under the current penalty/budget se
 \chapter{Deliverables}
 
 \begin{itemize}
-\item \texttt{results/raw\_runs.csv}
-\item \texttt{results/scenario\_summary.csv}
-\item \texttt{results/algorithm\_summary.csv}
-\item \texttt{results/scenario\_definitions.json}
+\item \texttt{results/data/raw\_runs.csv}
+\item \texttt{results/data/scenario\_summary.csv}
+\item \texttt{results/data/algorithm\_summary.csv}
+\item \texttt{results/data/scenario\_definitions.json}
 \item \texttt{results/figures/*.png}
 \end{itemize}
