@@ -5,6 +5,7 @@ from typing import List
 
 
 IMAGE_RE = re.compile(r"!\[(.*?)\]\((.*?)\)")
+HEADING_PREFIX_RE = re.compile(r"^\d+(\.\d+)*\.?\s+")
 
 
 def _escape_latex(text: str) -> str:
@@ -26,6 +27,54 @@ def _escape_latex(text: str) -> str:
     return "".join(out)
 
 
+def _clean_heading(text: str) -> str:
+    return HEADING_PREFIX_RE.sub("", text.strip())
+
+
+def _is_math_code(code: str) -> bool:
+    lowered = code.lower()
+    if "/" in code or "\\" in code:
+        return False
+    if lowered.endswith(".csv") or lowered.endswith(".json") or lowered.endswith(".png") or lowered.endswith(".md"):
+        return False
+    if lowered.startswith("results/") or lowered.startswith("tasks/"):
+        return False
+
+    math_tokens = ["=", "pi", "sqrt", "^", "_", "<=", ">=", "sum(", "A_i", "V_i", "J("]
+    return any(tok in code for tok in math_tokens)
+
+
+def _code_to_math(code: str) -> str:
+    expr = code.strip()
+    expr = expr.replace("<=", r"\leq")
+    expr = expr.replace(">=", r"\geq")
+    expr = re.sub(r"\bpi\b", r"\\pi", expr)
+    expr = re.sub(r"\bsum\((.*?)\)", r"\\sum(\1)", expr)
+    expr = expr.replace("*", r" \cdot ")
+    expr = expr.replace("..", r"\ldots ")
+    expr = re.sub(r"\b(\d+)e-([0-9]+)\b", r"\1 \\times 10^{-\2}", expr)
+    expr = re.sub(r"\b([A-Za-z])_([A-Za-z][A-Za-z0-9]*)\b", r"\1_{\2}", expr)
+
+    # Convert sqrt(...) to \sqrt{...} with shallow balanced parsing.
+    while "sqrt(" in expr:
+        start = expr.find("sqrt(")
+        idx = start + 5
+        depth = 1
+        end = idx
+        while end < len(expr) and depth > 0:
+            if expr[end] == "(":
+                depth += 1
+            elif expr[end] == ")":
+                depth -= 1
+            end += 1
+        if depth != 0:
+            break
+        inside = expr[idx : end - 1]
+        expr = expr[:start] + r"\sqrt{" + inside + "}" + expr[end:]
+
+    return r"\(" + expr + r"\)"
+
+
 def _convert_inline(text: str) -> str:
     # Preserve inline code first.
     code_spans: List[str] = []
@@ -44,7 +93,8 @@ def _convert_inline(text: str) -> str:
 
     # Restore code spans.
     for i, code in enumerate(code_spans):
-        text = text.replace(f"@@CODE{i}@@", r"\texttt{" + _escape_latex(code) + "}")
+        replacement = _code_to_math(code) if _is_math_code(code) else r"\texttt{" + _escape_latex(code) + "}"
+        text = text.replace(f"@@CODE{i}@@", replacement)
 
     return text
 
@@ -72,23 +122,26 @@ def _render_table(table_lines: List[str]) -> List[str]:
     header = rows[0]
     body = rows[2:]  # Skip markdown separator row.
     cols = len(header)
-    colspec = " | ".join(["p{0.13\\textwidth}"] * cols)
+    colspec = "@{}" + "l" * cols + "@{}"
 
     out = []
-    out.append(r"\begin{longtable}{" + colspec + "}")
+    out.append(r"\begin{table}[H]")
+    out.append(r"\centering")
+    out.append(r"\scriptsize")
+    out.append(r"\setlength{\tabcolsep}{4pt}")
+    out.append(r"\renewcommand{\arraystretch}{1.1}")
+    out.append(r"\resizebox{\textwidth}{!}{%")
+    out.append(r"\begin{tabular}{" + colspec + "}")
     out.append(r"\hline")
-    out.append(" & ".join(_convert_inline(c) for c in header) + r" \\")
+    out.append(" & ".join(r"\textbf{" + _convert_inline(c) + "}" for c in header) + r" \\")
     out.append(r"\hline")
-    out.append(r"\endfirsthead")
-    out.append(r"\hline")
-    out.append(" & ".join(_convert_inline(c) for c in header) + r" \\")
-    out.append(r"\hline")
-    out.append(r"\endhead")
     for row in body:
         padded = row + [""] * (cols - len(row))
         out.append(" & ".join(_convert_inline(c) for c in padded[:cols]) + r" \\")
     out.append(r"\hline")
-    out.append(r"\end{longtable}")
+    out.append(r"\end{tabular}%")
+    out.append(r"}")
+    out.append(r"\end{table}")
     return out
 
 
@@ -124,7 +177,7 @@ def convert_markdown_to_tex(md_text: str) -> str:
             if in_list:
                 out.append(r"\end{itemize}")
                 in_list = False
-            out.append(r"\chapter{" + _convert_inline(stripped[3:]) + "}")
+            out.append(r"\chapter{" + _convert_inline(_clean_heading(stripped[3:])) + "}")
             out.append("")
             i += 1
             continue
@@ -132,7 +185,7 @@ def convert_markdown_to_tex(md_text: str) -> str:
             if in_list:
                 out.append(r"\end{itemize}")
                 in_list = False
-            out.append(r"\section{" + _convert_inline(stripped[4:]) + "}")
+            out.append(r"\section{" + _convert_inline(_clean_heading(stripped[4:])) + "}")
             out.append("")
             i += 1
             continue
@@ -140,7 +193,7 @@ def convert_markdown_to_tex(md_text: str) -> str:
             if in_list:
                 out.append(r"\end{itemize}")
                 in_list = False
-            out.append(r"\subsection{" + _convert_inline(stripped[5:]) + "}")
+            out.append(r"\subsection{" + _convert_inline(_clean_heading(stripped[5:])) + "}")
             out.append("")
             i += 1
             continue

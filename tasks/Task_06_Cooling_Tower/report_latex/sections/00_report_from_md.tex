@@ -2,22 +2,22 @@
 Generated: 2026-02-06 21:26
 
 
-\chapter{1. Objective}
+\chapter{Objective}
 
 Minimize cooling-tower lateral shell area using SA, PSO, and BFGS while enforcing fixed target volume and scenario-specific constructability constraints.
 
 The study compares stochastic and deterministic optimization behavior across eight structurally different problem setups while keeping common engineering requirements (capacity and realistic shape) explicit in the objective.
 
 
-\chapter{2. Geometry Model}
+\chapter{Geometry Model}
 
 The tower is modeled as a stack of frustums.
 
 
 \begin{itemize}
-\item Frustum area: \texttt{A\_i = pi * (r\_\{i-1\} + r\_i) * sqrt((r\_i - r\_\{i-1\})\textasciicircum{}2 + h\_i\textasciicircum{}2)}
+\item Frustum area: \(A_{i} = \pi  \cdot  (r_{i-1} + r_{i})  \cdot  \sqrt{(r_{i} - r_{i-1})^2 + h_{i}^2}\)
 \item Frustum volume: \texttt{V\_i = (pi * h\_i / 3) * (r\_\{i-1\}\textasciicircum{}2 + r\_\{i-1\}*r\_i + r\_i\textasciicircum{}2)}
-\item Tower totals: \texttt{A = sum(A\_i)}, \texttt{V = sum(V\_i)}
+\item Tower totals: \(A = \sum(A_{i})\), \(V = \sum(V_{i})\)
 \end{itemize}
 
 Lateral shell area is optimized (top and bottom caps excluded), which directly corresponds to shell-construction material for fixed end radii.
@@ -25,87 +25,88 @@ Lateral shell area is optimized (top and bottom caps excluded), which directly c
 Analytic gradients were used for both \texttt{A} and \texttt{V}, and for all penalty terms, so BFGS receives exact first-order information.
 
 
-\section{2.1 Design Variables by Scenario Type}
+\section{Design Variables by Scenario Type}
 
 \begin{itemize}
-\item \texttt{radii} mode: optimize interior radii \texttt{r1..r\_\{m-1\}} while ring heights are fixed from \texttt{z} levels.
+\item \texttt{radii} mode: optimize interior radii \(r1\ldots r_{m-1}\) while ring heights are fixed from \texttt{z} levels.
 \item \texttt{heights} mode: optimize segment heights \texttt{h1..hm} while all ring radii are fixed.
 \item \texttt{joint} mode: optimize both interior radii and all heights simultaneously.
 \end{itemize}
 
-\chapter{3. Optimization Methods}
+\chapter{Optimization Methods}
 
 
-\section{3.1 Simulated Annealing (SA)}
+\section{Simulated Annealing (SA)}
 
 SA performs single-solution stochastic search. At each evaluation, a local perturbation is proposed and accepted if it improves objective, or probabilistically accepted otherwise using the temperature schedule.
 
 This supports escape from local minima early in search and gradual exploitation as temperature cools.
 
 
-\section{3.2 Particle Swarm Optimization (PSO)}
+\section{Particle Swarm Optimization (PSO)}
 
 PSO evolves a population of particles with velocity updates using inertia, cognitive pull to personal best, and social pull to global best.
 
 It is typically strong on global exploration and multimodal landscapes, but can require many evaluations to satisfy strict constraints.
 
 
-\section{3.3 BFGS (Deterministic Quasi-Newton)}
+\section{BFGS (Deterministic Quasi-Newton)}
 
 BFGS updates an inverse-Hessian approximation and computes descent directions with line search, yielding rapid local convergence when gradients are informative.
 
 It is efficient in evaluation count but can be sensitive to initialization and non-convex penalties.
 
 
-\chapter{4. Penalized Objective and Geometrical Constraints}
+\chapter{Penalized Objective and Geometrical Constraints}
 
-The optimized scalar objective is \texttt{J(x) = A(x) + P\_volume + P\_height + P\_shape + P\_smooth + P\_bounds + P\_ratio} (terms enabled per scenario).
+The optimized scalar objective is \(J(x) = A(x) + P_{volume} + P_{height} + P_{shape} + P_{smooth} + P_{bounds} + P_{ratio}\) (terms enabled per scenario).
 
 
-\section{4.1 Constraint Terms and Their Function}
-
-\begin{itemize}
-\item \texttt{P\_volume}: enforces target cooling capacity by penalizing relative deviation from target volume.
-\item \texttt{P\_height}: enforces total tower height in scenarios where heights vary, preserving comparable overall structure.
-\item \texttt{P\_shape}: enforces hyperboloid-like monotonic contraction to neck and expansion above neck.
-\item \texttt{P\_smooth}: penalizes second differences in radii to avoid oscillatory/sawtooth shell profiles.
-\item \texttt{P\_bounds}: hinge penalty for design-variable bounds to keep variables in practical/constructable ranges.
-\item \texttt{P\_ratio} (S8): limits adjacent-height ratios to promote constructability and avoid abrupt segment transitions.
-\end{itemize}
-
-\section{4.2 Feasibility Rule}
+\section{Constraint Terms and Their Function}
 
 \begin{itemize}
-\item Relative volume error must be \texttt{<= 1e-3}.
-\item If heights vary, relative total-height error must be \texttt{<= 1e-3}.
-\item If radii vary, monotonic hyperboloid violation must be \texttt{<= 1e-6}.
+\item \(P_{volume}\): enforces target cooling capacity by penalizing relative deviation from target volume.
+\item \(P_{height}\): enforces total tower height in scenarios where heights vary, preserving comparable overall structure.
+\item \(P_{shape}\): enforces hyperboloid-like monotonic contraction to neck and expansion above neck.
+\item \(P_{smooth}\): penalizes second differences in radii to avoid oscillatory/sawtooth shell profiles.
+\item \(P_{bounds}\): hinge penalty for design-variable bounds to keep variables in practical/constructable ranges.
+\item \(P_{ratio}\) (S8): limits adjacent-height ratios to promote constructability and avoid abrupt segment transitions.
 \end{itemize}
 
-\chapter{5. Optimization Protocol}
+\section{Feasibility Rule}
+
+\begin{itemize}
+\item Relative volume error must be \(\leq 1 \times 10^{-3}\).
+\item If heights vary, relative total-height error must be \(\leq 1 \times 10^{-3}\).
+\item If radii vary, monotonic hyperboloid violation must be \(\leq 1 \times 10^{-6}\).
+\end{itemize}
+
+\chapter{Optimization Protocol}
 
 \begin{itemize}
 \item Runs per algorithm per scenario: 10
 \item Seed offset: 0
-\item SA: \texttt{temp\_init=120}, \texttt{cooling\_rate=0.997}, scenario-dependent \texttt{step\_size}
-\item PSO: \texttt{w=0.65}, \texttt{c1=1.6}, \texttt{c2=1.7}, particles = 40 or 50 by dimension
-\item BFGS: \texttt{tol=1e-7}, \texttt{max\_iter=1200}
+\item SA: \(temp_init=120\), \(cooling_rate=0.997\), scenario-dependent \(step_size\)
+\item PSO: \(w=0.65\), \(c1=1.6\), \(c2=1.7\), particles = 40 or 50 by dimension
+\item BFGS: \(tol=1 \times 10^{-7}\), \(max_iter=1200\)
 \item Penalties: volume, height sum (when applicable), shape monotonicity, smoothness, bounds, ratio (S8)
 \end{itemize}
 
 Stochastic budgets are 10k evaluations for lower-dimensional setups and 16k for joint/high-dimensional setups. BFGS uses smaller budgets due to faster local convergence.
 
 
-\chapter{6. Scenario Definitions}
+\chapter{Scenario Definitions}
 
-\begin{longtable}{p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth}}
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lllllll@{}}
 \hline
-ID & Mode & m & Target Volume & r0 & rm & Description \\
+\textbf{ID} & \textbf{Mode} & \textbf{m} & \textbf{Target Volume} & \textbf{r0} & \textbf{rm} & \textbf{Description} \\
 \hline
-\endfirsthead
-\hline
-ID & Mode & m & Target Volume & r0 & rm & Description \\
-\hline
-\endhead
 S1 & radii & 10 & 70320 & 39.3 & 27.4 & Required case with bounded radii and required ring heights. \\
 S2 & radii & 10 & 70320 & 39.3 & 27.4 & Required case with wide radii range (unconstrained-like). \\
 S3 & radii & 10 & 70320 & 39.3 & 27.4 & Uniform-height radii design with bounded radii. \\
@@ -115,25 +116,30 @@ S6 & heights & 10 & 70320 & 39.3 & 27.4 & Fixed radii, optimize wide-range heigh
 S7 & joint & 10 & 70320 & 39.3 & 27.4 & Joint bounded optimization of radii and heights. \\
 S8 & joint & 10 & 90000 & 39.3 & 27.4 & Joint constructability-aware design with larger target volume. \\
 \hline
-\end{longtable}
+\end{tabular}%
+}
+\end{table}
 
 
-\chapter{7. Cross-Algorithm Summary}
+\chapter{Cross-Algorithm Summary}
 
-\begin{longtable}{p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth}}
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lllllll@{}}
 \hline
-Algorithm & Total Runs & Mean Area & Mean Rel Vol Err & Mean Evals & Mean Time (s) & Feasibility Rate \\
+\textbf{Algorithm} & \textbf{Total Runs} & \textbf{Mean Area} & \textbf{Mean Rel Vol Err} & \textbf{Mean Evals} & \textbf{Mean Time (s)} & \textbf{Feasibility Rate} \\
 \hline
-\endfirsthead
-\hline
-Algorithm & Total Runs & Mean Area & Mean Rel Vol Err & Mean Evals & Mean Time (s) & Feasibility Rate \\
-\hline
-\endhead
 SA & 80 & 7814.56 & 5.277e-04 & 11500.0 & 0.5448 & 71.2\% \\
 PSO & 80 & 8264.80 & 1.698e-02 & 11500.0 & 0.5803 & 50.0\% \\
 BFGS & 80 & 7850.64 & 4.018e-04 & 4227.9 & 0.2061 & 72.5\% \\
 \hline
-\end{longtable}
+\end{tabular}%
+}
+\end{table}
 
 
 \begin{figure}[H]
@@ -143,25 +149,28 @@ BFGS & 80 & 7850.64 & 4.018e-04 & 4227.9 & 0.2061 & 72.5\% \\
 \end{figure}
 
 
-\chapter{8. Scenario Results}
+\chapter{Scenario Results}
 
 
 \section{S1}
 
-\begin{longtable}{p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth}}
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lllllll@{}}
 \hline
-Algorithm & Mean Area & Std Area & Mean Rel Vol Err & Mean Evals & Mean Time (s) & Feasibility Rate \\
+\textbf{Algorithm} & \textbf{Mean Area} & \textbf{Std Area} & \textbf{Mean Rel Vol Err} & \textbf{Mean Evals} & \textbf{Mean Time (s)} & \textbf{Feasibility Rate} \\
 \hline
-\endfirsthead
-\hline
-Algorithm & Mean Area & Std Area & Mean Rel Vol Err & Mean Evals & Mean Time (s) & Feasibility Rate \\
-\hline
-\endhead
 BFGS & 7782.01 & 0.00 & 1.537e-03 & 3302.6 & 0.1651 & 0.0\% \\
 PSO & 7950.10 & 201.50 & 1.571e-02 & 10000.0 & 0.5382 & 20.0\% \\
 SA & 7781.85 & 4.69 & 1.246e-03 & 10000.0 & 0.5088 & 50.0\% \\
 \hline
-\end{longtable}
+\end{tabular}%
+}
+\end{table}
 
 
 \begin{figure}[H]
@@ -188,20 +197,23 @@ SA & 7781.85 & 4.69 & 1.246e-03 & 10000.0 & 0.5088 & 50.0\% \\
 
 \section{S2}
 
-\begin{longtable}{p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth}}
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lllllll@{}}
 \hline
-Algorithm & Mean Area & Std Area & Mean Rel Vol Err & Mean Evals & Mean Time (s) & Feasibility Rate \\
+\textbf{Algorithm} & \textbf{Mean Area} & \textbf{Std Area} & \textbf{Mean Rel Vol Err} & \textbf{Mean Evals} & \textbf{Mean Time (s)} & \textbf{Feasibility Rate} \\
 \hline
-\endfirsthead
-\hline
-Algorithm & Mean Area & Std Area & Mean Rel Vol Err & Mean Evals & Mean Time (s) & Feasibility Rate \\
-\hline
-\endhead
 BFGS & 8051.30 & 532.40 & 1.485e-04 & 3945.5 & 0.1574 & 100.0\% \\
 PSO & 9352.84 & 524.78 & 6.536e-02 & 10000.0 & 0.4444 & 40.0\% \\
 SA & 7753.26 & 9.27 & 5.492e-05 & 10000.0 & 0.4173 & 100.0\% \\
 \hline
-\end{longtable}
+\end{tabular}%
+}
+\end{table}
 
 
 \begin{figure}[H]
@@ -228,20 +240,23 @@ SA & 7753.26 & 9.27 & 5.492e-05 & 10000.0 & 0.4173 & 100.0\% \\
 
 \section{S3}
 
-\begin{longtable}{p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth}}
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lllllll@{}}
 \hline
-Algorithm & Mean Area & Std Area & Mean Rel Vol Err & Mean Evals & Mean Time (s) & Feasibility Rate \\
+\textbf{Algorithm} & \textbf{Mean Area} & \textbf{Std Area} & \textbf{Mean Rel Vol Err} & \textbf{Mean Evals} & \textbf{Mean Time (s)} & \textbf{Feasibility Rate} \\
 \hline
-\endfirsthead
-\hline
-Algorithm & Mean Area & Std Area & Mean Rel Vol Err & Mean Evals & Mean Time (s) & Feasibility Rate \\
-\hline
-\endhead
 BFGS & 7926.31 & 300.48 & 1.541e-04 & 2904.7 & 0.1189 & 100.0\% \\
 PSO & 8258.12 & 351.80 & 2.509e-05 & 10000.0 & 0.4407 & 90.0\% \\
 SA & 7753.02 & 21.36 & 3.424e-05 & 10000.0 & 0.4156 & 100.0\% \\
 \hline
-\end{longtable}
+\end{tabular}%
+}
+\end{table}
 
 
 \begin{figure}[H]
@@ -268,20 +283,23 @@ SA & 7753.02 & 21.36 & 3.424e-05 & 10000.0 & 0.4156 & 100.0\% \\
 
 \section{S4}
 
-\begin{longtable}{p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth}}
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lllllll@{}}
 \hline
-Algorithm & Mean Area & Std Area & Mean Rel Vol Err & Mean Evals & Mean Time (s) & Feasibility Rate \\
+\textbf{Algorithm} & \textbf{Mean Area} & \textbf{Std Area} & \textbf{Mean Rel Vol Err} & \textbf{Mean Evals} & \textbf{Mean Time (s)} & \textbf{Feasibility Rate} \\
 \hline
-\endfirsthead
-\hline
-Algorithm & Mean Area & Std Area & Mean Rel Vol Err & Mean Evals & Mean Time (s) & Feasibility Rate \\
-\hline
-\endhead
 BFGS & 7779.85 & 0.00 & 8.915e-04 & 4101.4 & 0.2142 & 100.0\% \\
 PSO & 8269.55 & 447.60 & 3.272e-02 & 10000.0 & 0.5666 & 0.0\% \\
 SA & 7783.18 & 14.88 & 1.557e-03 & 10000.0 & 0.5289 & 20.0\% \\
 \hline
-\end{longtable}
+\end{tabular}%
+}
+\end{table}
 
 
 \begin{figure}[H]
@@ -308,20 +326,23 @@ SA & 7783.18 & 14.88 & 1.557e-03 & 10000.0 & 0.5289 & 20.0\% \\
 
 \section{S5}
 
-\begin{longtable}{p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth}}
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lllllll@{}}
 \hline
-Algorithm & Mean Area & Std Area & Mean Rel Vol Err & Mean Evals & Mean Time (s) & Feasibility Rate \\
+\textbf{Algorithm} & \textbf{Mean Area} & \textbf{Std Area} & \textbf{Mean Rel Vol Err} & \textbf{Mean Evals} & \textbf{Mean Time (s)} & \textbf{Feasibility Rate} \\
 \hline
-\endfirsthead
-\hline
-Algorithm & Mean Area & Std Area & Mean Rel Vol Err & Mean Evals & Mean Time (s) & Feasibility Rate \\
-\hline
-\endhead
 BFGS & 7742.56 & 0.00 & 2.331e-06 & 4164.2 & 0.1605 & 100.0\% \\
 PSO & 7796.77 & 32.30 & 1.128e-04 & 10000.0 & 0.4224 & 90.0\% \\
 SA & 7757.25 & 6.61 & 3.902e-05 & 10000.0 & 0.3972 & 100.0\% \\
 \hline
-\end{longtable}
+\end{tabular}%
+}
+\end{table}
 
 
 \begin{figure}[H]
@@ -348,20 +369,23 @@ SA & 7757.25 & 6.61 & 3.902e-05 & 10000.0 & 0.3972 & 100.0\% \\
 
 \section{S6}
 
-\begin{longtable}{p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth}}
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lllllll@{}}
 \hline
-Algorithm & Mean Area & Std Area & Mean Rel Vol Err & Mean Evals & Mean Time (s) & Feasibility Rate \\
+\textbf{Algorithm} & \textbf{Mean Area} & \textbf{Std Area} & \textbf{Mean Rel Vol Err} & \textbf{Mean Evals} & \textbf{Mean Time (s)} & \textbf{Feasibility Rate} \\
 \hline
-\endfirsthead
-\hline
-Algorithm & Mean Area & Std Area & Mean Rel Vol Err & Mean Evals & Mean Time (s) & Feasibility Rate \\
-\hline
-\endhead
 BFGS & 7741.72 & 0.00 & 2.071e-06 & 1402.6 & 0.0560 & 100.0\% \\
 PSO & 7913.68 & 146.68 & 5.923e-04 & 10000.0 & 0.4250 & 90.0\% \\
 SA & 7825.77 & 33.17 & 6.569e-05 & 10000.0 & 0.3995 & 100.0\% \\
 \hline
-\end{longtable}
+\end{tabular}%
+}
+\end{table}
 
 
 \begin{figure}[H]
@@ -388,20 +412,23 @@ SA & 7825.77 & 33.17 & 6.569e-05 & 10000.0 & 0.3995 & 100.0\% \\
 
 \section{S7}
 
-\begin{longtable}{p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth}}
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lllllll@{}}
 \hline
-Algorithm & Mean Area & Std Area & Mean Rel Vol Err & Mean Evals & Mean Time (s) & Feasibility Rate \\
+\textbf{Algorithm} & \textbf{Mean Area} & \textbf{Std Area} & \textbf{Mean Rel Vol Err} & \textbf{Mean Evals} & \textbf{Mean Time (s)} & \textbf{Feasibility Rate} \\
 \hline
-\endfirsthead
-\hline
-Algorithm & Mean Area & Std Area & Mean Rel Vol Err & Mean Evals & Mean Time (s) & Feasibility Rate \\
-\hline
-\endhead
 BFGS & 7968.31 & 369.60 & 6.476e-05 & 7000.9 & 0.3292 & 80.0\% \\
 PSO & 8608.62 & 174.56 & 4.144e-04 & 16000.0 & 0.7790 & 70.0\% \\
 SA & 8160.14 & 281.40 & 1.305e-04 & 16000.0 & 0.7315 & 100.0\% \\
 \hline
-\end{longtable}
+\end{tabular}%
+}
+\end{table}
 
 
 \begin{figure}[H]
@@ -428,20 +455,23 @@ SA & 8160.14 & 281.40 & 1.305e-04 & 16000.0 & 0.7315 & 100.0\% \\
 
 \section{S8}
 
-\begin{longtable}{p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth} | p{0.13\textwidth}}
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lllllll@{}}
 \hline
-Algorithm & Mean Area & Std Area & Mean Rel Vol Err & Mean Evals & Mean Time (s) & Feasibility Rate \\
+\textbf{Algorithm} & \textbf{Mean Area} & \textbf{Std Area} & \textbf{Mean Rel Vol Err} & \textbf{Mean Evals} & \textbf{Mean Time (s)} & \textbf{Feasibility Rate} \\
 \hline
-\endfirsthead
-\hline
-Algorithm & Mean Area & Std Area & Mean Rel Vol Err & Mean Evals & Mean Time (s) & Feasibility Rate \\
-\hline
-\endhead
 BFGS & 7813.08 & 0.46 & 4.146e-04 & 7001.0 & 0.4476 & 0.0\% \\
 PSO & 7968.67 & 348.77 & 2.087e-02 & 16000.0 & 1.0261 & 0.0\% \\
 SA & 7701.98 & 32.24 & 1.093e-03 & 16000.0 & 0.9600 & 0.0\% \\
 \hline
-\end{longtable}
+\end{tabular}%
+}
+\end{table}
 
 
 \begin{figure}[H]
@@ -465,7 +495,7 @@ SA & 7701.98 & 32.24 & 1.093e-03 & 16000.0 & 0.9600 & 0.0\% \\
 \end{figure}
 
 
-\chapter{9. Key Findings}
+\chapter{Key Findings}
 
 
 \begin{itemize}
@@ -491,7 +521,7 @@ SA & 7701.98 & 32.24 & 1.093e-03 & 16000.0 & 0.9600 & 0.0\% \\
 \item Feasibility bottleneck scenarios: S8 (all tested methods yielded 0\% feasible runs under current constraints).
 \end{itemize}
 
-\chapter{10. Discussion and Conclusions}
+\chapter{Discussion and Conclusions}
 
 
 Across all scenarios, \textbackslash{}textbf\{BFGS\} achieved the highest overall feasibility (72.5\%).
@@ -510,7 +540,7 @@ For practical engineering usage in this problem family, the recommended workflow
 Scenario S8 remains the principal bottleneck under the current penalty/budget setup; this indicates that constructability and enlarged-volume requirements are jointly tight. Future refinement should focus on adaptive penalty scheduling, better initialization heuristics for joint variables, and potentially increased stochastic budget for S8.
 
 
-\chapter{11. Deliverables}
+\chapter{Deliverables}
 
 \begin{itemize}
 \item \texttt{results/raw\_runs.csv}
