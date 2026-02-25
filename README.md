@@ -132,6 +132,18 @@ Output PDF:
 
 - `tasks/Task_06_Cooling_Tower/Task6_Report.pdf`
 
+### Task 9 Poster Exploration (Task 6 Contrast)
+
+Generate communication-focused figures contrasting feasible vs relaxed optimization outcomes:
+
+```bash
+python tasks/Task_09_Presentation/task6_poster_exploration/run_poster_exploration.py
+```
+
+Outputs are written under:
+
+- `tasks/Task_09_Presentation/task6_poster_exploration/results/`
+
 ### Global Seeding
 To force fresh data generation with a new random seed:
 ```bash
