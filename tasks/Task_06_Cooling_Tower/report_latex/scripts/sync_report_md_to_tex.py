@@ -78,6 +78,7 @@ def _code_to_math(code: str) -> str:
 def _convert_inline(text: str) -> str:
     # Preserve inline code first.
     code_spans: List[str] = []
+    bold_spans: List[str] = []
 
     def repl_code(match: re.Match[str]) -> str:
         code_spans.append(match.group(1))
@@ -85,8 +86,12 @@ def _convert_inline(text: str) -> str:
 
     text = re.sub(r"`([^`]+)`", repl_code, text)
 
-    # Bold markdown.
-    text = re.sub(r"\*\*(.+?)\*\*", lambda m: r"\textbf{" + _escape_latex(m.group(1)) + "}", text)
+    # Preserve bold markdown before escaping to avoid turning \textbf into literal text.
+    def repl_bold(match: re.Match[str]) -> str:
+        bold_spans.append(match.group(1))
+        return f"@@BOLD{len(bold_spans)-1}@@"
+
+    text = re.sub(r"\*\*(.+?)\*\*", repl_bold, text)
 
     # Escape remaining text.
     text = _escape_latex(text)
@@ -95,6 +100,10 @@ def _convert_inline(text: str) -> str:
     for i, code in enumerate(code_spans):
         replacement = _code_to_math(code) if _is_math_code(code) else r"\texttt{" + _escape_latex(code) + "}"
         text = text.replace(f"@@CODE{i}@@", replacement)
+
+    # Restore bold spans.
+    for i, content in enumerate(bold_spans):
+        text = text.replace(f"@@BOLD{i}@@", r"\textbf{" + _escape_latex(content) + "}")
 
     return text
 
