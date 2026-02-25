@@ -1,0 +1,29 @@
+\chapter{Problem Formulation}
+
+\section{Geometry Model}
+The cooling tower is modeled as a stack of frustums.
+For segment $i$ with lower and upper radii $r_{i-1}, r_i$ and height $h_i$:
+\begin{align}
+A_i &= \pi (r_{i-1} + r_i)\sqrt{(r_i-r_{i-1})^2 + h_i^2},\\
+V_i &= \frac{\pi h_i}{3}\left(r_{i-1}^2 + r_{i-1}r_i + r_i^2\right).
+\end{align}
+Total shell area and volume are:
+\begin{align}
+\towerArea &= \sum_i A_i,\quad
+\towerVolume = \sum_i V_i.
+\end{align}
+
+\section{Optimization Objective}
+The scalar objective minimized by all solvers is:
+\begin{equation}
+\obj(x) = \towerArea(x) + P_{\mathrm{volume}} + P_{\mathrm{height}} + P_{\mathrm{shape}} + P_{\mathrm{smooth}} + P_{\mathrm{bounds}} + P_{\mathrm{ratio}},
+\end{equation}
+with terms activated per scenario.
+
+\section{Feasibility Criteria}
+A run is feasible if all relevant conditions are satisfied:
+\begin{itemize}[leftmargin=1.5em]
+\item Relative volume error $\le 10^{-3}$,
+\item Relative total-height error $\le 10^{-3}$ when heights are decision variables,
+\item Monotonic hyperboloid violation $\le 10^{-6}$ when radii are decision variables.
+\end{itemize}

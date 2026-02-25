@@ -1,0 +1,34 @@
+\chapter{Results}
+
+\section{Cross-Algorithm Summary}
+\IfFileExists{tables/algorithm_summary_table.tex}{
+\input{tables/algorithm_summary_table}
+}{
+Algorithm summary table not generated yet. Run the table-generation script.
+}
+
+\section{Scenario Summary}
+\IfFileExists{tables/scenario_summary_table.tex}{
+\input{tables/scenario_summary_table}
+}{
+Scenario summary table not generated yet. Run the table-generation script.
+}
+
+\section{Key Findings}
+\IfFileExists{tables/key_findings_table.tex}{
+\input{tables/key_findings_table}
+}{
+Key findings table not generated yet. Run the table-generation script.
+}
+
+\section{Figures}
+\begin{figure}[H]
+\centering
+\IfFileExists{cross_scenario_area_bar.png}{
+\includegraphics[width=0.9\textwidth]{cross_scenario_area_bar.png}
+}{
+\fbox{\parbox{0.85\textwidth}{Figure not generated yet: \texttt{cross\_scenario\_area\_bar.png}}}
+}
+\caption{Mean area by scenario and algorithm.}
+\label{fig:cross-scenario-area}
+\end{figure}

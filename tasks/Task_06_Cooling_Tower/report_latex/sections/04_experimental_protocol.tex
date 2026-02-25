@@ -1,0 +1,29 @@
+\chapter{Experimental Protocol}
+
+\section{Scenarios}
+Eight scenarios (S1--S8) are defined in code with three decision modes:
+\texttt{radii}, \texttt{heights}, and \texttt{joint}.
+
+\section{Run Settings}
+Default run protocol:
+\begin{itemize}[leftmargin=1.5em]
+\item 10 runs per algorithm per scenario,
+\item deterministic seed offset policy for reproducibility,
+\item scenario-specific evaluation budgets and penalties.
+\end{itemize}
+
+\section{Reproducible Pipeline}
+\begin{enumerate}[leftmargin=1.5em]
+\item Generate experiments and figures:
+\begin{verbatim}
+python tasks/Task_06_Cooling_Tower/run_experiments.py
+\end{verbatim}
+\item Generate LaTeX tables from CSV exports:
+\begin{verbatim}
+python tasks/Task_06_Cooling_Tower/report_latex/scripts/generate_tables.py
+\end{verbatim}
+\item Compile report:
+\begin{verbatim}
+latexmk -pdf -interaction=nonstopmode main.tex
+\end{verbatim}
+\end{enumerate}

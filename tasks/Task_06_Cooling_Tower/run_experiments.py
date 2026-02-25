@@ -118,6 +118,106 @@ def _write_csv(path: str, rows: List[Dict[str, object]], fieldnames: List[str]) 
             writer.writerow(row)
 
 
+def _export_latex_csv_inputs(
+    output_dir: str,
+    scenario_summary_rows: List[Dict[str, object]],
+    algorithm_summary_rows: List[Dict[str, object]],
+) -> None:
+    _ensure_dir(output_dir)
+
+    scenario_table_rows = []
+    for row in scenario_summary_rows:
+        scenario_table_rows.append(
+            {
+                "scenario_id": row["scenario_id"],
+                "algorithm": row["algorithm"],
+                "mean_area": row["mean_area"],
+                "std_area": row["std_area"],
+                "mean_rel_volume_error": row["mean_rel_volume_error"],
+                "mean_evals": row["mean_evals"],
+                "mean_time_s": row["mean_time_s"],
+                "feasibility_rate": row["feasibility_rate"],
+            }
+        )
+
+    _write_csv(
+        os.path.join(output_dir, "scenario_summary_table.csv"),
+        scenario_table_rows,
+        fieldnames=[
+            "scenario_id",
+            "algorithm",
+            "mean_area",
+            "std_area",
+            "mean_rel_volume_error",
+            "mean_evals",
+            "mean_time_s",
+            "feasibility_rate",
+        ],
+    )
+
+    algorithm_table_rows = []
+    for row in algorithm_summary_rows:
+        algorithm_table_rows.append(
+            {
+                "algorithm": row["algorithm"],
+                "total_runs": row["total_runs"],
+                "mean_area": row["mean_area"],
+                "mean_rel_volume_error": row["mean_rel_volume_error"],
+                "mean_evals": row["mean_evals"],
+                "mean_time_s": row["mean_time_s"],
+                "overall_feasibility_rate": row["overall_feasibility_rate"],
+            }
+        )
+
+    _write_csv(
+        os.path.join(output_dir, "algorithm_summary_table.csv"),
+        algorithm_table_rows,
+        fieldnames=[
+            "algorithm",
+            "total_runs",
+            "mean_area",
+            "mean_rel_volume_error",
+            "mean_evals",
+            "mean_time_s",
+            "overall_feasibility_rate",
+        ],
+    )
+
+    key_findings_rows = []
+    scenario_ids = sorted({str(row["scenario_id"]) for row in scenario_summary_rows})
+    for sid in scenario_ids:
+        rows = [row for row in scenario_summary_rows if row["scenario_id"] == sid]
+        if not rows:
+            continue
+
+        best_tradeoff_row = max(rows, key=lambda item: (float(item["feasibility_rate"]), -float(item["mean_area"])))
+        fastest_row = min(rows, key=lambda item: float(item["mean_evals"]))
+
+        key_findings_rows.append(
+            {
+                "scenario_id": sid,
+                "best_tradeoff_algorithm": best_tradeoff_row["algorithm"],
+                "best_tradeoff_feasibility_rate": best_tradeoff_row["feasibility_rate"],
+                "best_tradeoff_mean_area": best_tradeoff_row["mean_area"],
+                "fastest_algorithm": fastest_row["algorithm"],
+                "fastest_mean_evals": fastest_row["mean_evals"],
+            }
+        )
+
+    _write_csv(
+        os.path.join(output_dir, "key_findings_table.csv"),
+        key_findings_rows,
+        fieldnames=[
+            "scenario_id",
+            "best_tradeoff_algorithm",
+            "best_tradeoff_feasibility_rate",
+            "best_tradeoff_mean_area",
+            "fastest_algorithm",
+            "fastest_mean_evals",
+        ],
+    )
+
+
 def _markdown_table(headers: List[str], rows: List[List[str]]) -> str:
     lines = []
     lines.append("| " + " | ".join(headers) + " |")
@@ -297,7 +397,7 @@ def _generate_report(
         )
     )
     lines.append("")
-    lines.append("![Cross-scenario area comparison](results/figures/cross_scenario_area_bar.png)")
+    lines.append("![Cross-scenario area comparison](../figures/cross_scenario_area_bar.png)")
     lines.append("")
 
     lines.append("## 8. Scenario Results")
@@ -334,12 +434,12 @@ def _generate_report(
             )
         )
         lines.append("")
-        lines.append(f"![{sid} convergence](results/figures/{sid}_convergence.png)")
+        lines.append(f"![{sid} convergence](../figures/{sid}_convergence.png)")
         lines.append("")
-        lines.append(f"![{sid} profile](results/figures/{sid}_profile_overlay.png)")
+        lines.append(f"![{sid} profile](../figures/{sid}_profile_overlay.png)")
         lines.append("")
         if include_3d:
-            lines.append(f"![{sid} 3D towers](results/figures/{sid}_tower_3d.png)")
+            lines.append(f"![{sid} 3D towers](../figures/{sid}_tower_3d.png)")
             lines.append("")
 
     lines.append("## 9. Key Findings")
@@ -413,10 +513,10 @@ def _generate_report(
     )
     lines.append("")
     lines.append("## 11. Deliverables")
-    lines.append("- `results/raw_runs.csv`")
-    lines.append("- `results/scenario_summary.csv`")
-    lines.append("- `results/algorithm_summary.csv`")
-    lines.append("- `results/scenario_definitions.json`")
+    lines.append("- `results/data/raw_runs.csv`")
+    lines.append("- `results/data/scenario_summary.csv`")
+    lines.append("- `results/data/algorithm_summary.csv`")
+    lines.append("- `results/data/scenario_definitions.json`")
     lines.append("- `results/figures/*.png`")
 
     with open(report_path, "w", encoding="utf-8") as f:
@@ -434,13 +534,36 @@ def main() -> None:
         help="Comma-separated scenario IDs (default: all S1..S8)",
     )
     parser.add_argument("--no-3d", action="store_true", help="Skip 3D tower plots")
+    parser.add_argument(
+        "--report-outdir",
+        type=str,
+        default="",
+        help="Optional directory for report artifacts (Report.md). Default: results/reports",
+    )
+    parser.set_defaults(export_latex_tables=True)
+    parser.add_argument(
+        "--export-latex-tables",
+        dest="export_latex_tables",
+        action="store_true",
+        help="Export CSV inputs under results/latex for LaTeX table generation (default: enabled).",
+    )
+    parser.add_argument(
+        "--no-export-latex-tables",
+        dest="export_latex_tables",
+        action="store_false",
+        help="Disable CSV export used by the LaTeX report pipeline.",
+    )
     args = parser.parse_args()
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
     results_dir = os.path.join(script_dir, "results")
     figures_dir = os.path.join(results_dir, "figures")
+    data_dir = os.path.join(results_dir, "data")
+    report_outdir = os.path.abspath(args.report_outdir) if args.report_outdir else os.path.join(results_dir, "reports")
     _ensure_dir(results_dir)
     _ensure_dir(figures_dir)
+    _ensure_dir(data_dir)
+    _ensure_dir(report_outdir)
 
     all_scenarios = get_all_scenarios()
     all_ids = sorted(all_scenarios.keys())
@@ -583,7 +706,7 @@ def main() -> None:
     scenario_definitions = [scenario_to_dict(get_scenario(sid)) for sid in scenario_ids]
 
     _write_csv(
-        os.path.join(results_dir, "raw_runs.csv"),
+        os.path.join(data_dir, "raw_runs.csv"),
         raw_rows,
         fieldnames=[
             "scenario_id",
@@ -606,7 +729,7 @@ def main() -> None:
     )
 
     _write_csv(
-        os.path.join(results_dir, "scenario_summary.csv"),
+        os.path.join(data_dir, "scenario_summary.csv"),
         scenario_summary_rows,
         fieldnames=[
             "scenario_id",
@@ -626,7 +749,7 @@ def main() -> None:
     )
 
     _write_csv(
-        os.path.join(results_dir, "algorithm_summary.csv"),
+        os.path.join(data_dir, "algorithm_summary.csv"),
         algorithm_summary_rows,
         fieldnames=[
             "algorithm",
@@ -640,10 +763,18 @@ def main() -> None:
         ],
     )
 
-    with open(os.path.join(results_dir, "scenario_definitions.json"), "w", encoding="utf-8") as f:
+    with open(os.path.join(data_dir, "scenario_definitions.json"), "w", encoding="utf-8") as f:
         json.dump(scenario_definitions, f, indent=2)
 
-    report_path = os.path.join(script_dir, "Report.md")
+    if args.export_latex_tables:
+        latex_csv_dir = os.path.join(results_dir, "latex")
+        _export_latex_csv_inputs(
+            output_dir=latex_csv_dir,
+            scenario_summary_rows=scenario_summary_rows,
+            algorithm_summary_rows=algorithm_summary_rows,
+        )
+
+    report_path = os.path.join(report_outdir, "Report.md")
     _generate_report(
         report_path=report_path,
         scenario_ids=scenario_ids,
@@ -657,6 +788,9 @@ def main() -> None:
 
     print("\nTask 6 experiments complete.")
     print(f"Results directory: {results_dir}")
+    print(f"Data directory: {data_dir}")
+    if args.export_latex_tables:
+        print(f"LaTeX CSV inputs: {os.path.join(results_dir, 'latex')}")
     print(f"Report: {report_path}")
 
 

@@ -93,12 +93,34 @@ python tasks/Task_06_Cooling_Tower/run_experiments.py --runs 2 --scenarios S1,S7
 
 Task 6 outputs are written to:
 
-- `tasks/Task_06_Cooling_Tower/results/raw_runs.csv`
-- `tasks/Task_06_Cooling_Tower/results/scenario_summary.csv`
-- `tasks/Task_06_Cooling_Tower/results/algorithm_summary.csv`
-- `tasks/Task_06_Cooling_Tower/results/scenario_definitions.json`
+- `tasks/Task_06_Cooling_Tower/results/data/raw_runs.csv`
+- `tasks/Task_06_Cooling_Tower/results/data/scenario_summary.csv`
+- `tasks/Task_06_Cooling_Tower/results/data/algorithm_summary.csv`
+- `tasks/Task_06_Cooling_Tower/results/data/scenario_definitions.json`
 - `tasks/Task_06_Cooling_Tower/results/figures/*.png`
-- `tasks/Task_06_Cooling_Tower/Report.md`
+- `tasks/Task_06_Cooling_Tower/results/latex/*.csv` (inputs for LaTeX tables)
+- `tasks/Task_06_Cooling_Tower/results/reports/Report.md`
+
+### Task 6 LaTeX Report Workflow
+
+Generate experiments and LaTeX CSV inputs:
+
+```bash
+python tasks/Task_06_Cooling_Tower/run_experiments.py
+```
+
+Convert CSV inputs to `.tex` tables:
+
+```bash
+python tasks/Task_06_Cooling_Tower/report_latex/scripts/generate_tables.py
+```
+
+Compile the report:
+
+```bash
+cd tasks/Task_06_Cooling_Tower/report_latex
+latexmk -pdf -interaction=nonstopmode main.tex
+```
 
 ### Global Seeding
 To force fresh data generation with a new random seed:
