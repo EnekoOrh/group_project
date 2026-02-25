@@ -16,6 +16,5 @@ __pycache__
 # OS
 .DS_Store
 
-# Generated Results (re-generatable)
-tasks/*/results/
-tasks/**/results/
+
+
