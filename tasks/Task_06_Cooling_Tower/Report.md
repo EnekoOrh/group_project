@@ -121,6 +121,8 @@ Feasibility of the shown 3D towers (same selected runs as profile overlay):
 - PSO: **FEASIBLE** - passes volume (2.663e-04 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
 - BFGS: **FEASIBLE** - passes volume (1.899e-06 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
 
+S2 limitation note: although the selected PSO tower is mathematically feasible under the current rule, it can still look non-practical (abrupt throat/expansion). This happens because S2 intentionally uses a wide radii range and does not enforce smoothness or additional constructability checks; feasibility here only enforces volume and hyperboloid monotonicity.
+
 
 ### S3
 | Algorithm | Mean Area | Std Area | Mean Rel Vol Err | Mean Evals | Mean Time (s) | Feasibility Rate |
@@ -267,6 +269,8 @@ Result patterns are consistent with expected method behavior: BFGS is computatio
 For practical engineering usage in this problem family, the recommended workflow is a hybrid strategy: use SA/PSO for global search and feasibility discovery, then warm-start BFGS for rapid refinement of the best feasible candidate.
 
 Scenario S8 remains the principal bottleneck under the current penalty/budget setup; this indicates that constructability and enlarged-volume requirements are jointly tight. Future refinement should focus on adaptive penalty scheduling, better initialization heuristics for joint variables, and potentially increased stochastic budget for S8.
+
+An additional modeling limitation is visible in S2: some solutions can be formally feasible while still looking impractical, because the feasibility definition does not currently include geometric smoothness or constructability constraints in that scenario. A practical improvement is to report dual status (mathematical feasibility vs engineering practicality) and add explicit constructability constraints such as smoothness penalties, adjacent-radius jump limits, curvature controls, and minimum neck-radius rules.
 
 ## 11. Deliverables
 - `results/data/raw_runs.csv`
