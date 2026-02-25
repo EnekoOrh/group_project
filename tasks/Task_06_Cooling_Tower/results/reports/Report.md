@@ -1,6 +1,6 @@
 # Task 6 Report: Hyperboloid Cooling Tower Optimization
 
-Generated: 2026-02-25 18:54
+Generated: 2026-02-25 19:19
 
 ## 1. Objective
 Minimize cooling-tower lateral shell area using SA, PSO, and BFGS while enforcing fixed target volume and scenario-specific constructability constraints.
@@ -52,7 +52,7 @@ The optimized scalar objective is `J(x) = A(x) + P_volume + P_height + P_shape +
 - If radii vary, monotonic hyperboloid violation must be `<= 1e-6`.
 
 ## 5. Optimization Protocol
-- Runs per algorithm per scenario: 1
+- Runs per algorithm per scenario: 10
 - Seed offset: 0
 - SA: `temp_init=120`, `cooling_rate=0.997`, scenario-dependent `step_size`
 - PSO: `w=0.65`, `c1=1.6`, `c2=1.7`, particles = 40 or 50 by dimension
@@ -76,9 +76,9 @@ Stochastic budgets are 10k evaluations for lower-dimensional setups and 16k for 
 ## 7. Cross-Algorithm Summary
 | Algorithm | Total Runs | Mean Area | Mean Rel Vol Err | Mean Evals | Mean Time (s) | Feasibility Rate |
 |---|---|---|---|---|---|---|
-| SA | 8 | 7781.46 | 6.159e-04 | 11500.0 | 1.0160 | 62.5% |
-| PSO | 8 | 8230.94 | 1.237e-02 | 11500.0 | 1.0459 | 75.0% |
-| BFGS | 8 | 7807.58 | 3.919e-04 | 4197.5 | 0.3592 | 75.0% |
+| SA | 80 | 7814.56 | 5.277e-04 | 11500.0 | 0.5373 | 71.2% |
+| PSO | 80 | 8264.80 | 1.698e-02 | 11500.0 | 0.5744 | 50.0% |
+| BFGS | 80 | 7850.64 | 4.018e-04 | 4227.9 | 0.2097 | 72.5% |
 
 ![Cross-scenario area comparison](../figures/cross_scenario_area_bar.png)
 
@@ -87,9 +87,9 @@ Stochastic budgets are 10k evaluations for lower-dimensional setups and 16k for 
 ### S1
 | Algorithm | Mean Area | Std Area | Mean Rel Vol Err | Mean Evals | Mean Time (s) | Feasibility Rate |
 |---|---|---|---|---|---|---|
-| BFGS | 7782.01 | 0.00 | 1.537e-03 | 5001.0 | 0.4115 | 0.0% |
-| PSO | 7819.93 | 0.00 | 3.504e-04 | 10000.0 | 0.9225 | 100.0% |
-| SA | 7779.78 | 0.00 | 1.897e-03 | 10000.0 | 0.9014 | 0.0% |
+| BFGS | 7782.01 | 0.00 | 1.537e-03 | 3302.6 | 0.1629 | 0.0% |
+| PSO | 7950.10 | 201.50 | 1.571e-02 | 10000.0 | 0.5322 | 20.0% |
+| SA | 7781.85 | 4.69 | 1.246e-03 | 10000.0 | 0.5033 | 50.0% |
 
 ![S1 convergence](../figures/S1_convergence.png)
 
@@ -97,13 +97,18 @@ Stochastic budgets are 10k evaluations for lower-dimensional setups and 16k for 
 
 ![S1 3D towers](../figures/S1_tower_3d.png)
 
+Feasibility of the shown 3D towers (same selected runs as profile overlay):
+- SA: **FEASIBLE** - passes volume (3.037e-04 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+- PSO: **FEASIBLE** - passes volume (2.407e-04 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+- BFGS: **INFEASIBLE** - fails volume (1.537e-03 > 1.000e-03). visualized run is lowest penalized objective among infeasible runs.
+
 
 ### S2
 | Algorithm | Mean Area | Std Area | Mean Rel Vol Err | Mean Evals | Mean Time (s) | Feasibility Rate |
 |---|---|---|---|---|---|---|
-| BFGS | 7741.67 | 0.00 | 1.899e-06 | 3606.0 | 0.2617 | 100.0% |
-| PSO | 9075.03 | 0.00 | 2.663e-04 | 10000.0 | 0.8287 | 100.0% |
-| SA | 7751.12 | 0.00 | 2.854e-05 | 10000.0 | 0.8041 | 100.0% |
+| BFGS | 8051.30 | 532.40 | 1.485e-04 | 3945.5 | 0.1556 | 100.0% |
+| PSO | 9352.84 | 524.78 | 6.536e-02 | 10000.0 | 0.4390 | 40.0% |
+| SA | 7753.26 | 9.27 | 5.492e-05 | 10000.0 | 0.4092 | 100.0% |
 
 ![S2 convergence](../figures/S2_convergence.png)
 
@@ -111,13 +116,18 @@ Stochastic budgets are 10k evaluations for lower-dimensional setups and 16k for 
 
 ![S2 3D towers](../figures/S2_tower_3d.png)
 
+Feasibility of the shown 3D towers (same selected runs as profile overlay):
+- SA: **FEASIBLE** - passes volume (1.686e-05 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+- PSO: **FEASIBLE** - passes volume (2.663e-04 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+- BFGS: **FEASIBLE** - passes volume (1.899e-06 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+
 
 ### S3
 | Algorithm | Mean Area | Std Area | Mean Rel Vol Err | Mean Evals | Mean Time (s) | Feasibility Rate |
 |---|---|---|---|---|---|---|
-| BFGS | 7741.69 | 0.00 | 1.900e-06 | 2142.0 | 0.1632 | 100.0% |
-| PSO | 8014.30 | 0.00 | 1.301e-05 | 10000.0 | 0.8033 | 100.0% |
-| SA | 7744.82 | 0.00 | 2.512e-05 | 10000.0 | 0.8046 | 100.0% |
+| BFGS | 7926.31 | 300.48 | 1.541e-04 | 2904.7 | 0.1227 | 100.0% |
+| PSO | 8258.12 | 351.80 | 2.509e-05 | 10000.0 | 0.4378 | 90.0% |
+| SA | 7753.02 | 21.36 | 3.424e-05 | 10000.0 | 0.4124 | 100.0% |
 
 ![S3 convergence](../figures/S3_convergence.png)
 
@@ -125,13 +135,18 @@ Stochastic budgets are 10k evaluations for lower-dimensional setups and 16k for 
 
 ![S3 3D towers](../figures/S3_tower_3d.png)
 
+Feasibility of the shown 3D towers (same selected runs as profile overlay):
+- SA: **FEASIBLE** - passes volume (5.257e-06 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+- PSO: **FEASIBLE** - passes volume (1.211e-06 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+- BFGS: **FEASIBLE** - passes volume (1.900e-06 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+
 
 ### S4
 | Algorithm | Mean Area | Std Area | Mean Rel Vol Err | Mean Evals | Mean Time (s) | Feasibility Rate |
 |---|---|---|---|---|---|---|
-| BFGS | 7779.85 | 0.00 | 8.915e-04 | 5001.0 | 0.4409 | 100.0% |
-| PSO | 8365.55 | 0.00 | 9.705e-02 | 10000.0 | 1.0105 | 0.0% |
-| SA | 7766.67 | 0.00 | 1.979e-03 | 10000.0 | 0.9973 | 0.0% |
+| BFGS | 7779.85 | 0.00 | 8.915e-04 | 4101.4 | 0.2508 | 100.0% |
+| PSO | 8269.55 | 447.60 | 3.272e-02 | 10000.0 | 0.5619 | 0.0% |
+| SA | 7783.18 | 14.88 | 1.557e-03 | 10000.0 | 0.5240 | 20.0% |
 
 ![S4 convergence](../figures/S4_convergence.png)
 
@@ -139,13 +154,18 @@ Stochastic budgets are 10k evaluations for lower-dimensional setups and 16k for 
 
 ![S4 3D towers](../figures/S4_tower_3d.png)
 
+Feasibility of the shown 3D towers (same selected runs as profile overlay):
+- SA: **FEASIBLE** - passes volume (3.986e-05 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+- PSO: **INFEASIBLE** - fails volume (2.086e-03 > 1.000e-03). visualized run is lowest penalized objective among infeasible runs.
+- BFGS: **FEASIBLE** - passes volume (8.915e-04 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+
 
 ### S5
 | Algorithm | Mean Area | Std Area | Mean Rel Vol Err | Mean Evals | Mean Time (s) | Feasibility Rate |
 |---|---|---|---|---|---|---|
-| BFGS | 7742.56 | 0.00 | 2.331e-06 | 2427.0 | 0.1761 | 100.0% |
-| PSO | 7819.97 | 0.00 | 1.489e-04 | 10000.0 | 0.7615 | 100.0% |
-| SA | 7754.88 | 0.00 | 6.674e-05 | 10000.0 | 0.7261 | 100.0% |
+| BFGS | 7742.56 | 0.00 | 2.331e-06 | 4164.2 | 0.1625 | 100.0% |
+| PSO | 7796.77 | 32.30 | 1.128e-04 | 10000.0 | 0.4147 | 90.0% |
+| SA | 7757.25 | 6.61 | 3.902e-05 | 10000.0 | 0.3880 | 100.0% |
 
 ![S5 convergence](../figures/S5_convergence.png)
 
@@ -153,13 +173,18 @@ Stochastic budgets are 10k evaluations for lower-dimensional setups and 16k for 
 
 ![S5 3D towers](../figures/S5_tower_3d.png)
 
+Feasibility of the shown 3D towers (same selected runs as profile overlay):
+- SA: **FEASIBLE** - passes volume (7.754e-06 <= 1.000e-03), height (1.602e-04 <= 1.000e-03).
+- PSO: **FEASIBLE** - passes volume (4.870e-07 <= 1.000e-03), height (6.591e-05 <= 1.000e-03).
+- BFGS: **FEASIBLE** - passes volume (2.331e-06 <= 1.000e-03), height (8.747e-05 <= 1.000e-03).
+
 
 ### S6
 | Algorithm | Mean Area | Std Area | Mean Rel Vol Err | Mean Evals | Mean Time (s) | Feasibility Rate |
 |---|---|---|---|---|---|---|
-| BFGS | 7741.72 | 0.00 | 2.071e-06 | 1401.0 | 0.0951 | 100.0% |
-| PSO | 7914.47 | 0.00 | 3.403e-06 | 10000.0 | 0.7871 | 100.0% |
-| SA | 7783.24 | 0.00 | 1.478e-05 | 10000.0 | 0.7521 | 100.0% |
+| BFGS | 7741.72 | 0.00 | 2.071e-06 | 1402.6 | 0.0551 | 100.0% |
+| PSO | 7913.68 | 146.68 | 5.923e-04 | 10000.0 | 0.4184 | 90.0% |
+| SA | 7825.77 | 33.17 | 6.569e-05 | 10000.0 | 0.3880 | 100.0% |
 
 ![S6 convergence](../figures/S6_convergence.png)
 
@@ -167,13 +192,18 @@ Stochastic budgets are 10k evaluations for lower-dimensional setups and 16k for 
 
 ![S6 3D towers](../figures/S6_tower_3d.png)
 
+Feasibility of the shown 3D towers (same selected runs as profile overlay):
+- SA: **FEASIBLE** - passes volume (1.478e-05 <= 1.000e-03), height (8.960e-05 <= 1.000e-03).
+- PSO: **FEASIBLE** - passes volume (2.557e-05 <= 1.000e-03), height (5.838e-05 <= 1.000e-03).
+- BFGS: **FEASIBLE** - passes volume (2.071e-06 <= 1.000e-03), height (8.632e-05 <= 1.000e-03).
+
 
 ### S7
 | Algorithm | Mean Area | Std Area | Mean Rel Vol Err | Mean Evals | Mean Time (s) | Feasibility Rate |
 |---|---|---|---|---|---|---|
-| BFGS | 8117.92 | 0.00 | 2.799e-04 | 7001.0 | 0.5477 | 100.0% |
-| PSO | 8596.66 | 0.00 | 1.888e-05 | 16000.0 | 1.3884 | 100.0% |
-| SA | 7952.90 | 0.00 | 7.725e-05 | 16000.0 | 1.3875 | 100.0% |
+| BFGS | 7968.31 | 369.60 | 6.476e-05 | 7000.9 | 0.3242 | 80.0% |
+| PSO | 8608.62 | 174.56 | 4.144e-04 | 16000.0 | 0.7688 | 70.0% |
+| SA | 8160.14 | 281.40 | 1.305e-04 | 16000.0 | 0.7203 | 100.0% |
 
 ![S7 convergence](../figures/S7_convergence.png)
 
@@ -181,13 +211,18 @@ Stochastic budgets are 10k evaluations for lower-dimensional setups and 16k for 
 
 ![S7 3D towers](../figures/S7_tower_3d.png)
 
+Feasibility of the shown 3D towers (same selected runs as profile overlay):
+- SA: **FEASIBLE** - passes volume (1.717e-04 <= 1.000e-03), height (4.769e-04 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+- PSO: **FEASIBLE** - passes volume (6.824e-05 <= 1.000e-03), height (9.218e-05 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+- BFGS: **FEASIBLE** - passes volume (1.890e-06 <= 1.000e-03), height (8.481e-05 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+
 
 ### S8
 | Algorithm | Mean Area | Std Area | Mean Rel Vol Err | Mean Evals | Mean Time (s) | Feasibility Rate |
 |---|---|---|---|---|---|---|
-| BFGS | 7813.24 | 0.00 | 4.192e-04 | 7001.0 | 0.7771 | 0.0% |
-| PSO | 8241.63 | 0.00 | 1.074e-03 | 16000.0 | 1.8651 | 0.0% |
-| SA | 7718.27 | 0.00 | 8.381e-04 | 16000.0 | 1.7551 | 0.0% |
+| BFGS | 7813.08 | 0.46 | 4.146e-04 | 7001.0 | 0.4441 | 0.0% |
+| PSO | 7968.67 | 348.77 | 2.087e-02 | 16000.0 | 1.0223 | 0.0% |
+| SA | 7701.98 | 32.24 | 1.093e-03 | 16000.0 | 0.9536 | 0.0% |
 
 ![S8 convergence](../figures/S8_convergence.png)
 
@@ -195,32 +230,37 @@ Stochastic budgets are 10k evaluations for lower-dimensional setups and 16k for 
 
 ![S8 3D towers](../figures/S8_tower_3d.png)
 
+Feasibility of the shown 3D towers (same selected runs as profile overlay):
+- SA: **INFEASIBLE** - fails height (2.220e-03 > 1.000e-03). visualized run is lowest penalized objective among infeasible runs.
+- PSO: **INFEASIBLE** - fails volume (1.192e-03 > 1.000e-03), height (1.597e-02 > 1.000e-03), shape (6.460e-03 > 1.000e-06). visualized run is lowest penalized objective among infeasible runs.
+- BFGS: **INFEASIBLE** - fails height (2.684e-03 > 1.000e-03), shape (2.649e-03 > 1.000e-06). visualized run is lowest penalized objective among infeasible runs.
+
 ## 9. Key Findings
 
-- S1: best feasibility-area tradeoff = PSO (feasibility 100.0%, mean area 7819.93 m^2).
-- S1: lowest mean evaluation count = BFGS (5001.0 evals).
-- S2: best feasibility-area tradeoff = BFGS (feasibility 100.0%, mean area 7741.67 m^2).
-- S2: lowest mean evaluation count = BFGS (3606.0 evals).
-- S3: best feasibility-area tradeoff = BFGS (feasibility 100.0%, mean area 7741.69 m^2).
-- S3: lowest mean evaluation count = BFGS (2142.0 evals).
+- S1: best feasibility-area tradeoff = SA (feasibility 50.0%, mean area 7781.85 m^2).
+- S1: lowest mean evaluation count = BFGS (3302.6 evals).
+- S2: best feasibility-area tradeoff = SA (feasibility 100.0%, mean area 7753.26 m^2).
+- S2: lowest mean evaluation count = BFGS (3945.5 evals).
+- S3: best feasibility-area tradeoff = SA (feasibility 100.0%, mean area 7753.02 m^2).
+- S3: lowest mean evaluation count = BFGS (2904.7 evals).
 - S4: best feasibility-area tradeoff = BFGS (feasibility 100.0%, mean area 7779.85 m^2).
-- S4: lowest mean evaluation count = BFGS (5001.0 evals).
+- S4: lowest mean evaluation count = BFGS (4101.4 evals).
 - S5: best feasibility-area tradeoff = BFGS (feasibility 100.0%, mean area 7742.56 m^2).
-- S5: lowest mean evaluation count = BFGS (2427.0 evals).
+- S5: lowest mean evaluation count = BFGS (4164.2 evals).
 - S6: best feasibility-area tradeoff = BFGS (feasibility 100.0%, mean area 7741.72 m^2).
-- S6: lowest mean evaluation count = BFGS (1401.0 evals).
-- S7: best feasibility-area tradeoff = SA (feasibility 100.0%, mean area 7952.90 m^2).
-- S7: lowest mean evaluation count = BFGS (7001.0 evals).
-- S8: best feasibility-area tradeoff = SA (feasibility 0.0%, mean area 7718.27 m^2).
+- S6: lowest mean evaluation count = BFGS (1402.6 evals).
+- S7: best feasibility-area tradeoff = SA (feasibility 100.0%, mean area 8160.14 m^2).
+- S7: lowest mean evaluation count = BFGS (7000.9 evals).
+- S8: best feasibility-area tradeoff = SA (feasibility 0.0%, mean area 7701.98 m^2).
 - S8: lowest mean evaluation count = BFGS (7001.0 evals).
 
 - Feasibility bottleneck scenarios: S8 (all tested methods yielded 0% feasible runs under current constraints).
 
 ## 10. Discussion and Conclusions
 
-Across all scenarios, **PSO** achieved the highest overall feasibility (75.0%).
-**BFGS** required the fewest evaluations on average (4197.5), confirming its efficiency for local convergence.
-By raw mean area across all runs, **SA** produced the lowest average shell area (7781.46 m^2), but this must be interpreted jointly with feasibility rates.
+Across all scenarios, **BFGS** achieved the highest overall feasibility (72.5%).
+**BFGS** required the fewest evaluations on average (4227.9), confirming its efficiency for local convergence.
+By raw mean area across all runs, **SA** produced the lowest average shell area (7814.56 m^2), but this must be interpreted jointly with feasibility rates.
 
 Result patterns are consistent with expected method behavior: BFGS is computationally efficient and strong when gradients and local curvature align with feasible basins; SA is often robust under hard nonlinear penalties because probabilistic acceptance helps transition between constrained basins; PSO explores broadly but can underperform feasibility when penalty landscapes are steep and high-dimensional.
 

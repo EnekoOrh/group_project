@@ -32,6 +32,9 @@ from src.visualization.cooling_tower_plotting import (
 
 ALGORITHMS = ["SA", "PSO", "BFGS"]
 ALGO_SEED_OFFSETS = {"SA": 0, "PSO": 10000, "BFGS": 20000}
+VOLUME_FEASIBILITY_THRESHOLD = 1e-3
+HEIGHT_FEASIBILITY_THRESHOLD = 1e-3
+SHAPE_FEASIBILITY_THRESHOLD = 1e-6
 
 
 def _ensure_dir(path: str) -> None:
@@ -108,6 +111,70 @@ def _safe_std(values: List[float]) -> float:
     if len(values) <= 1:
         return 0.0
     return float(np.std(values))
+
+
+def _feasibility_checks_for_scenario(scenario, metrics: Dict[str, float]) -> List[Dict[str, object]]:
+    checks = [
+        {
+            "name": "volume",
+            "value": float(metrics["rel_volume_error"]),
+            "threshold": VOLUME_FEASIBILITY_THRESHOLD,
+        }
+    ]
+
+    heights_are_variables = scenario.decision_mode in ("heights", "joint")
+    radii_are_variables = scenario.decision_mode in ("radii", "joint")
+
+    if heights_are_variables:
+        checks.append(
+            {
+                "name": "height",
+                "value": float(metrics["rel_height_error"]),
+                "threshold": HEIGHT_FEASIBILITY_THRESHOLD,
+            }
+        )
+
+    if radii_are_variables:
+        checks.append(
+            {
+                "name": "shape",
+                "value": float(metrics["monotonic_violation"]),
+                "threshold": SHAPE_FEASIBILITY_THRESHOLD,
+            }
+        )
+
+    for check in checks:
+        check["passed"] = bool(float(check["value"]) <= float(check["threshold"]))
+
+    return checks
+
+
+def _format_visual_feasibility_line(
+    algo: str,
+    scenario,
+    metrics: Dict[str, float],
+    selection_basis: str,
+) -> str:
+    checks = _feasibility_checks_for_scenario(scenario, metrics)
+    failed = [check for check in checks if not check["passed"]]
+
+    def _format_check(check: Dict[str, object], comparator: str) -> str:
+        return (
+            f"{check['name']} "
+            f"({float(check['value']):.3e} {comparator} {float(check['threshold']):.3e})"
+        )
+
+    if bool(metrics["feasible"]):
+        reason = ", ".join(_format_check(check, "<=") for check in checks)
+        return f"- {algo}: **FEASIBLE** - passes {reason}."
+
+    if not failed:
+        failed = checks
+    reason = ", ".join(_format_check(check, ">") for check in failed)
+    line = f"- {algo}: **INFEASIBLE** - fails {reason}."
+    if selection_basis == "best_penalized_objective":
+        line += " visualized run is lowest penalized objective among infeasible runs."
+    return line
 
 
 def _write_csv(path: str, rows: List[Dict[str, object]], fieldnames: List[str]) -> None:
@@ -233,6 +300,7 @@ def _generate_report(
     scenario_definitions: List[Dict[str, object]],
     scenario_summary_rows: List[Dict[str, object]],
     algorithm_summary_rows: List[Dict[str, object]],
+    visual_selection_by_scenario: Dict[str, Dict[str, Dict[str, object]]],
     include_3d: bool,
     runs: int,
     seed_offset: int,
@@ -438,8 +506,24 @@ def _generate_report(
         lines.append("")
         lines.append(f"![{sid} profile](../figures/{sid}_profile_overlay.png)")
         lines.append("")
+        scenario = get_scenario(sid)
+        selected_visual_runs = visual_selection_by_scenario.get(sid, {})
         if include_3d:
             lines.append(f"![{sid} 3D towers](../figures/{sid}_tower_3d.png)")
+            lines.append("")
+            lines.append("Feasibility of the shown 3D towers (same selected runs as profile overlay):")
+            for algo in ALGORITHMS:
+                selected = selected_visual_runs.get(algo)
+                if not selected:
+                    continue
+                lines.append(
+                    _format_visual_feasibility_line(
+                        algo=algo,
+                        scenario=scenario,
+                        metrics=selected["metrics"],
+                        selection_basis=str(selected["selection_basis"]),
+                    )
+                )
             lines.append("")
 
     lines.append("## 9. Key Findings")
@@ -572,6 +656,7 @@ def main() -> None:
     raw_rows: List[Dict[str, object]] = []
     scenario_summary_rows: List[Dict[str, object]] = []
     algorithm_summary_rows: List[Dict[str, object]] = []
+    visual_selection_by_scenario: Dict[str, Dict[str, Dict[str, object]]] = {}
 
     print(f"Running Task 6 scenarios: {', '.join(scenario_ids)}")
     print(f"Runs per algorithm: {args.runs} | Seed offset: {args.seed_offset}")
@@ -590,6 +675,7 @@ def main() -> None:
         scenario_run_rows = defaultdict(list)
         histories_by_algorithm: Dict[str, List[List[tuple]]] = defaultdict(list)
         profiles_by_algorithm: Dict[str, Dict[str, np.ndarray]] = {}
+        visual_selection_by_scenario[sid] = {}
 
         max_eval_for_plot = 0
 
@@ -631,11 +717,24 @@ def main() -> None:
             best_row = _pick_best_run(scenario_run_rows[algo_name])
             best_x = np.array(json.loads(best_row["decision_vector"]), dtype=float)
             best_metrics = evaluate_decision(scenario, best_x)
+            selection_basis = "best_feasible_area" if bool(best_row["feasible"]) else "best_penalized_objective"
             profiles_by_algorithm[algo_name] = {
                 "radii": best_metrics["radii"],
                 "z": best_metrics["z"],
                 "area": best_metrics["area"],
                 "rel_volume_error": best_metrics["rel_volume_error"],
+            }
+            visual_selection_by_scenario[sid][algo_name] = {
+                "run_index": int(best_row["run_index"]),
+                "seed": int(best_row["seed"]),
+                "selection_basis": selection_basis,
+                "metrics": {
+                    "feasible": bool(best_metrics["feasible"]),
+                    "area": float(best_metrics["area"]),
+                    "rel_volume_error": float(best_metrics["rel_volume_error"]),
+                    "rel_height_error": float(best_metrics["rel_height_error"]),
+                    "monotonic_violation": float(best_metrics["monotonic_violation"]),
+                },
             }
 
             rows = scenario_run_rows[algo_name]
@@ -781,6 +880,7 @@ def main() -> None:
         scenario_definitions=scenario_definitions,
         scenario_summary_rows=scenario_summary_rows,
         algorithm_summary_rows=algorithm_summary_rows,
+        visual_selection_by_scenario=visual_selection_by_scenario,
         include_3d=(not args.no_3d),
         runs=args.runs,
         seed_offset=args.seed_offset,
