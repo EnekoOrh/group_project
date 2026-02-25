@@ -32,8 +32,17 @@ python tasks/Task_06_Cooling_Tower/run_experiments.py
 python tasks/Task_06_Cooling_Tower/report_latex/scripts/generate_tables.py
 ```
 
-3. Compile LaTeX report:
+3. Sync markdown report into LaTeX source:
+```bash
+python tasks/Task_06_Cooling_Tower/report_latex/scripts/sync_report_md_to_tex.py
+```
+
+4. Compile LaTeX report:
 ```bash
 cd tasks/Task_06_Cooling_Tower/report_latex
 latexmk -pdf -interaction=nonstopmode main.tex
 ```
+
+The compiled PDF is written to:
+
+- `tasks/Task_06_Cooling_Tower/Task6_Report.pdf`

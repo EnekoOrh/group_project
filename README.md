@@ -115,12 +115,22 @@ Convert CSV inputs to `.tex` tables:
 python tasks/Task_06_Cooling_Tower/report_latex/scripts/generate_tables.py
 ```
 
+Sync `tasks/Task_06_Cooling_Tower/Report.md` into LaTeX:
+
+```bash
+python tasks/Task_06_Cooling_Tower/report_latex/scripts/sync_report_md_to_tex.py
+```
+
 Compile the report:
 
 ```bash
 cd tasks/Task_06_Cooling_Tower/report_latex
 latexmk -pdf -interaction=nonstopmode main.tex
 ```
+
+Output PDF:
+
+- `tasks/Task_06_Cooling_Tower/Task6_Report.pdf`
 
 ### Global Seeding
 To force fresh data generation with a new random seed:

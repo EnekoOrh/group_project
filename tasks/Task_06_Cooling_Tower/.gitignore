@@ -9,7 +9,7 @@ report_latex/*.fdb_latexmk
 report_latex/*.fls
 report_latex/*.log
 report_latex/*.out
-report_latex/*.pdf
 report_latex/*.run.xml
 report_latex/*.toc
 report_latex/scripts/__pycache__/
+report_latex/build/
