@@ -1,0 +1,2 @@
+scenario_id,best_tradeoff_algorithm,best_tradeoff_feasibility_rate,best_tradeoff_mean_area,fastest_algorithm,fastest_mean_evals
+S1,PSO,1.0,7819.932209032414,BFGS,5001.0
