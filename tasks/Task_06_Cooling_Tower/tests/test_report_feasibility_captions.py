@@ -215,6 +215,7 @@ class ReportFeasibilityCaptionTests(unittest.TestCase):
                 include_3d=True,
                 runs=1,
                 seed_offset=0,
+                figures_dir=str(Path(tmpdir) / "results" / "figures"),
             )
 
             report = report_path.read_text(encoding="utf-8")
@@ -225,6 +226,23 @@ class ReportFeasibilityCaptionTests(unittest.TestCase):
             self.assertIn("lowest penalized objective among infeasible runs", report)
             self.assertIn("volume", report)
             self.assertIn("shape", report)
+            self.assertNotIn("## 9. Key Findings", report)
+            self.assertNotIn("## 11. Deliverables", report)
+            self.assertNotIn("Generated:", report)
+            self.assertIn("### 9.1 Planned Structural Validation in Abaqus", report)
+            self.assertIn("Abaqus", report)
+            self.assertIn("structural suitability", report)
+            self.assertIn("buckling sensitivity", report)
+            self.assertIn("![S1 convergence](results/figures/S1_convergence.png)", report)
+            self.assertIn("![Cross-scenario area comparison](results/figures/cross_scenario_area_bar.png)", report)
+            self.assertIn("S1 remains a difficult required case", report)
+            self.assertNotIn("What Stayed Stable", report)
+            self.assertNotIn("fresh rerun", report.lower())
+            self.assertLess(report.index("## 7. Scenario Results"), report.index("## 8. Cross-Algorithm Summary"))
+            self.assertLess(report.index("![S1 profile](results/figures/S1_profile_overlay.png)"),
+                            report.index("![S1 3D towers](results/figures/S1_tower_3d.png)"))
+            self.assertLess(report.index("![S1 3D towers](results/figures/S1_tower_3d.png)"),
+                            report.index("Feasibility of the shown 3D towers"))
 
 
 if __name__ == "__main__":

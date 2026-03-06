@@ -1,0 +1,276 @@
+[
+  {
+    "scenario_id": "S1",
+    "description": "Required case with bounded radii and required ring heights.",
+    "m": 10,
+    "decision_mode": "radii",
+    "r0": 39.3,
+    "rm": 27.4,
+    "target_volume": 70320.0,
+    "target_total_height": 36.5,
+    "fixed_z": [
+      0.0,
+      3.6,
+      7.3,
+      10.9,
+      14.6,
+      18.2,
+      21.9,
+      25.5,
+      29.1,
+      32.8,
+      36.5
+    ],
+    "fixed_radii": null,
+    "neck_index": 6,
+    "radii_bounds": [
+      12.0,
+      45.0
+    ],
+    "heights_bounds": [
+      1.5,
+      6.0
+    ],
+    "apply_shape_penalty": true,
+    "apply_smoothness_penalty": true,
+    "apply_bounds_penalty": true,
+    "adjacent_height_ratio_limit": null
+  },
+  {
+    "scenario_id": "S2",
+    "description": "Required case with wide radii range (unconstrained-like).",
+    "m": 10,
+    "decision_mode": "radii",
+    "r0": 39.3,
+    "rm": 27.4,
+    "target_volume": 70320.0,
+    "target_total_height": 36.5,
+    "fixed_z": [
+      0.0,
+      3.6,
+      7.3,
+      10.9,
+      14.6,
+      18.2,
+      21.9,
+      25.5,
+      29.1,
+      32.8,
+      36.5
+    ],
+    "fixed_radii": null,
+    "neck_index": 6,
+    "radii_bounds": [
+      5.0,
+      80.0
+    ],
+    "heights_bounds": [
+      1.5,
+      6.0
+    ],
+    "apply_shape_penalty": true,
+    "apply_smoothness_penalty": false,
+    "apply_bounds_penalty": false,
+    "adjacent_height_ratio_limit": null
+  },
+  {
+    "scenario_id": "S3",
+    "description": "Uniform-height radii design with bounded radii.",
+    "m": 10,
+    "decision_mode": "radii",
+    "r0": 39.3,
+    "rm": 27.4,
+    "target_volume": 70320.0,
+    "target_total_height": 36.5,
+    "fixed_z": [
+      0.0,
+      3.65,
+      7.3,
+      10.95,
+      14.6,
+      18.25,
+      21.9,
+      25.55,
+      29.2,
+      32.85,
+      36.5
+    ],
+    "fixed_radii": null,
+    "neck_index": 6,
+    "radii_bounds": [
+      12.0,
+      45.0
+    ],
+    "heights_bounds": [
+      1.5,
+      6.0
+    ],
+    "apply_shape_penalty": true,
+    "apply_smoothness_penalty": false,
+    "apply_bounds_penalty": true,
+    "adjacent_height_ratio_limit": null
+  },
+  {
+    "scenario_id": "S4",
+    "description": "Finer discretization (m=12) with bounded radii and smoothness.",
+    "m": 12,
+    "decision_mode": "radii",
+    "r0": 39.3,
+    "rm": 27.4,
+    "target_volume": 70320.0,
+    "target_total_height": 36.5,
+    "fixed_z": [
+      0.0,
+      3.0416666666666665,
+      6.083333333333333,
+      9.125,
+      12.166666666666666,
+      15.208333333333332,
+      18.25,
+      21.291666666666664,
+      24.333333333333332,
+      27.375,
+      30.416666666666664,
+      33.45833333333333,
+      36.5
+    ],
+    "fixed_radii": null,
+    "neck_index": 7,
+    "radii_bounds": [
+      12.0,
+      45.0
+    ],
+    "heights_bounds": [
+      1.5,
+      6.0
+    ],
+    "apply_shape_penalty": true,
+    "apply_smoothness_penalty": true,
+    "apply_bounds_penalty": true,
+    "adjacent_height_ratio_limit": null
+  },
+  {
+    "scenario_id": "S5",
+    "description": "Fixed radii, optimize bounded heights.",
+    "m": 10,
+    "decision_mode": "heights",
+    "r0": 39.3,
+    "rm": 27.4,
+    "target_volume": 70320.0,
+    "target_total_height": 36.5,
+    "fixed_z": null,
+    "fixed_radii": [
+      39.3,
+      34.94,
+      30.73,
+      27.01,
+      23.77,
+      21.42,
+      20.15,
+      20.22,
+      21.58,
+      24.08,
+      27.4
+    ],
+    "neck_index": null,
+    "radii_bounds": [
+      12.0,
+      45.0
+    ],
+    "heights_bounds": [
+      2.0,
+      5.5
+    ],
+    "apply_shape_penalty": false,
+    "apply_smoothness_penalty": false,
+    "apply_bounds_penalty": true,
+    "adjacent_height_ratio_limit": null
+  },
+  {
+    "scenario_id": "S6",
+    "description": "Fixed radii, optimize wide-range heights (unconstrained-like).",
+    "m": 10,
+    "decision_mode": "heights",
+    "r0": 39.3,
+    "rm": 27.4,
+    "target_volume": 70320.0,
+    "target_total_height": 36.5,
+    "fixed_z": null,
+    "fixed_radii": [
+      39.3,
+      34.94,
+      30.73,
+      27.01,
+      23.77,
+      21.42,
+      20.15,
+      20.22,
+      21.58,
+      24.08,
+      27.4
+    ],
+    "neck_index": null,
+    "radii_bounds": [
+      12.0,
+      45.0
+    ],
+    "heights_bounds": [
+      0.8,
+      8.0
+    ],
+    "apply_shape_penalty": false,
+    "apply_smoothness_penalty": false,
+    "apply_bounds_penalty": false,
+    "adjacent_height_ratio_limit": null
+  },
+  {
+    "scenario_id": "S7",
+    "description": "Joint bounded optimization of radii and heights.",
+    "m": 10,
+    "decision_mode": "joint",
+    "r0": 39.3,
+    "rm": 27.4,
+    "target_volume": 70320.0,
+    "target_total_height": 36.5,
+    "fixed_z": null,
+    "fixed_radii": null,
+    "neck_index": 6,
+    "radii_bounds": [
+      12.0,
+      45.0
+    ],
+    "heights_bounds": [
+      1.5,
+      6.0
+    ],
+    "apply_shape_penalty": true,
+    "apply_smoothness_penalty": false,
+    "apply_bounds_penalty": true,
+    "adjacent_height_ratio_limit": null
+  },
+  {
+    "scenario_id": "S8",
+    "description": "Joint constructability-aware design with larger target volume.",
+    "m": 10,
+    "decision_mode": "joint",
+    "r0": 39.3,
+    "rm": 27.4,
+    "target_volume": 90000.0,
+    "target_total_height": 36.5,
+    "fixed_z": null,
+    "fixed_radii": null,
+    "neck_index": 6,
+    "radii_bounds": [
+      14.0,
+      50.0
+    ],
+    "heights_bounds": [
+      1.5,
+      7.0
+    ],
+    "apply_shape_penalty": true,
+    "apply_smoothness_penalty": true,
+    "apply_bounds_penalty": true,
+    "adjacent_height_ratio_limit": 1.8
+  }
+]

@@ -1,7 +1,5 @@
 # Task 6 Report: Hyperboloid Cooling Tower Optimization
 
-Generated: 2026-02-25 19:19
-
 ## 1. Objective
 Minimize cooling-tower lateral shell area using SA, PSO, and BFGS while enforcing fixed target volume and scenario-specific constructability constraints.
 The study compares stochastic and deterministic optimization behavior across eight structurally different problem setups while keeping common engineering requirements (capacity and realistic shape) explicit in the objective.
@@ -53,7 +51,7 @@ The optimized scalar objective is `J(x) = A(x) + P_volume + P_height + P_shape +
 
 ## 5. Optimization Protocol
 - Runs per algorithm per scenario: 10
-- Seed offset: 0
+- Seed offset: 50000
 - SA: `temp_init=120`, `cooling_rate=0.997`, scenario-dependent `step_size`
 - PSO: `w=0.65`, `c1=1.6`, `c2=1.7`, particles = 40 or 50 by dimension
 - BFGS: `tol=1e-7`, `max_iter=1200`
@@ -73,23 +71,14 @@ Stochastic budgets are 10k evaluations for lower-dimensional setups and 16k for 
 | S7 | joint | 10 | 70320 | 39.3 | 27.4 | Joint bounded optimization of radii and heights. |
 | S8 | joint | 10 | 90000 | 39.3 | 27.4 | Joint constructability-aware design with larger target volume. |
 
-## 7. Cross-Algorithm Summary
-| Algorithm | Total Runs | Mean Area | Mean Rel Vol Err | Mean Evals | Mean Time (s) | Feasibility Rate |
-|---|---|---|---|---|---|---|
-| SA | 80 | 7814.56 | 5.277e-04 | 11500.0 | 0.5373 | 71.2% |
-| PSO | 80 | 8264.80 | 1.698e-02 | 11500.0 | 0.5744 | 50.0% |
-| BFGS | 80 | 7850.64 | 4.018e-04 | 4227.9 | 0.2097 | 72.5% |
-
-![Cross-scenario area comparison](results/figures/cross_scenario_area_bar.png)
-
-## 8. Scenario Results
+## 7. Scenario Results
 
 ### S1
 | Algorithm | Mean Area | Std Area | Mean Rel Vol Err | Mean Evals | Mean Time (s) | Feasibility Rate |
 |---|---|---|---|---|---|---|
-| BFGS | 7782.01 | 0.00 | 1.537e-03 | 3302.6 | 0.1629 | 0.0% |
-| PSO | 7950.10 | 201.50 | 1.571e-02 | 10000.0 | 0.5322 | 20.0% |
-| SA | 7781.85 | 4.69 | 1.246e-03 | 10000.0 | 0.5033 | 50.0% |
+| BFGS | 7782.01 | 0.00 | 1.537e-03 | 5001.0 | 0.2401 | 0.0% |
+| PSO | 7993.19 | 251.35 | 4.408e-03 | 10000.0 | 0.5261 | 30.0% |
+| SA | 7783.36 | 5.13 | 1.051e-03 | 10000.0 | 0.5017 | 40.0% |
 
 ![S1 convergence](results/figures/S1_convergence.png)
 
@@ -98,17 +87,21 @@ Stochastic budgets are 10k evaluations for lower-dimensional setups and 16k for 
 ![S1 3D towers](results/figures/S1_tower_3d.png)
 
 Feasibility of the shown 3D towers (same selected runs as profile overlay):
-- SA: **FEASIBLE** - passes volume (3.037e-04 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
-- PSO: **FEASIBLE** - passes volume (2.407e-04 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+- SA: **FEASIBLE** - passes volume (3.739e-04 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+- PSO: **FEASIBLE** - passes volume (5.843e-04 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
 - BFGS: **INFEASIBLE** - fails volume (1.537e-03 > 1.000e-03). visualized run is lowest penalized objective among infeasible runs.
+
+S1 remains a difficult required case even though the plotted profiles are visually very similar. **SA** gives the best feasibility-area tradeoff with 40.0% feasibility and mean area 7783.36 m^2, while **PSO** improves feasibility only modestly and still pays a clear area penalty. **BFGS** is the fastest method, but here speed does not translate into reliability because the same low-area local outcome remains volume-infeasible.
+
+The main point in S1 is that the search space contains a narrow feasible basin around the required geometry. The algorithms do not differ much in the shapes they ultimately prefer; they differ in how often they can satisfy the strict volume tolerance while keeping the surface area low.
 
 
 ### S2
 | Algorithm | Mean Area | Std Area | Mean Rel Vol Err | Mean Evals | Mean Time (s) | Feasibility Rate |
 |---|---|---|---|---|---|---|
-| BFGS | 8051.30 | 532.40 | 1.485e-04 | 3945.5 | 0.1556 | 100.0% |
-| PSO | 9352.84 | 524.78 | 6.536e-02 | 10000.0 | 0.4390 | 40.0% |
-| SA | 7753.26 | 9.27 | 5.492e-05 | 10000.0 | 0.4092 | 100.0% |
+| BFGS | 8574.90 | 709.96 | 2.548e-04 | 4215.4 | 0.1657 | 90.0% |
+| PSO | 9008.37 | 629.49 | 1.375e-01 | 10000.0 | 0.4415 | 40.0% |
+| SA | 7766.94 | 29.81 | 4.278e-05 | 10000.0 | 0.4106 | 100.0% |
 
 ![S2 convergence](results/figures/S2_convergence.png)
 
@@ -117,19 +110,21 @@ Feasibility of the shown 3D towers (same selected runs as profile overlay):
 ![S2 3D towers](results/figures/S2_tower_3d.png)
 
 Feasibility of the shown 3D towers (same selected runs as profile overlay):
-- SA: **FEASIBLE** - passes volume (1.686e-05 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
-- PSO: **FEASIBLE** - passes volume (2.663e-04 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+- SA: **FEASIBLE** - passes volume (7.252e-06 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+- PSO: **FEASIBLE** - passes volume (6.404e-05 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
 - BFGS: **FEASIBLE** - passes volume (1.899e-06 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
 
-S2 limitation note: although the selected PSO tower is mathematically feasible under the current rule, it can still look non-practical (abrupt throat/expansion). This happens because S2 intentionally uses a wide radii range and does not enforce smoothness or additional constructability checks; feasibility here only enforces volume and hyperboloid monotonicity.
+S2 again shows why mathematical feasibility is not the same as practical plausibility. **SA** is the strongest method here with 100.0% feasibility and mean area 7766.94 m^2, while **BFGS** remains mostly feasible but much less robust in mean area and **PSO** remains weak on both area and consistency.
+
+Because S2 deliberately removes smoothness control and allows a wide radii range, feasible profiles can still look structurally awkward. That is visible in the PSO profile, which has a sharper throat and more abrupt expansion than the smoother SA and BFGS solutions. This is the clearest scenario where the report must distinguish formal feasibility from practical shape quality.
 
 
 ### S3
 | Algorithm | Mean Area | Std Area | Mean Rel Vol Err | Mean Evals | Mean Time (s) | Feasibility Rate |
 |---|---|---|---|---|---|---|
-| BFGS | 7926.31 | 300.48 | 1.541e-04 | 2904.7 | 0.1227 | 100.0% |
-| PSO | 8258.12 | 351.80 | 2.509e-05 | 10000.0 | 0.4378 | 90.0% |
-| SA | 7753.02 | 21.36 | 3.424e-05 | 10000.0 | 0.4124 | 100.0% |
+| BFGS | 7862.58 | 362.68 | 5.966e-05 | 2410.2 | 0.1001 | 100.0% |
+| PSO | 8551.22 | 598.39 | 4.491e-05 | 10000.0 | 0.4379 | 70.0% |
+| SA | 7750.71 | 12.99 | 2.640e-05 | 10000.0 | 0.4050 | 100.0% |
 
 ![S3 convergence](results/figures/S3_convergence.png)
 
@@ -138,17 +133,21 @@ S2 limitation note: although the selected PSO tower is mathematically feasible u
 ![S3 3D towers](results/figures/S3_tower_3d.png)
 
 Feasibility of the shown 3D towers (same selected runs as profile overlay):
-- SA: **FEASIBLE** - passes volume (5.257e-06 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
-- PSO: **FEASIBLE** - passes volume (1.211e-06 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+- SA: **FEASIBLE** - passes volume (6.054e-05 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+- PSO: **FEASIBLE** - passes volume (5.240e-06 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
 - BFGS: **FEASIBLE** - passes volume (1.900e-06 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+
+S3 is more stable than S2 because the uniform-height setting simplifies the search. **SA** and **BFGS** both remain fully feasible, with SA giving the lower mean area at 7750.71 m^2 and BFGS remaining the fastest method at 2410.2 evaluations on average. **PSO** can still find a good design, but its lower feasibility and higher variance show that it reaches that quality less consistently.
+
+The plotted profiles support this interpretation: SA and BFGS are almost indistinguishable visually, suggesting that the bounded uniform-height radii problem has a clear preferred geometry. The main remaining uncertainty is therefore algorithmic consistency rather than disagreement about the tower shape itself.
 
 
 ### S4
 | Algorithm | Mean Area | Std Area | Mean Rel Vol Err | Mean Evals | Mean Time (s) | Feasibility Rate |
 |---|---|---|---|---|---|---|
-| BFGS | 7779.85 | 0.00 | 8.915e-04 | 4101.4 | 0.2508 | 100.0% |
-| PSO | 8269.55 | 447.60 | 3.272e-02 | 10000.0 | 0.5619 | 0.0% |
-| SA | 7783.18 | 14.88 | 1.557e-03 | 10000.0 | 0.5240 | 20.0% |
+| BFGS | 7779.85 | 0.00 | 8.915e-04 | 4391.3 | 0.2261 | 100.0% |
+| PSO | 8183.83 | 485.21 | 2.006e-02 | 10000.0 | 0.5589 | 20.0% |
+| SA | 7776.90 | 12.83 | 1.712e-03 | 10000.0 | 0.5228 | 20.0% |
 
 ![S4 convergence](results/figures/S4_convergence.png)
 
@@ -157,17 +156,21 @@ Feasibility of the shown 3D towers (same selected runs as profile overlay):
 ![S4 3D towers](results/figures/S4_tower_3d.png)
 
 Feasibility of the shown 3D towers (same selected runs as profile overlay):
-- SA: **FEASIBLE** - passes volume (3.986e-05 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
-- PSO: **INFEASIBLE** - fails volume (2.086e-03 > 1.000e-03). visualized run is lowest penalized objective among infeasible runs.
+- SA: **FEASIBLE** - passes volume (3.849e-04 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+- PSO: **FEASIBLE** - passes volume (5.113e-04 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
 - BFGS: **FEASIBLE** - passes volume (8.915e-04 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+
+S4 combines finer discretization with smoothness control, so it is a stronger test of repeated convergence than the simpler radii-only cases. **BFGS** remains dominant with 100.0% feasibility and mean area 7779.85 m^2, whereas **SA** and **PSO** find feasible solutions only occasionally even though their selected plotted towers are competitive in shape and area.
+
+The correct interpretation is not that the stochastic methods produce bad geometries when they succeed. Rather, the extra discretization and smoothness penalty make this scenario harder to solve consistently, and BFGS handles that additional structure much more reliably than SA or PSO.
 
 
 ### S5
 | Algorithm | Mean Area | Std Area | Mean Rel Vol Err | Mean Evals | Mean Time (s) | Feasibility Rate |
 |---|---|---|---|---|---|---|
-| BFGS | 7742.56 | 0.00 | 2.331e-06 | 4164.2 | 0.1625 | 100.0% |
-| PSO | 7796.77 | 32.30 | 1.128e-04 | 10000.0 | 0.4147 | 90.0% |
-| SA | 7757.25 | 6.61 | 3.902e-05 | 10000.0 | 0.3880 | 100.0% |
+| BFGS | 7742.56 | 0.00 | 2.331e-06 | 3371.2 | 0.1285 | 100.0% |
+| PSO | 7802.45 | 23.76 | 4.302e-04 | 10000.0 | 0.4200 | 70.0% |
+| SA | 7758.49 | 6.64 | 4.108e-05 | 10000.0 | 0.3903 | 100.0% |
 
 ![S5 convergence](results/figures/S5_convergence.png)
 
@@ -176,17 +179,21 @@ Feasibility of the shown 3D towers (same selected runs as profile overlay):
 ![S5 3D towers](results/figures/S5_tower_3d.png)
 
 Feasibility of the shown 3D towers (same selected runs as profile overlay):
-- SA: **FEASIBLE** - passes volume (7.754e-06 <= 1.000e-03), height (1.602e-04 <= 1.000e-03).
-- PSO: **FEASIBLE** - passes volume (4.870e-07 <= 1.000e-03), height (6.591e-05 <= 1.000e-03).
+- SA: **FEASIBLE** - passes volume (5.319e-05 <= 1.000e-03), height (1.809e-04 <= 1.000e-03).
+- PSO: **FEASIBLE** - passes volume (5.000e-04 <= 1.000e-03), height (3.988e-04 <= 1.000e-03).
 - BFGS: **FEASIBLE** - passes volume (2.331e-06 <= 1.000e-03), height (8.747e-05 <= 1.000e-03).
+
+S5 is a comparatively well-behaved bounded heights-only problem. **BFGS** is strongest on both accuracy and efficiency, reaching 100.0% feasibility with mean area 7742.56 m^2 and the lowest evaluation count. **SA** is also fully feasible but slightly less efficient, while **PSO** is the least reliable method in this setting.
+
+The three plotted profiles are close, which means the scenario is not about discovering radically different shapes. Instead, it is about how precisely each method can fine-tune the segment heights while keeping both volume and total height within tolerance.
 
 
 ### S6
 | Algorithm | Mean Area | Std Area | Mean Rel Vol Err | Mean Evals | Mean Time (s) | Feasibility Rate |
 |---|---|---|---|---|---|---|
-| BFGS | 7741.72 | 0.00 | 2.071e-06 | 1402.6 | 0.0551 | 100.0% |
-| PSO | 7913.68 | 146.68 | 5.923e-04 | 10000.0 | 0.4184 | 90.0% |
-| SA | 7825.77 | 33.17 | 6.569e-05 | 10000.0 | 0.3880 | 100.0% |
+| BFGS | 7741.72 | 0.00 | 2.071e-06 | 1403.3 | 0.0554 | 100.0% |
+| PSO | 7971.10 | 107.04 | 2.812e-06 | 10000.0 | 0.4161 | 100.0% |
+| SA | 7847.58 | 27.68 | 5.217e-05 | 10000.0 | 0.3912 | 100.0% |
 
 ![S6 convergence](results/figures/S6_convergence.png)
 
@@ -195,17 +202,21 @@ Feasibility of the shown 3D towers (same selected runs as profile overlay):
 ![S6 3D towers](results/figures/S6_tower_3d.png)
 
 Feasibility of the shown 3D towers (same selected runs as profile overlay):
-- SA: **FEASIBLE** - passes volume (1.478e-05 <= 1.000e-03), height (8.960e-05 <= 1.000e-03).
-- PSO: **FEASIBLE** - passes volume (2.557e-05 <= 1.000e-03), height (5.838e-05 <= 1.000e-03).
+- SA: **FEASIBLE** - passes volume (7.270e-06 <= 1.000e-03), height (3.561e-04 <= 1.000e-03).
+- PSO: **FEASIBLE** - passes volume (5.197e-06 <= 1.000e-03), height (9.426e-05 <= 1.000e-03).
 - BFGS: **FEASIBLE** - passes volume (2.071e-06 <= 1.000e-03), height (8.632e-05 <= 1.000e-03).
+
+S6 becomes easier once the height bounds are widened. All three methods are fully feasible in this run, but **BFGS** still gives the lowest mean area at 7741.72 m^2 and is by far the fastest method at 1403.3 evaluations. **PSO** becomes competitive on feasibility, but not on area, and **SA** remains the largest of the three mean designs.
+
+This scenario shows that relaxing the height bounds can remove much of the feasibility difficulty without changing the overall algorithm ranking. Greater design freedom helps every method, but it does not overturn the advantage of BFGS on efficiency or final area.
 
 
 ### S7
 | Algorithm | Mean Area | Std Area | Mean Rel Vol Err | Mean Evals | Mean Time (s) | Feasibility Rate |
 |---|---|---|---|---|---|---|
-| BFGS | 7968.31 | 369.60 | 6.476e-05 | 7000.9 | 0.3242 | 80.0% |
-| PSO | 8608.62 | 174.56 | 4.144e-04 | 16000.0 | 0.7688 | 70.0% |
-| SA | 8160.14 | 281.40 | 1.305e-04 | 16000.0 | 0.7203 | 100.0% |
+| BFGS | 7851.72 | 305.19 | 5.959e-05 | 7000.9 | 0.3282 | 100.0% |
+| PSO | 8475.39 | 478.15 | 1.649e-03 | 16000.0 | 0.7784 | 60.0% |
+| SA | 8213.61 | 258.51 | 1.270e-04 | 16000.0 | 0.7232 | 80.0% |
 
 ![S7 convergence](results/figures/S7_convergence.png)
 
@@ -214,17 +225,21 @@ Feasibility of the shown 3D towers (same selected runs as profile overlay):
 ![S7 3D towers](results/figures/S7_tower_3d.png)
 
 Feasibility of the shown 3D towers (same selected runs as profile overlay):
-- SA: **FEASIBLE** - passes volume (1.717e-04 <= 1.000e-03), height (4.769e-04 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
-- PSO: **FEASIBLE** - passes volume (6.824e-05 <= 1.000e-03), height (9.218e-05 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+- SA: **FEASIBLE** - passes volume (6.863e-05 <= 1.000e-03), height (1.425e-04 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+- PSO: **FEASIBLE** - passes volume (3.294e-05 <= 1.000e-03), height (4.207e-05 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
 - BFGS: **FEASIBLE** - passes volume (1.890e-06 <= 1.000e-03), height (8.481e-05 <= 1.000e-03), shape (0.000e+00 <= 1.000e-06).
+
+S7 is the clearest joint optimization case in the study. **BFGS** is the strongest method here with 100.0% feasibility, mean area 7851.72 m^2, and the lowest evaluation count in the scenario. **SA** and **PSO** can still produce feasible towers, but they do so less reliably and with materially larger mean areas.
+
+The profile overlay helps explain the ranking. BFGS maintains the cleanest transition through the neck region while staying close to the lowest-area profile, whereas PSO shows a boxier middle section and SA settles on a smoother but noticeably larger tower. This is a good example of a coupled radii-height problem where strong local refinement is especially valuable.
 
 
 ### S8
 | Algorithm | Mean Area | Std Area | Mean Rel Vol Err | Mean Evals | Mean Time (s) | Feasibility Rate |
 |---|---|---|---|---|---|---|
-| BFGS | 7813.08 | 0.46 | 4.146e-04 | 7001.0 | 0.4441 | 0.0% |
-| PSO | 7968.67 | 348.77 | 2.087e-02 | 16000.0 | 1.0223 | 0.0% |
-| SA | 7701.98 | 32.24 | 1.093e-03 | 16000.0 | 0.9536 | 0.0% |
+| BFGS | 7813.00 | 2.02 | 4.222e-04 | 7000.9 | 0.4426 | 0.0% |
+| PSO | 8363.77 | 635.91 | 2.748e-02 | 16000.0 | 1.0040 | 0.0% |
+| SA | 7660.78 | 38.06 | 6.456e-04 | 16000.0 | 0.9494 | 0.0% |
 
 ![S8 convergence](results/figures/S8_convergence.png)
 
@@ -233,48 +248,39 @@ Feasibility of the shown 3D towers (same selected runs as profile overlay):
 ![S8 3D towers](results/figures/S8_tower_3d.png)
 
 Feasibility of the shown 3D towers (same selected runs as profile overlay):
-- SA: **INFEASIBLE** - fails height (2.220e-03 > 1.000e-03). visualized run is lowest penalized objective among infeasible runs.
-- PSO: **INFEASIBLE** - fails volume (1.192e-03 > 1.000e-03), height (1.597e-02 > 1.000e-03), shape (6.460e-03 > 1.000e-06). visualized run is lowest penalized objective among infeasible runs.
+- SA: **INFEASIBLE** - fails height (4.596e-03 > 1.000e-03). visualized run is lowest penalized objective among infeasible runs.
+- PSO: **INFEASIBLE** - fails volume (1.539e-03 > 1.000e-03), height (5.174e-03 > 1.000e-03), shape (6.325e-04 > 1.000e-06). visualized run is lowest penalized objective among infeasible runs.
 - BFGS: **INFEASIBLE** - fails height (2.684e-03 > 1.000e-03), shape (2.649e-03 > 1.000e-06). visualized run is lowest penalized objective among infeasible runs.
 
-## 9. Key Findings
+S8 remains the strongest bottleneck in the whole study. All three methods have 0.0% feasibility under the current constraints, even though **SA** still reaches the lowest mean area at 7660.78 m^2 and the lowest penalized objective among the infeasible methods.
 
-- S1: best feasibility-area tradeoff = SA (feasibility 50.0%, mean area 7781.85 m^2).
-- S1: lowest mean evaluation count = BFGS (3302.6 evals).
-- S2: best feasibility-area tradeoff = SA (feasibility 100.0%, mean area 7753.26 m^2).
-- S2: lowest mean evaluation count = BFGS (3945.5 evals).
-- S3: best feasibility-area tradeoff = SA (feasibility 100.0%, mean area 7753.02 m^2).
-- S3: lowest mean evaluation count = BFGS (2904.7 evals).
-- S4: best feasibility-area tradeoff = BFGS (feasibility 100.0%, mean area 7779.85 m^2).
-- S4: lowest mean evaluation count = BFGS (4101.4 evals).
-- S5: best feasibility-area tradeoff = BFGS (feasibility 100.0%, mean area 7742.56 m^2).
-- S5: lowest mean evaluation count = BFGS (4164.2 evals).
-- S6: best feasibility-area tradeoff = BFGS (feasibility 100.0%, mean area 7741.72 m^2).
-- S6: lowest mean evaluation count = BFGS (1402.6 evals).
-- S7: best feasibility-area tradeoff = SA (feasibility 100.0%, mean area 8160.14 m^2).
-- S7: lowest mean evaluation count = BFGS (7000.9 evals).
-- S8: best feasibility-area tradeoff = SA (feasibility 0.0%, mean area 7701.98 m^2).
-- S8: lowest mean evaluation count = BFGS (7001.0 evals).
+The convergence and profile plots show that this is not simply a random failure case. The enlarged target volume, smoothness requirement, and adjacent-height ratio control together create a genuinely hard joint problem. BFGS remains more controlled than PSO, but neither method can satisfy the full feasibility rule, so S8 still marks the limit of the current formulation.
 
-- Feasibility bottleneck scenarios: S8 (all tested methods yielded 0% feasible runs under current constraints).
+## 8. Cross-Algorithm Summary
+| Algorithm | Total Runs | Mean Area | Mean Rel Vol Err | Mean Evals | Mean Time (s) | Feasibility Rate |
+|---|---|---|---|---|---|---|
+| SA | 80 | 7819.80 | 4.623e-04 | 11500.0 | 0.5368 | 67.5% |
+| PSO | 80 | 8293.67 | 2.395e-02 | 11500.0 | 0.5729 | 48.8% |
+| BFGS | 80 | 7893.54 | 4.036e-04 | 4349.3 | 0.2108 | 73.8% |
 
-## 10. Discussion and Conclusions
+![Cross-scenario area comparison](results/figures/cross_scenario_area_bar.png)
 
-Across all scenarios, **BFGS** achieved the highest overall feasibility (72.5%).
-**BFGS** required the fewest evaluations on average (4227.9), confirming its efficiency for local convergence.
-By raw mean area across all runs, **SA** produced the lowest average shell area (7814.56 m^2), but this must be interpreted jointly with feasibility rates.
+## 9. Discussion and Conclusions
+
+Across all scenarios, **BFGS** achieved the highest overall feasibility (73.8%).
+**BFGS** required the fewest evaluations on average (4349.3), confirming its efficiency for local convergence.
+By raw mean area across all runs, **SA** produced the lowest average shell area (7819.80 m^2), but this must be interpreted jointly with feasibility rates.
 
 Result patterns are consistent with expected method behavior: BFGS is computationally efficient and strong when gradients and local curvature align with feasible basins; SA is often robust under hard nonlinear penalties because probabilistic acceptance helps transition between constrained basins; PSO explores broadly but can underperform feasibility when penalty landscapes are steep and high-dimensional.
 
 For practical engineering usage in this problem family, the recommended workflow is a hybrid strategy: use SA/PSO for global search and feasibility discovery, then warm-start BFGS for rapid refinement of the best feasible candidate.
 
-Scenario S8 remains the principal bottleneck under the current penalty/budget setup; this indicates that constructability and enlarged-volume requirements are jointly tight. Future refinement should focus on adaptive penalty scheduling, better initialization heuristics for joint variables, and potentially increased stochastic budget for S8.
+The remaining limitation is that optimization does not by itself confirm structural suitability. S2 shows that mathematically feasible shapes can still look impractical, while S8 shows that higher-capacity, constructability-aware designs remain difficult under the current formulation.
 
-An additional modeling limitation is visible in S2: some solutions can be formally feasible while still looking impractical, because the feasibility definition does not currently include geometric smoothness or constructability constraints in that scenario. A practical improvement is to report dual status (mathematical feasibility vs engineering practicality) and add explicit constructability constraints such as smoothness penalties, adjacent-radius jump limits, curvature controls, and minimum neck-radius rules.
+Under the current penalty and budget settings, S8 remains the clearest feasibility bottleneck, indicating that the present formulation still struggles when constructability and higher-capacity requirements are combined.
 
-## 11. Deliverables
-- `results/data/raw_runs.csv`
-- `results/data/scenario_summary.csv`
-- `results/data/algorithm_summary.csv`
-- `results/data/scenario_definitions.json`
-- `results/figures/*.png`
+### 9.1 Planned Structural Validation in Abaqus
+
+The next step is to transfer the best candidate geometries into Abaqus shell models with realistic material properties and shell-thickness assumptions for reinforced-concrete cooling towers. These models will be checked under self-weight and representative environmental loading to evaluate displacement, stress distribution, and buckling sensitivity.
+
+Multiple candidate towers will be compared, not only the minimum-area design, so selection can be based on structural feasibility as well as geometric efficiency. The Abaqus results will then be used to refine the optimization model by tightening feasibility rules or adding constraints linked to smoothness, curvature, and stability.
