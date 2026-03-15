@@ -1,0 +1,67 @@
+{
+  "study_name": "Task7_Montresor_CoolingTower_Abaqus",
+  "reference_dynamic_pressure_pa": 562.5,
+  "wind_model": {
+    "reference_speed_m_s": 30.0,
+    "air_density_kg_m3": 1.25,
+    "pressure_coefficient_model": "clip(0.8*cos(theta), -0.5, 0.8)",
+    "wind_direction_axis": "+X",
+    "notes": "Comparative one-direction wind case with circumferential pressure sectors."
+  },
+  "material_model": {
+    "name": "EquivalentReinforcedConcrete_C30_37",
+    "youngs_modulus_pa": 33000000000.0,
+    "poisson_ratio": 0.2,
+    "density_kg_m3": 2500.0,
+    "notes": "Linear-elastic equivalent reinforced concrete baseline for comparative shell analysis."
+  },
+  "shell": {
+    "thickness_m": 0.2
+  },
+  "cases": [
+    {
+      "job_name": "task7_radius_baseline",
+      "case_id": "radius_baseline",
+      "case_label": "S2 / BFGS radius baseline",
+      "case_variant": "comparison",
+      "input_path": "C:\\Users\\achille.larregle\\OneDrive - ESTIA\\Bureau\\CRANFIELD\\CRANFIELD COURSE\\GroupProject2026\\group_project\\tasks\\Task_07_Abaqus\\results\\inputs\\task7_radius_baseline.inp",
+      "odb_path": "C:\\Users\\achille.larregle\\OneDrive - ESTIA\\Bureau\\CRANFIELD\\CRANFIELD COURSE\\GroupProject2026\\group_project\\tasks\\Task_07_Abaqus\\results\\jobs\\task7_radius_baseline.odb",
+      "circumferential_divisions": 16,
+      "axial_subdivisions_per_segment": 1,
+      "task6_area_m2": 7741.672759154888
+    },
+    {
+      "job_name": "task7_height_variant",
+      "case_id": "height_variant",
+      "case_label": "S6 / BFGS height variant",
+      "case_variant": "comparison",
+      "input_path": "C:\\Users\\achille.larregle\\OneDrive - ESTIA\\Bureau\\CRANFIELD\\CRANFIELD COURSE\\GroupProject2026\\group_project\\tasks\\Task_07_Abaqus\\results\\inputs\\task7_height_variant.inp",
+      "odb_path": "C:\\Users\\achille.larregle\\OneDrive - ESTIA\\Bureau\\CRANFIELD\\CRANFIELD COURSE\\GroupProject2026\\group_project\\tasks\\Task_07_Abaqus\\results\\jobs\\task7_height_variant.odb",
+      "circumferential_divisions": 16,
+      "axial_subdivisions_per_segment": 1,
+      "task6_area_m2": 7741.717219149712
+    },
+    {
+      "job_name": "task7_joint_reference",
+      "case_id": "joint_reference",
+      "case_label": "S7 / BFGS joint reference",
+      "case_variant": "comparison",
+      "input_path": "C:\\Users\\achille.larregle\\OneDrive - ESTIA\\Bureau\\CRANFIELD\\CRANFIELD COURSE\\GroupProject2026\\group_project\\tasks\\Task_07_Abaqus\\results\\inputs\\task7_joint_reference.inp",
+      "odb_path": "C:\\Users\\achille.larregle\\OneDrive - ESTIA\\Bureau\\CRANFIELD\\CRANFIELD COURSE\\GroupProject2026\\group_project\\tasks\\Task_07_Abaqus\\results\\jobs\\task7_joint_reference.odb",
+      "circumferential_divisions": 16,
+      "axial_subdivisions_per_segment": 1,
+      "task6_area_m2": 7740.659882815151
+    },
+    {
+      "job_name": "task7_joint_reference_refined",
+      "case_id": "joint_reference",
+      "case_label": "S7 / BFGS joint reference",
+      "case_variant": "mesh_sensitivity",
+      "input_path": "C:\\Users\\achille.larregle\\OneDrive - ESTIA\\Bureau\\CRANFIELD\\CRANFIELD COURSE\\GroupProject2026\\group_project\\tasks\\Task_07_Abaqus\\results\\inputs\\task7_joint_reference_refined.inp",
+      "odb_path": "C:\\Users\\achille.larregle\\OneDrive - ESTIA\\Bureau\\CRANFIELD\\CRANFIELD COURSE\\GroupProject2026\\group_project\\tasks\\Task_07_Abaqus\\results\\jobs\\task7_joint_reference_refined.odb",
+      "circumferential_divisions": 24,
+      "axial_subdivisions_per_segment": 2,
+      "task6_area_m2": 7740.659882815151
+    }
+  ]
+}

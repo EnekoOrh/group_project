@@ -105,6 +105,11 @@ def _convert_inline(text: str) -> str:
     for i, content in enumerate(bold_spans):
         text = text.replace(f"@@BOLD{i}@@", r"\textbf{" + _escape_latex(content) + "}")
 
+    text = text.replace("m²", r"m$^2$")
+    text = text.replace("m³", r"m$^3$")
+    text = text.replace("m\u00c2\u00b2", r"m$^2$")
+    text = text.replace("m\u00c2\u00b3", r"m$^3$")
+
     return text
 
 
@@ -163,6 +168,38 @@ def convert_markdown_to_tex(md_text: str) -> str:
     while i < len(lines):
         line = lines[i].rstrip()
         stripped = line.strip()
+
+        if stripped.startswith("Generated:"):
+            i += 1
+            continue
+
+        # Display math blocks.
+        if stripped.startswith("$$") and stripped.endswith("$$") and len(stripped) > 4:
+            if in_list:
+                out.append(r"\end{itemize}")
+                in_list = False
+            out.append(r"\[")
+            out.append(stripped[2:-2].strip())
+            out.append(r"\]")
+            out.append("")
+            i += 1
+            continue
+        if stripped == "$$":
+            if in_list:
+                out.append(r"\end{itemize}")
+                in_list = False
+            display_lines: List[str] = []
+            i += 1
+            while i < len(lines) and lines[i].strip() != "$$":
+                display_lines.append(lines[i].rstrip())
+                i += 1
+            out.append(r"\[")
+            out.extend(display_lines)
+            out.append(r"\]")
+            out.append("")
+            if i < len(lines) and lines[i].strip() == "$$":
+                i += 1
+            continue
 
         # Table block.
         if stripped.startswith("|"):
@@ -267,7 +304,9 @@ def main() -> None:
     parser.add_argument(
         "--output-tex",
         type=str,
-        default=os.path.join("tasks", "Task_06_Cooling_Tower", "report_latex", "sections", "00_report_from_md.tex"),
+        default=os.path.join(
+            "tasks", "Task_06_Cooling_Tower", "report_latex", "sections", "generated", "00_report_from_md.tex"
+        ),
         help="Path to generated TeX section file.",
     )
     args = parser.parse_args()

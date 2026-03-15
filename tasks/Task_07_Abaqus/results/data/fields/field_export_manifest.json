@@ -1,0 +1,36 @@
+{
+  "cases": [
+    {
+      "job_name": "task7_radius_baseline",
+      "case_id": "radius_baseline",
+      "case_variant": "comparison",
+      "node_count": 176,
+      "element_count": 160,
+      "buckling_scale_factor": 2.9334152407124643
+    },
+    {
+      "job_name": "task7_height_variant",
+      "case_id": "height_variant",
+      "case_variant": "comparison",
+      "node_count": 176,
+      "element_count": 160,
+      "buckling_scale_factor": 3.00989025951842
+    },
+    {
+      "job_name": "task7_joint_reference",
+      "case_id": "joint_reference",
+      "case_variant": "comparison",
+      "node_count": 176,
+      "element_count": 160,
+      "buckling_scale_factor": 2.9395371987667236
+    },
+    {
+      "job_name": "task7_joint_reference_refined",
+      "case_id": "joint_reference",
+      "case_variant": "mesh_sensitivity",
+      "node_count": 504,
+      "element_count": 480,
+      "buckling_scale_factor": 3.17335822890416
+    }
+  ]
+}

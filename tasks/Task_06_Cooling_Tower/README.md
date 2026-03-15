@@ -7,7 +7,8 @@ This folder is organized so generated artifacts are separated from source code.
 ```text
 Task_06_Cooling_Tower/
   run_experiments.py            # Main experiment runner
-  Report.md                     # Legacy snapshot report (kept for reference)
+  Report.md                     # Live markdown report used for the LaTeX build
+  scripts/                      # Helper scripts for report-only rebuilds
   tests/                        # Unit tests for geometry and gradients
   report_latex/                 # LaTeX manuscript source
     scripts/generate_tables.py  # CSV -> .tex table generator
@@ -27,17 +28,22 @@ Task_06_Cooling_Tower/
 python tasks/Task_06_Cooling_Tower/run_experiments.py
 ```
 
-2. Generate LaTeX tables:
+2. If you only changed report text/layout and want to reuse the existing results, rebuild the markdown report without rerunning the optimization:
+```bash
+python tasks/Task_06_Cooling_Tower/scripts/rebuild_report_from_results.py
+```
+
+3. Generate LaTeX tables:
 ```bash
 python tasks/Task_06_Cooling_Tower/report_latex/scripts/generate_tables.py
 ```
 
-3. Sync markdown report into LaTeX source:
+4. Sync markdown report into LaTeX source:
 ```bash
 python tasks/Task_06_Cooling_Tower/report_latex/scripts/sync_report_md_to_tex.py
 ```
 
-4. Compile LaTeX report:
+5. Compile LaTeX report:
 ```bash
 cd tasks/Task_06_Cooling_Tower/report_latex
 latexmk -pdf -interaction=nonstopmode main.tex
@@ -45,4 +51,4 @@ latexmk -pdf -interaction=nonstopmode main.tex
 
 The compiled PDF is written to:
 
-- `tasks/Task_06_Cooling_Tower/Task6_Report.pdf`
+- `tasks/Task_06_Cooling_Tower/Task6_Montrésor_CoolingTower.pdf`

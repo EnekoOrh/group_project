@@ -16,27 +16,69 @@
 \usepackage{longtable}
 \usepackage{enumitem}
 \usepackage{tocloft}
+\usepackage{fancyhdr}
+\usepackage{tikz}
 \usepackage[backend=biber,style=ieee]{biblatex}
 
-\geometry{margin=1in}
-\graphicspath{{../results/figures/}{figures/}}
+\geometry{margin=1in,includefoot}
+\graphicspath{{../results/figures/}{../img/}{figures/}{img/}}
 \addbibresource{refs.bib}
 \input{macros}
 
-\title{Task 6 Report\\Hyperboloid Cooling Tower Optimization}
-\author{Group Project 2026}
-\date{\today}
+\newcommand{\reportdate}{\today}
 \setcounter{tocdepth}{1}
 \setcounter{secnumdepth}{2}
 \setlength{\cftbeforechapskip}{2pt}
 \setlength{\cftbeforesecskip}{1pt}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[L]{Montr\'esor group}
+\fancyfoot[C]{\thepage}
+\fancyfoot[R]{\reportdate}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyfoot[L]{Montr\'esor group}
+  \fancyfoot[C]{\thepage}
+  \fancyfoot[R]{\reportdate}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0.4pt}
+}
 
 \begin{document}
-\maketitle
+\begin{titlepage}
+\thispagestyle{empty}
+\pagenumbering{gobble}
+\begin{tikzpicture}[remember picture,overlay]
+  \node[anchor=north west, xshift=1.2cm, yshift=-1.1cm] at (current page.north west)
+    {\includegraphics[width=3.2cm]{logo-estia.png}};
+  \node[anchor=north east, xshift=-1.2cm, yshift=-1.1cm] at (current page.north east)
+    {\includegraphics[width=4.2cm]{Cranfield_logo.png}};
+\end{tikzpicture}
+
+\vspace*{4.2cm}
+\begin{center}
+{\Huge\bfseries Task 6 Report\par}
+\vspace{0.5cm}
+{\LARGE Hyperboloid Cooling Tower Optimization\par}
+\vspace{2.2cm}
+{\large
+Eneko ORHATEGARAY\par
+Paul BROCVIELLE\par
+Aiert CECCON\par
+Achille LARREGLE\par
+}
+\end{center}
+\vfill
+\end{titlepage}
+
+\clearpage
+\pagenumbering{arabic}
 \tableofcontents
 \clearpage
 
-\input{sections/00_report_from_md}
+\input{sections/generated/00_report_from_md}
 
 \printbibliography
 \end{document}

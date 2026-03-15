@@ -1,0 +1,4 @@
+case_id,label,scenario_id,algorithm,source_run_index,decision_mode,task6_area_m2,task6_volume_m3,task6_total_height_m
+radius_baseline,S2 / BFGS radius baseline,S2,BFGS,2,radii,7741.672759,70320.133572,36.500000
+height_variant,S6 / BFGS height variant,S6,BFGS,1,heights,7741.717219,70320.145609,36.496849
+joint_reference,S7 / BFGS joint reference,S7,BFGS,1,joint,7740.659883,70320.132928,36.496904

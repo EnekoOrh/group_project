@@ -106,6 +106,7 @@ def main() -> None:
                 _fmt_float(row["mean_evals"], 1),
                 _fmt_float(row["mean_time_s"], 4),
                 _fmt_pct01(row["feasibility_rate"], 1),
+                _fmt_pct01(row.get("engineering_feasibility_rate", ""), 1),
             ]
         )
 
@@ -113,7 +114,17 @@ def main() -> None:
         os.path.join(output_dir, "scenario_summary_table.tex"),
         caption="Scenario-level performance summary across algorithms.",
         label="tab:scenario-summary",
-        columns=["Scenario", "Algorithm", "Mean Area", "Std Area", "Mean Rel Vol Err", "Mean Evals", "Mean Time (s)", "Feasibility"],
+        columns=[
+            "Scenario",
+            "Algorithm",
+            "Mean Area",
+            "Std Area",
+            "Mean Rel Vol Err",
+            "Mean Evals",
+            "Mean Time (s)",
+            "Math Feasibility",
+            "Eng. Feasibility",
+        ],
         rows=scenario_table_rows,
     )
 
@@ -128,6 +139,7 @@ def main() -> None:
                 _fmt_float(row["mean_evals"], 1),
                 _fmt_float(row["mean_time_s"], 4),
                 _fmt_pct01(row["overall_feasibility_rate"], 1),
+                _fmt_pct01(row.get("overall_engineering_feasibility_rate", ""), 1),
             ]
         )
 
@@ -135,7 +147,16 @@ def main() -> None:
         os.path.join(output_dir, "algorithm_summary_table.tex"),
         caption="Cross-scenario algorithm summary.",
         label="tab:algorithm-summary",
-        columns=["Algorithm", "Total Runs", "Mean Area", "Mean Rel Vol Err", "Mean Evals", "Mean Time (s)", "Feasibility"],
+        columns=[
+            "Algorithm",
+            "Total Runs",
+            "Mean Area",
+            "Mean Rel Vol Err",
+            "Mean Evals",
+            "Mean Time (s)",
+            "Math Feasibility",
+            "Eng. Feasibility",
+        ],
         rows=algo_table_rows,
     )
 

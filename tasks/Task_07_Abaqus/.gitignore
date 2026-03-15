@@ -1,0 +1,14 @@
+results/jobs/
+results/jobs/**
+*.odb
+*.dat
+*.msg
+*.sta
+*.prt
+*.sim
+*.com
+*.lck
+*.cae
+*.jnl
+*.rec
+*.rpy

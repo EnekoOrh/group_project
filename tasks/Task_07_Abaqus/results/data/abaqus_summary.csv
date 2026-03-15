@@ -1,0 +1,5 @@
+job_name,case_id,case_label,case_variant,task6_area_m2,max_displacement_m,max_mises_pa,base_reaction_fx_n,base_reaction_fy_n,base_reaction_fz_n,base_reaction_resultant_n,buckling_factor_1
+task7_radius_baseline,radius_baseline,S2 / BFGS radius baseline,comparison,7741.672759154888,0.008101311512291431,3895720.5,1083721.34375,0.0,37487371.25,37503032.61319311,45.08
+task7_height_variant,height_variant,S6 / BFGS height variant,comparison,7741.717219149712,0.01040656864643097,4444058.5,1084799.296875,0.0,37490006.0,37505697.42578501,42.313
+task7_joint_reference,joint_reference,S7 / BFGS joint reference,comparison,7740.659882815151,0.008689980022609234,4137909.25,1084093.9375,3.725290298461914e-09,37483280.5,37498954.34151471,43.947
+task7_joint_reference_refined,joint_reference,S7 / BFGS joint reference,mesh_sensitivity,7740.659882815151,0.01006170641630888,4115711.0,1089631.0234375,0.0,37794280.375,37809984.459549144,28.071

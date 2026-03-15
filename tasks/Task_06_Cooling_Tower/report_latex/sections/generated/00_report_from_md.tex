@@ -1,0 +1,855 @@
+
+\chapter{Objective}
+
+This study addresses constrained shape optimization of a hyperboloid cooling tower, where the engineering target is to reduce lateral shell area while preserving required cooling capacity.
+
+The optimization is performed with Simulated Annealing (SA), Particle Swarm Optimization (PSO), and BFGS under explicit feasibility constraints on volume, total height (when variable), and hyperboloid monotonicity (when radii are variable).
+
+Eight scenarios are used to increase complexity from constrained baseline cases to a high-demand constructability stress case, allowing method behavior to be compared under a controlled progression of design difficulty.
+
+Success is evaluated first by feasibility robustness, then by feasible shell-area quality and computational efficiency.
+
+
+\chapter{Geometry Model}
+
+The cooling-tower shell is modeled as a stack of conical frustums. For segment \texttt{i}, the slant height is:
+
+
+\[
+s_i = \sqrt{(r_i - r_{i-1})^2 + h_i^2}
+\]
+
+
+The lateral shell area and enclosed volume of each frustum follow the same notation used in the benchmark implementation:
+
+
+\[
+A_i = \pi (r_{i-1} + r_i) s_i
+\]
+
+
+\[
+V_i = \frac{\pi h_i}{3} \left(r_{i-1}^2 + r_{i-1} r_i + r_i^2\right)
+\]
+
+
+The total tower area and total tower volume are then obtained by summing the segment contributions:
+
+
+\[
+A = \sum_{i=1}^{m} A_i
+\]
+
+
+\[
+V = \sum_{i=1}^{m} V_i
+\]
+
+
+Lateral shell area is optimized (top and bottom caps excluded), which directly corresponds to shell-construction material for fixed end radii.
+
+Analytic gradients were used for both \texttt{A} and \texttt{V}, and for all penalty terms, so BFGS receives exact first-order information.
+
+
+\section{Design Variables by Scenario Type}
+
+In \texttt{radii} mode, interior radii \(r1\ldots r_{m-1}\) are optimized while ring heights are fixed from predefined \texttt{z} levels.
+
+In \texttt{heights} mode, segment heights \texttt{h1..hm} are optimized while ring radii are fixed.
+
+In \texttt{joint} mode, both interior radii and segment heights are optimized simultaneously.
+
+
+\chapter{Optimization Methods}
+
+
+\section{Simulated Annealing (SA)}
+
+SA performs single-solution stochastic search. At each evaluation, a local perturbation is proposed and accepted if it improves objective, or probabilistically accepted otherwise using the temperature schedule.
+
+This supports escape from local minima early in search and gradual exploitation as temperature cools.
+
+
+\section{Particle Swarm Optimization (PSO)}
+
+PSO evolves a population of particles with velocity updates using inertia, cognitive pull to personal best, and social pull to global best.
+
+It is typically strong on global exploration and multimodal landscapes, but can require many evaluations to satisfy strict constraints.
+
+
+\section{BFGS (Deterministic Quasi-Newton)}
+
+BFGS updates an inverse-Hessian approximation and computes descent directions with line search, yielding rapid local convergence when gradients are informative.
+
+It is efficient in evaluation count but can be sensitive to initialization and non-convex penalties.
+
+
+\chapter{Penalized Objective and Geometrical Constraints}
+
+The optimized scalar objective is \(J(x) = A(x) + P_{volume} + P_{height} + P_{shape} + P_{smooth} + P_{bounds} + P_{ratio}\) (terms enabled per scenario).
+
+
+\section{Constraint Terms and Their Function}
+
+\begin{itemize}
+\item \(P_{volume}\): enforces target cooling capacity by penalizing relative deviation from target volume.
+\item \(P_{height}\): enforces total tower height in scenarios where heights vary, preserving comparable overall structure.
+\item \(P_{shape}\): enforces hyperboloid-like monotonic contraction to neck and expansion above neck.
+\item \(P_{smooth}\): penalizes second differences in radii to avoid oscillatory/sawtooth shell profiles.
+\item \(P_{bounds}\): hinge penalty for design-variable bounds to keep variables in practical and constructable ranges.
+\item \(P_{ratio}\) (S8): limits adjacent-height ratios to promote constructability and avoid abrupt segment transitions.
+\end{itemize}
+
+\section{Feasibility Rule}
+
+\begin{itemize}
+\item Relative volume error must be \(\leq 1 \times 10^{-3}\).
+\item If heights vary, relative total-height error must be \(\leq 1 \times 10^{-3}\).
+\item If radii vary, monotonic hyperboloid violation must be \(\leq 1 \times 10^{-6}\).
+\end{itemize}
+
+\section{Engineering Feasibility Criteria}
+
+Engineering feasibility is evaluated in addition to mathematical compliance in order to flag designs that are formally valid but impractical. The checks are: minimum neck radius \(\geq 18.0 m\), maximum relative adjacent radius step \(\leq 0.35\), maximum radius second-difference \(\leq 6.0\), and, when heights vary, maximum adjacent-height ratio \(\leq 2.5\) (or scenario-specific limit, e.g. \texttt{1.8} in S8).
+
+In the scenario result sections, both statuses are reported side-by-side for each shown 3D tower.
+
+
+\chapter{Optimization Protocol}
+
+Each algorithm is run 10 times per scenario with deterministic seed control (seed offset 0). SA uses \(temp_init=120\), \(cooling_rate=0.997\), and scenario-dependent step size; PSO uses \(w=0.65\), \(c1=1.6\), \(c2=1.7\) with particle count tied to dimension; BFGS uses \(tol=1 \times 10^{-7}\) and \(max_iter=1200\).
+
+All runs share the same penalized objective structure (volume, height sum where applicable, shape monotonicity, smoothness, bounds, and S8 ratio constraint).
+
+
+Stochastic budgets are 10k evaluations for lower-dimensional setups and 16k for joint/high-dimensional setups. BFGS uses smaller budgets due to faster local convergence.
+
+
+\section{Methodology Quality Checks}
+
+Feasibility is evaluated independently from objective value using explicit thresholds, and scenario comparisons report both all-run and feasible-only statistics.
+
+Because evaluation budgets differ between SA/PSO and BFGS, quality and efficiency are interpreted together rather than from a single metric.
+
+For statistically tighter uncertainty on difficult cases, hard scenarios should be repeated with at least 20 runs.
+
+
+\chapter{Scenario Definitions}
+
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lllllll@{}}
+\hline
+\textbf{ID} & \textbf{Mode} & \textbf{m} & \textbf{Target Volume} & \textbf{r0} & \textbf{rm} & \textbf{Description} \\
+\hline
+S1 & radii & 10 & 70320 & 39.3 & 27.4 & Required case with bounded radii and required ring heights. \\
+S2 & radii & 10 & 70320 & 39.3 & 27.4 & Required case with wide radii range (unconstrained-like). \\
+S3 & radii & 10 & 70320 & 39.3 & 27.4 & Uniform-height radii design with bounded radii. \\
+S4 & radii & 12 & 70320 & 39.3 & 27.4 & Finer discretization (m=12) with bounded radii and smoothness. \\
+S5 & heights & 10 & 70320 & 39.3 & 27.4 & Fixed radii, optimize bounded heights. \\
+S6 & heights & 10 & 70320 & 39.3 & 27.4 & Fixed radii, optimize wide-range heights (unconstrained-like). \\
+S7 & joint & 10 & 70320 & 39.3 & 27.4 & Joint bounded optimization of radii and heights. \\
+S8 & joint & 10 & 90000 & 39.3 & 27.4 & Joint constructability-aware design with larger target volume. \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+
+\section{Why These 8 Scenarios Are Relevant}
+
+S1. Design change: Bounded radii with required ring heights and smoothness. Hypothesis: Reference constrained case should be feasible and stable across methods. This is relevant because it serves as baseline required assignment case for fair method comparison.
+
+
+S2. Design change: Wide radii range with reduced practical constraints. Hypothesis: Constraint relaxation improves search freedom but can produce impractical geometries. This is relevant because it separates mathematical feasibility from engineering practicality.
+
+
+S3. Design change: Bounded radii with uniform height discretization. Hypothesis: Uniform axial spacing isolates radial optimization effects. This is relevant because it controls for geometry discretization bias in radii-only optimization.
+
+
+S4. Design change: Higher radial discretization (m=12) with smoothness. Hypothesis: Higher dimensionality increases search difficulty but allows finer profiles. This is relevant because it tests resolution sensitivity and smoothness regularization impact.
+
+
+S5. Design change: Heights-only optimization with bounded heights and fixed radii template. Hypothesis: Vertical segmentation can be optimized reliably under practical bounds. This is relevant because it isolates height design effects from radius-shape effects.
+
+
+S6. Design change: Heights-only optimization with wide height bounds. Hypothesis: Relaxed height limits expose robustness and potential non-practical spacing patterns. This is relevant because it serves as unconstrained-like counterpart to S5 for sensitivity analysis.
+
+
+S7. Design change: Joint optimization of radii and heights under bounded settings. Hypothesis: Coupled variables increase nonlinearity and challenge feasibility preservation. This is relevant because it serves as most representative realistic design-optimization setup before stress case.
+
+
+S8. Design change: Joint optimization with larger target volume and constructability constraints. Hypothesis: Combined demand increase and constructability controls create a feasibility bottleneck. This is relevant because it serves as industrial stress test of methods under tight and conflicting requirements.
+
+
+\chapter{Cross-Algorithm Summary}
+
+This summary aggregates all selected scenarios for each method. Mean and median area describe central tendency, IQR and 95\% CI indicate dispersion, and the two feasibility columns separate strict mathematical compliance from the stricter engineering constructability screen.
+
+
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lllllllllllll@{}}
+\hline
+\textbf{Algorithm} & \textbf{Total Runs} & \textbf{Mean Area} & \textbf{Median Area} & \textbf{IQR (Q1-Q3)} & \textbf{95\% CI} & \textbf{Mean Rel Vol Err} & \textbf{Mean Evals} & \textbf{Mean Time (s)} & \textbf{Math Feasibility} & \textbf{Engineering Feasibility} & \textbf{Feasible Mean Area} & \textbf{Feasible Median Area} \\
+\hline
+SA & 80 & 7814.56 & 7770.28 & 7749.16-7791.32 & 37.17 & 5.277e-04 & 11500.0 & 1.9828 & 71.2\% & 50.0\% & 7841.72 & 7770.67 \\
+PSO & 80 & 8264.80 & 8071.38 & 7821.72-8484.34 & 126.82 & 1.698e-02 & 11500.0 & 2.5211 & 50.0\% & 7.5\% & 8213.12 & 7935.87 \\
+BFGS & 80 & 7866.44 & 7765.45 & 7741.72-7789.81 & 71.34 & 4.033e-04 & 4407.9 & 1.2287 & 73.8\% & 61.3\% & 7871.02 & 7742.56 \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{../figures/cross_scenario_area_bar.png}
+\caption{Cross-scenario area comparison}
+\end{figure}
+
+
+Across the current aggregated run set, BFGS achieved the highest mathematical compliance (73.8\%) and the highest engineering feasibility (61.3\%). BFGS remained the most evaluation-efficient, while SA delivered the lowest raw mean area.
+
+
+\chapter{Scenario Results}
+
+
+\section{S1}
+
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lllllllllllll@{}}
+\hline
+\textbf{Algorithm} & \textbf{Mean Area} & \textbf{Median Area} & \textbf{IQR (Q1-Q3)} & \textbf{95\% CI} & \textbf{Std Area} & \textbf{Mean Rel Vol Err} & \textbf{Mean Evals} & \textbf{Mean Time (s)} & \textbf{Math Feasibility} & \textbf{Engineering Feasibility} & \textbf{Feasible Runs} & \textbf{Feasible Median Area} \\
+\hline
+BFGS & 7782.01 & 7782.01 & 7782.01-7782.01 & 0.00 & 0.00 & 1.537e-03 & 3973.2 & 0.5213 & 0.0\% & 0.0\% & 0/10 & N/A \\
+PSO & 7950.10 & 7866.26 & 7802.73-8031.94 & 131.65 & 201.50 & 1.571e-02 & 10000.0 & 1.3185 & 20.0\% & 10.0\% & 2/10 & 7812.24 \\
+SA & 7781.85 & 7781.58 & 7780.02-7783.43 & 3.07 & 4.69 & 1.246e-03 & 10000.0 & 1.4225 & 50.0\% & 50.0\% & 5/10 & 7783.98 \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{../figures/S1_convergence.png}
+\caption{S1 convergence}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{../figures/S1_profile_overlay.png}
+\caption{S1 profile}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{../figures/S1_tower_3d.png}
+\caption{S1 3D towers}
+\end{figure}
+
+
+Compliance and feasibility status of the shown 3D towers (same selected runs as profile overlay):
+
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lllll@{}}
+\hline
+\textbf{Algorithm} & \textbf{Math Status} & \textbf{Math Failed Checks} & \textbf{Engineering Status} & \textbf{Engineering Failed Checks} \\
+\hline
+SA & NON-COMPLIANT & volume & INFEASIBLE & math\_compliance \\
+PSO & NON-COMPLIANT & volume, shape & INFEASIBLE & math\_compliance \\
+BFGS & NON-COMPLIANT & volume & INFEASIBLE & math\_compliance \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+
+In S1, the design change is: Bounded radii with required ring heights and smoothness. The working hypothesis is: Reference constrained case should be feasible and stable across methods. The highest mathematical compliance rate was achieved by SA (50.0\%), while the highest engineering-feasibility rate was achieved by SA (50.0\%). Among mathematically compliant runs, the lowest median area (cost proxy) was obtained by SA at 7783.98 m$^2$. Among engineering-feasible runs, the lowest median area was obtained by SA at 7783.98 m$^2$. In terms of evaluation efficiency, BFGS required the fewest mean evaluations (3973.2). Practical selection should still combine strict mathematical compliance with constructability review from the profile shape.
+
+
+
+\section{S2}
+
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lllllllllllll@{}}
+\hline
+\textbf{Algorithm} & \textbf{Mean Area} & \textbf{Median Area} & \textbf{IQR (Q1-Q3)} & \textbf{95\% CI} & \textbf{Std Area} & \textbf{Mean Rel Vol Err} & \textbf{Mean Evals} & \textbf{Mean Time (s)} & \textbf{Math Feasibility} & \textbf{Engineering Feasibility} & \textbf{Feasible Runs} & \textbf{Feasible Median Area} \\
+\hline
+BFGS & 8295.44 & 7741.67 & 7741.67-8935.73 & 453.22 & 693.71 & 1.558e-04 & 3550.2 & 0.3728 & 90.0\% & 60.0\% & 9/10 & 7741.67 \\
+PSO & 9352.84 & 9260.29 & 9045.31-9593.73 & 342.85 & 524.78 & 6.536e-02 & 10000.0 & 1.1347 & 40.0\% & 0.0\% & 4/10 & 9260.29 \\
+SA & 7753.26 & 7750.90 & 7746.56-7756.29 & 6.06 & 9.27 & 5.492e-05 & 10000.0 & 1.1780 & 100.0\% & 100.0\% & 10/10 & 7750.90 \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{../figures/S2_convergence.png}
+\caption{S2 convergence}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{../figures/S2_profile_overlay.png}
+\caption{S2 profile}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{../figures/S2_tower_3d.png}
+\caption{S2 3D towers}
+\end{figure}
+
+
+Compliance and feasibility status of the shown 3D towers (same selected runs as profile overlay):
+
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lllll@{}}
+\hline
+\textbf{Algorithm} & \textbf{Math Status} & \textbf{Math Failed Checks} & \textbf{Engineering Status} & \textbf{Engineering Failed Checks} \\
+\hline
+SA & COMPLIANT & None & FEASIBLE & None \\
+PSO & NON-COMPLIANT & shape & INFEASIBLE & math\_compliance, neck\_radius, rel\_radius\_step, radius\_second\_diff \\
+BFGS & COMPLIANT & None & FEASIBLE & None \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+
+In S2, the design change is: Wide radii range with reduced practical constraints. The working hypothesis is: Constraint relaxation improves search freedom but can produce impractical geometries. The highest mathematical compliance rate was achieved by SA (100.0\%), while the highest engineering-feasibility rate was achieved by SA (100.0\%). Among mathematically compliant runs, the lowest median area (cost proxy) was obtained by BFGS at 7741.67 m$^2$. Among engineering-feasible runs, the lowest median area was obtained by BFGS at 7741.67 m$^2$. In terms of evaluation efficiency, BFGS required the fewest mean evaluations (3550.2). Practical selection should still combine strict mathematical compliance with constructability review from the profile shape.
+
+
+
+\section{S3}
+
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lllllllllllll@{}}
+\hline
+\textbf{Algorithm} & \textbf{Mean Area} & \textbf{Median Area} & \textbf{IQR (Q1-Q3)} & \textbf{95\% CI} & \textbf{Std Area} & \textbf{Mean Rel Vol Err} & \textbf{Mean Evals} & \textbf{Mean Time (s)} & \textbf{Math Feasibility} & \textbf{Engineering Feasibility} & \textbf{Feasible Runs} & \textbf{Feasible Median Area} \\
+\hline
+BFGS & 7926.45 & 7741.69 & 7741.69-8066.12 & 196.42 & 300.65 & 1.542e-04 & 2959.1 & 0.3936 & 100.0\% & 70.0\% & 10/10 & 7741.69 \\
+PSO & 8258.12 & 8394.04 & 7895.12-8534.48 & 229.84 & 351.80 & 2.509e-05 & 10000.0 & 1.8164 & 90.0\% & 20.0\% & 9/10 & 8407.03 \\
+SA & 7753.02 & 7745.51 & 7744.11-7749.32 & 13.96 & 21.36 & 3.424e-05 & 10000.0 & 2.0273 & 100.0\% & 100.0\% & 10/10 & 7745.51 \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{../figures/S3_convergence.png}
+\caption{S3 convergence}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{../figures/S3_profile_overlay.png}
+\caption{S3 profile}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{../figures/S3_tower_3d.png}
+\caption{S3 3D towers}
+\end{figure}
+
+
+Compliance and feasibility status of the shown 3D towers (same selected runs as profile overlay):
+
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lllll@{}}
+\hline
+\textbf{Algorithm} & \textbf{Math Status} & \textbf{Math Failed Checks} & \textbf{Engineering Status} & \textbf{Engineering Failed Checks} \\
+\hline
+SA & COMPLIANT & None & FEASIBLE & None \\
+PSO & COMPLIANT & None & FEASIBLE & None \\
+BFGS & COMPLIANT & None & FEASIBLE & None \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+
+In S3, the design change is: Bounded radii with uniform height discretization. The working hypothesis is: Uniform axial spacing isolates radial optimization effects. The highest mathematical compliance rate was achieved by BFGS (100.0\%), while the highest engineering-feasibility rate was achieved by SA (100.0\%). Among mathematically compliant runs, the lowest median area (cost proxy) was obtained by BFGS at 7741.69 m$^2$. Among engineering-feasible runs, the lowest median area was obtained by BFGS at 7741.69 m$^2$. In terms of evaluation efficiency, BFGS required the fewest mean evaluations (2959.1). Practical selection should still combine strict mathematical compliance with constructability review from the profile shape.
+
+
+
+\section{S4}
+
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lllllllllllll@{}}
+\hline
+\textbf{Algorithm} & \textbf{Mean Area} & \textbf{Median Area} & \textbf{IQR (Q1-Q3)} & \textbf{95\% CI} & \textbf{Std Area} & \textbf{Mean Rel Vol Err} & \textbf{Mean Evals} & \textbf{Mean Time (s)} & \textbf{Math Feasibility} & \textbf{Engineering Feasibility} & \textbf{Feasible Runs} & \textbf{Feasible Median Area} \\
+\hline
+BFGS & 7779.85 & 7779.85 & 7779.85-7779.85 & 0.00 & 0.00 & 8.915e-04 & 5001.0 & 0.8333 & 100.0\% & 100.0\% & 10/10 & 7779.85 \\
+PSO & 8269.55 & 8187.35 & 7954.82-8348.35 & 292.43 & 447.60 & 3.272e-02 & 10000.0 & 2.0781 & 0.0\% & 0.0\% & 0/10 & N/A \\
+SA & 7783.18 & 7784.07 & 7770.83-7789.45 & 9.72 & 14.88 & 1.557e-03 & 10000.0 & 1.8587 & 20.0\% & 20.0\% & 2/10 & 7779.32 \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{../figures/S4_convergence.png}
+\caption{S4 convergence}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{../figures/S4_profile_overlay.png}
+\caption{S4 profile}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{../figures/S4_tower_3d.png}
+\caption{S4 3D towers}
+\end{figure}
+
+
+Compliance and feasibility status of the shown 3D towers (same selected runs as profile overlay):
+
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lllll@{}}
+\hline
+\textbf{Algorithm} & \textbf{Math Status} & \textbf{Math Failed Checks} & \textbf{Engineering Status} & \textbf{Engineering Failed Checks} \\
+\hline
+SA & NON-COMPLIANT & volume & INFEASIBLE & math\_compliance \\
+PSO & NON-COMPLIANT & volume, shape & INFEASIBLE & math\_compliance \\
+BFGS & COMPLIANT & None & FEASIBLE & None \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+
+In S4, the design change is: Higher radial discretization (m=12) with smoothness. The working hypothesis is: Higher dimensionality increases search difficulty but allows finer profiles. The highest mathematical compliance rate was achieved by BFGS (100.0\%), while the highest engineering-feasibility rate was achieved by BFGS (100.0\%). Among mathematically compliant runs, the lowest median area (cost proxy) was obtained by SA at 7779.32 m$^2$. Among engineering-feasible runs, the lowest median area was obtained by SA at 7779.32 m$^2$. In terms of evaluation efficiency, BFGS required the fewest mean evaluations (5001.0). Practical selection should still combine strict mathematical compliance with constructability review from the profile shape.
+
+
+
+\section{S5}
+
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lllllllllllll@{}}
+\hline
+\textbf{Algorithm} & \textbf{Mean Area} & \textbf{Median Area} & \textbf{IQR (Q1-Q3)} & \textbf{95\% CI} & \textbf{Std Area} & \textbf{Mean Rel Vol Err} & \textbf{Mean Evals} & \textbf{Mean Time (s)} & \textbf{Math Feasibility} & \textbf{Engineering Feasibility} & \textbf{Feasible Runs} & \textbf{Feasible Median Area} \\
+\hline
+BFGS & 7742.56 & 7742.56 & 7742.56-7742.56 & 0.00 & 0.00 & 2.331e-06 & 3657.4 & 0.6989 & 100.0\% & 100.0\% & 10/10 & 7742.56 \\
+PSO & 7796.77 & 7807.33 & 7764.83-7821.72 & 21.10 & 32.30 & 1.128e-04 & 10000.0 & 1.1962 & 90.0\% & 20.0\% & 9/10 & 7819.97 \\
+SA & 7757.25 & 7755.80 & 7752.49-7761.19 & 4.32 & 6.61 & 3.902e-05 & 10000.0 & 1.4740 & 100.0\% & 100.0\% & 10/10 & 7755.80 \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{../figures/S5_convergence.png}
+\caption{S5 convergence}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{../figures/S5_profile_overlay.png}
+\caption{S5 profile}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{../figures/S5_tower_3d.png}
+\caption{S5 3D towers}
+\end{figure}
+
+
+Compliance and feasibility status of the shown 3D towers (same selected runs as profile overlay):
+
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lllll@{}}
+\hline
+\textbf{Algorithm} & \textbf{Math Status} & \textbf{Math Failed Checks} & \textbf{Engineering Status} & \textbf{Engineering Failed Checks} \\
+\hline
+SA & COMPLIANT & None & FEASIBLE & None \\
+PSO & COMPLIANT & None & FEASIBLE & None \\
+BFGS & COMPLIANT & None & FEASIBLE & None \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+
+In S5, the design change is: Heights-only optimization with bounded heights and fixed radii template. The working hypothesis is: Vertical segmentation can be optimized reliably under practical bounds. The highest mathematical compliance rate was achieved by BFGS (100.0\%), while the highest engineering-feasibility rate was achieved by BFGS (100.0\%). Among mathematically compliant runs, the lowest median area (cost proxy) was obtained by BFGS at 7742.56 m$^2$. Among engineering-feasible runs, the lowest median area was obtained by BFGS at 7742.56 m$^2$. In terms of evaluation efficiency, BFGS required the fewest mean evaluations (3657.4). Practical selection should still combine strict mathematical compliance with constructability review from the profile shape.
+
+
+
+\section{S6}
+
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lllllllllllll@{}}
+\hline
+\textbf{Algorithm} & \textbf{Mean Area} & \textbf{Median Area} & \textbf{IQR (Q1-Q3)} & \textbf{95\% CI} & \textbf{Std Area} & \textbf{Mean Rel Vol Err} & \textbf{Mean Evals} & \textbf{Mean Time (s)} & \textbf{Math Feasibility} & \textbf{Engineering Feasibility} & \textbf{Feasible Runs} & \textbf{Feasible Median Area} \\
+\hline
+BFGS & 7741.72 & 7741.72 & 7741.72-7741.72 & 0.00 & 0.00 & 2.071e-06 & 2120.5 & 0.3118 & 100.0\% & 100.0\% & 10/10 & 7741.72 \\
+PSO & 7913.68 & 7889.15 & 7798.78-7941.51 & 95.83 & 146.68 & 5.923e-04 & 10000.0 & 1.7270 & 90.0\% & 10.0\% & 9/10 & 7863.83 \\
+SA & 7825.77 & 7823.82 & 7797.00-7848.27 & 21.67 & 33.17 & 6.569e-05 & 10000.0 & 1.5147 & 100.0\% & 30.0\% & 10/10 & 7823.82 \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{../figures/S6_convergence.png}
+\caption{S6 convergence}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{../figures/S6_profile_overlay.png}
+\caption{S6 profile}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{../figures/S6_tower_3d.png}
+\caption{S6 3D towers}
+\end{figure}
+
+
+Compliance and feasibility status of the shown 3D towers (same selected runs as profile overlay):
+
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lllll@{}}
+\hline
+\textbf{Algorithm} & \textbf{Math Status} & \textbf{Math Failed Checks} & \textbf{Engineering Status} & \textbf{Engineering Failed Checks} \\
+\hline
+SA & COMPLIANT & None & FEASIBLE & None \\
+PSO & COMPLIANT & None & FEASIBLE & None \\
+BFGS & COMPLIANT & None & FEASIBLE & None \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+
+In S6, the design change is: Heights-only optimization with wide height bounds. The working hypothesis is: Relaxed height limits expose robustness and potential non-practical spacing patterns. The highest mathematical compliance rate was achieved by BFGS (100.0\%), while the highest engineering-feasibility rate was achieved by BFGS (100.0\%). Among mathematically compliant runs, the lowest median area (cost proxy) was obtained by BFGS at 7741.72 m$^2$. Among engineering-feasible runs, the lowest median area was obtained by BFGS at 7741.72 m$^2$. In terms of evaluation efficiency, BFGS required the fewest mean evaluations (2120.5). Practical selection should still combine strict mathematical compliance with constructability review from the profile shape.
+
+
+
+\section{S7}
+
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lllllllllllll@{}}
+\hline
+\textbf{Algorithm} & \textbf{Mean Area} & \textbf{Median Area} & \textbf{IQR (Q1-Q3)} & \textbf{95\% CI} & \textbf{Std Area} & \textbf{Mean Rel Vol Err} & \textbf{Mean Evals} & \textbf{Mean Time (s)} & \textbf{Math Feasibility} & \textbf{Engineering Feasibility} & \textbf{Feasible Runs} & \textbf{Feasible Median Area} \\
+\hline
+BFGS & 7849.98 & 7743.85 & 7740.93-7946.58 & 112.04 & 171.50 & 6.374e-05 & 7000.8 & 3.1489 & 100.0\% & 60.0\% & 10/10 & 7743.85 \\
+PSO & 8608.62 & 8632.89 & 8473.89-8770.80 & 114.05 & 174.56 & 4.144e-04 & 16000.0 & 2.8357 & 70.0\% & 0.0\% & 7/10 & 8479.52 \\
+SA & 8160.14 & 8089.13 & 7959.39-8256.83 & 183.85 & 281.40 & 1.305e-04 & 16000.0 & 3.2232 & 100.0\% & 0.0\% & 10/10 & 8089.13 \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{../figures/S7_convergence.png}
+\caption{S7 convergence}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{../figures/S7_profile_overlay.png}
+\caption{S7 profile}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{../figures/S7_tower_3d.png}
+\caption{S7 3D towers}
+\end{figure}
+
+
+Compliance and feasibility status of the shown 3D towers (same selected runs as profile overlay):
+
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lllll@{}}
+\hline
+\textbf{Algorithm} & \textbf{Math Status} & \textbf{Math Failed Checks} & \textbf{Engineering Status} & \textbf{Engineering Failed Checks} \\
+\hline
+SA & COMPLIANT & None & INFEASIBLE & radius\_second\_diff, adj\_height\_ratio \\
+PSO & COMPLIANT & None & INFEASIBLE & neck\_radius, rel\_radius\_step, radius\_second\_diff \\
+BFGS & COMPLIANT & None & FEASIBLE & None \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+
+In S7, the design change is: Joint optimization of radii and heights under bounded settings. The working hypothesis is: Coupled variables increase nonlinearity and challenge feasibility preservation. The highest mathematical compliance rate was achieved by BFGS (100.0\%), while the highest engineering-feasibility rate was achieved by BFGS (60.0\%). Among mathematically compliant runs, the lowest median area (cost proxy) was obtained by BFGS at 7743.85 m$^2$. Among engineering-feasible runs, the lowest median area was obtained by BFGS at 7741.19 m$^2$. In terms of evaluation efficiency, BFGS required the fewest mean evaluations (7000.8). Practical selection should still combine strict mathematical compliance with constructability review from the profile shape.
+
+
+
+\section{S8}
+
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lllllllllllll@{}}
+\hline
+\textbf{Algorithm} & \textbf{Mean Area} & \textbf{Median Area} & \textbf{IQR (Q1-Q3)} & \textbf{95\% CI} & \textbf{Std Area} & \textbf{Mean Rel Vol Err} & \textbf{Mean Evals} & \textbf{Mean Time (s)} & \textbf{Math Feasibility} & \textbf{Engineering Feasibility} & \textbf{Feasible Runs} & \textbf{Feasible Median Area} \\
+\hline
+BFGS & 7813.48 & 7813.24 & 7813.24-7813.25 & 0.33 & 0.51 & 4.204e-04 & 7001.0 & 3.5489 & 0.0\% & 0.0\% & 0/10 & N/A \\
+PSO & 7968.67 & 7978.96 & 7834.39-8245.54 & 227.86 & 348.77 & 2.087e-02 & 16000.0 & 8.0625 & 0.0\% & 0.0\% & 0/10 & N/A \\
+SA & 7701.98 & 7703.58 & 7683.11-7722.19 & 21.06 & 32.24 & 1.093e-03 & 16000.0 & 3.1637 & 0.0\% & 0.0\% & 0/10 & N/A \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{../figures/S8_convergence.png}
+\caption{S8 convergence}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{../figures/S8_profile_overlay.png}
+\caption{S8 profile}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{../figures/S8_tower_3d.png}
+\caption{S8 3D towers}
+\end{figure}
+
+
+Compliance and feasibility status of the shown 3D towers (same selected runs as profile overlay):
+
+\begin{table}[H]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lllll@{}}
+\hline
+\textbf{Algorithm} & \textbf{Math Status} & \textbf{Math Failed Checks} & \textbf{Engineering Status} & \textbf{Engineering Failed Checks} \\
+\hline
+SA & NON-COMPLIANT & height & INFEASIBLE & math\_compliance \\
+PSO & NON-COMPLIANT & volume, height, shape & INFEASIBLE & math\_compliance, adj\_height\_ratio \\
+BFGS & NON-COMPLIANT & height, shape & INFEASIBLE & math\_compliance, adj\_height\_ratio \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+
+In S8, the design change is: Joint optimization with larger target volume and constructability constraints. The working hypothesis is: Combined demand increase and constructability controls create a feasibility bottleneck. The highest mathematical compliance rate was achieved by SA (0.0\%), while the highest engineering-feasibility rate was achieved by SA (0.0\%). No mathematically compliant run was found in this configuration, and the lowest penalized infeasible result came from BFGS. No mathematically compliant runs were available for cost comparison. No engineering-feasible runs were available for cost comparison. In terms of evaluation efficiency, BFGS required the fewest mean evaluations (7001.0). Practical selection should still combine strict mathematical compliance with constructability review from the profile shape.
+
+
+\chapter{Key Findings}
+
+
+S1: the best mathematical compliance-area tradeoff was achieved by SA (compliance 50.0\%, feasible median area 7783.98 m$^2$).
+
+S1: the best engineering-feasibility tradeoff was achieved by SA (engineering feasibility 50.0\%, engineering-feasible median area 7783.98 m$^2$).
+
+S1: the lowest mean evaluation count was achieved by BFGS (3973.2 evals).
+
+S2: the best mathematical compliance-area tradeoff was achieved by SA (compliance 100.0\%, feasible median area 7750.90 m$^2$).
+
+S2: the best engineering-feasibility tradeoff was achieved by SA (engineering feasibility 100.0\%, engineering-feasible median area 7750.90 m$^2$).
+
+S2: the lowest mean evaluation count was achieved by BFGS (3550.2 evals).
+
+S3: the best mathematical compliance-area tradeoff was achieved by BFGS (compliance 100.0\%, feasible median area 7741.69 m$^2$).
+
+S3: the best engineering-feasibility tradeoff was achieved by SA (engineering feasibility 100.0\%, engineering-feasible median area 7745.51 m$^2$).
+
+S3: the lowest mean evaluation count was achieved by BFGS (2959.1 evals).
+
+S4: the best mathematical compliance-area tradeoff was achieved by BFGS (compliance 100.0\%, feasible median area 7779.85 m$^2$).
+
+S4: the best engineering-feasibility tradeoff was achieved by BFGS (engineering feasibility 100.0\%, engineering-feasible median area 7779.85 m$^2$).
+
+S4: the lowest mean evaluation count was achieved by BFGS (5001.0 evals).
+
+S5: the best mathematical compliance-area tradeoff was achieved by BFGS (compliance 100.0\%, feasible median area 7742.56 m$^2$).
+
+S5: the best engineering-feasibility tradeoff was achieved by BFGS (engineering feasibility 100.0\%, engineering-feasible median area 7742.56 m$^2$).
+
+S5: the lowest mean evaluation count was achieved by BFGS (3657.4 evals).
+
+S6: the best mathematical compliance-area tradeoff was achieved by BFGS (compliance 100.0\%, feasible median area 7741.72 m$^2$).
+
+S6: the best engineering-feasibility tradeoff was achieved by BFGS (engineering feasibility 100.0\%, engineering-feasible median area 7741.72 m$^2$).
+
+S6: the lowest mean evaluation count was achieved by BFGS (2120.5 evals).
+
+S7: the best mathematical compliance-area tradeoff was achieved by BFGS (compliance 100.0\%, feasible median area 7743.85 m$^2$).
+
+S7: the best engineering-feasibility tradeoff was achieved by BFGS (engineering feasibility 60.0\%, engineering-feasible median area 7741.19 m$^2$).
+
+S7: the lowest mean evaluation count was achieved by BFGS (7000.8 evals).
+
+S8: no mathematically compliant solutions were found (all algorithms at 0.0\% compliance), and the lowest penalized infeasible objective was obtained by BFGS.
+
+S8: current constructability checks yielded no engineering-feasible solutions.
+
+S8: the lowest mean evaluation count was achieved by BFGS (7001.0 evals).
+
+
+Mathematical-compliance bottleneck scenarios: S8 (all tested methods yielded 0\% compliant runs under current constraints).
+
+Engineering-feasibility bottleneck scenarios: S8 (no algorithm produced engineering-feasible solutions under current checks).
+
+
+\chapter{Discussion and Conclusions}
+
+
+Across all scenarios, \textbf{BFGS} achieved the highest overall mathematical compliance (73.8\%).
+
+Across all scenarios, \textbf{BFGS} achieved the highest overall engineering feasibility (61.3\%).
+
+\textbf{BFGS} required the fewest evaluations on average (4407.9), confirming its efficiency for local convergence.
+
+By raw mean area across all runs, \textbf{SA} produced the lowest average shell area (7814.56 m$^2$), but this must be interpreted jointly with compliance and feasibility rates.
+
+Considering compliant runs only, \textbf{BFGS} achieved the lowest compliant median area (7742.56 m$^2$).
+
+On engineering-feasible central tendency, \textbf{BFGS} achieved the lowest engineering-feasible median area (7741.72 m$^2$).
+
+
+These comparisons should be interpreted with budget asymmetry in mind: SA and PSO use larger evaluation budgets than BFGS in most scenarios, so quality and efficiency must be read together.
+
+
+Result patterns are consistent with expected method behavior: BFGS is computationally efficient and strong when gradients and local curvature align with feasible basins; SA is often robust under hard nonlinear penalties because probabilistic acceptance helps transition between constrained basins; PSO explores broadly but can underperform compliance when penalty landscapes are steep and high-dimensional.
+
+
+The split between mathematical compliance and engineering feasibility is necessary for this task. Some shapes can satisfy the formal optimization constraints yet remain impractical because of neck narrowing, abrupt radius transitions, or uneven segment heights. Those cases should be reported as compliant but not engineering-feasible rather than accepted as final designs.
+
+
+For practical engineering usage in this problem family, the recommended workflow is a hybrid strategy: use SA or PSO for broader search and feasible-region discovery, then warm-start BFGS for rapid refinement of the best compliant candidate after constructability screening.
+
+
+The principal bottleneck scenarios are S8. These cases combine tighter capacity, geometric, and constructability demands, so future refinement should focus on adaptive penalties, better initialization, and stronger smoothing or ratio constraints.
+
+
+\section{Planned Structural Validation in Abaqus}
+
+
+The next step is to transfer the best candidate geometries into Abaqus shell models with realistic material properties and shell-thickness assumptions for reinforced-concrete cooling towers. These models will be checked under self-weight and representative environmental loading to evaluate displacement, stress distribution, and buckling sensitivity.
+
+
+Multiple candidate towers will be compared, not only the minimum-area design, so selection can be based on engineering feasibility as well as geometric efficiency. The Abaqus results will then be used to refine the optimization model by tightening feasibility rules or adding constraints linked to smoothness, curvature, and stability.

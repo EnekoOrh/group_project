@@ -1,0 +1,5 @@
+job_name,case_id,case_variant,nodes,elements,circumferential_divisions,axial_subdivisions_per_segment
+task7_radius_baseline,radius_baseline,comparison,176,160,16,1
+task7_height_variant,height_variant,comparison,176,160,16,1
+task7_joint_reference,joint_reference,comparison,176,160,16,1
+task7_joint_reference_refined,joint_reference,mesh_sensitivity,504,480,24,2

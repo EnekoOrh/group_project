@@ -1,6 +1,7 @@
+use utf8;
 $pdf_mode = 1;
 $pdflatex = 'pdflatex -interaction=nonstopmode -file-line-error %O %S';
 $bibtex = 'biber %O %B';
-$jobname = 'Task6_Report';
+$jobname = 'Task6_Montrésor_CoolingTower';
 $out_dir = '..';
 $aux_dir = 'build';
