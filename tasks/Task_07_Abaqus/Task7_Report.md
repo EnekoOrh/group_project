@@ -2,98 +2,365 @@
 
 ## 1. Objective
 
-This Task 7 study transfers three selected Task 6 cooling-tower geometries into Abaqus shell models in order to compare their structural response under self-weight and one-direction wind loading.
-The engineering question is not which geometry had the lowest optimized shell area alone, but which geometry remains the most convincing once displacement, stress, and shell-buckling sensitivity are checked under a common structural load case.
+This Task 7 study expands the previous three-tower screening into a full structural comparison across the eight Task 6 scenarios and the three optimization algorithms SA, PSO, and BFGS.
+The engineering objective is to identify which Task 6 concepts remain convincing once the towers are checked under self-weight, one-direction wind loading, and linear buckling in Abaqus.
 
-## 2. Towers Carried Forward from Task 6
+## 2. Selection Rule and Scenario Matrix
 
-| Case ID | Task 6 source | Why it was kept |
-|---|---|---|
-| Radius baseline (S2 / BFGS) | S2 / BFGS | Radius-only optimized tower used as the clean Task 6 baseline candidate. |
-| Height variant (S6 / BFGS) | S6 / BFGS | Height-only optimized tower used to test structural sensitivity to vertical segmentation. |
-| Joint reference (S7 / BFGS) | S7 / BFGS | Joint radii-height optimized tower used as the main realistic reference for Task 7. |
+The Task 7 matrix contains **24 refined presentation models**. For scenarios S1 to S7, the preferred choice is the lowest-area engineering-feasible Task 6 run for each scenario/algorithm pair. If no engineering-feasible run exists, the workflow falls back to the lowest-area mathematically compliant run. If neither exists, the best penalized run is kept only as a warning case. Scenario S8 is intentionally carried as warning-only because it has no compliant Task 6 solution in the current study.
 
-![Task 7 candidate profiles](../figures/candidate_profiles.png)
+Across the 24 selected cases, there are **16 engineering-feasible selections**, **3 mathematical fallbacks**, and **5 warning-only cases**.
 
-## 3. Material and Loading Assumptions
+| Case | Status | Selection basis | Task 6 run | Decision mode | Task 6 area (m^2) |
+|---|---|---|---|---|---|
+| S1 / BFGS | Warning case | best_penalized_warning | 6 | radii | 7782.01 |
+| S1 / PSO | Engineering-feasible | lowest_area_engineering_feasible | 7 | radii | 7804.56 |
+| S1 / SA | Engineering-feasible | lowest_area_engineering_feasible | 5 | radii | 7780.73 |
+| S2 / BFGS | Engineering-feasible | lowest_area_engineering_feasible | 2 | radii | 7741.67 |
+| S2 / PSO | Math fallback | lowest_area_mathematical_fallback | 0 | radii | 9075.03 |
+| S2 / SA | Engineering-feasible | lowest_area_engineering_feasible | 5 | radii | 7744.01 |
+| S3 / BFGS | Engineering-feasible | lowest_area_engineering_feasible | 6 | radii | 7741.69 |
+| S3 / PSO | Engineering-feasible | lowest_area_engineering_feasible | 6 | radii | 7743.34 |
+| S3 / SA | Engineering-feasible | lowest_area_engineering_feasible | 6 | radii | 7742.77 |
+| S4 / BFGS | Engineering-feasible | lowest_area_engineering_feasible | 1 | radii | 7779.85 |
+| S4 / PSO | Warning case | best_penalized_warning | 1 | radii | 7931.66 |
+| S4 / SA | Engineering-feasible | lowest_area_engineering_feasible | 7 | radii | 7769.88 |
+| S5 / BFGS | Engineering-feasible | lowest_area_engineering_feasible | 0 | heights | 7742.56 |
+| S5 / PSO | Engineering-feasible | lowest_area_engineering_feasible | 6 | heights | 7747.93 |
+| S5 / SA | Engineering-feasible | lowest_area_engineering_feasible | 6 | heights | 7749.52 |
+| S6 / BFGS | Engineering-feasible | lowest_area_engineering_feasible | 1 | heights | 7741.72 |
+| S6 / PSO | Engineering-feasible | lowest_area_engineering_feasible | 3 | heights | 7748.25 |
+| S6 / SA | Engineering-feasible | lowest_area_engineering_feasible | 0 | heights | 7783.24 |
+| S7 / BFGS | Engineering-feasible | lowest_area_engineering_feasible | 1 | joint | 7740.66 |
+| S7 / PSO | Math fallback | lowest_area_mathematical_fallback | 9 | joint | 8324.25 |
+| S7 / SA | Math fallback | lowest_area_mathematical_fallback | 9 | joint | 7890.85 |
+| S8 / BFGS | Warning case | best_penalized_warning | 5 | joint | 7813.24 |
+| S8 / PSO | Warning case | best_penalized_warning | 8 | joint | 7899.07 |
+| S8 / SA | Warning case | best_penalized_warning | 0 | joint | 7718.27 |
 
-- Equivalent reinforced concrete: `E = 33 GPa`, `nu = 0.20`, `rho = 2500 kg/m^3`.
-- Constant shell thickness: `0.20 m`.
-- Reference wind speed: `30.0 m/s`, giving `q = 562.5 Pa` from `q = 0.5 rho V^2`.
-- Circumferential wind coefficient law: `clip(0.8*cos(theta), -0.5, 0.8)` with wind acting from the `+X` direction.
-- Base boundary condition: fully fixed support ring at the tower base.
-- Analysis sequence: static response under self-weight plus wind, followed by linear buckling on the preloaded state.
+![Task 7 candidate profiles](results/figures/candidate_profiles.png)
 
-## 4. Abaqus Model Setup
+## 3. Material, Loading, and CAE Setup
 
-Each tower is meshed as a full 3D shell surface generated from the Task 6 meridian profile. The study uses the same material, shell thickness, and wind basis for all three towers so the structural comparison remains controlled.
-The comparison mesh uses `16` circumferential sectors and `1` axial subdivision per Task 6 frustum segment.
+The structural baseline keeps the same assumptions for every model: equivalent reinforced concrete with `E = 33 GPa`, `nu = 0.20`, and `rho = 2500 kg/m^3`, together with a constant shell thickness of `0.20 m`.
+The reference wind speed is `30.0 m/s`, which gives a dynamic pressure of `562.5 Pa` through `q = 0.5 rho V^2`.
+Wind loading is interpreted as one-direction external action: windward sectors receive positive external pressure and leeward sectors receive suction. This is not internal cabin-style pressurization.
+The directional pressure model is:
+$$
+C_p(\theta) = \mathrm{clip}(0.8\cos\theta, -0.5, 0.8), \quad p(\theta) = q\,C_p(\theta)
+$$
+Task 7 uses a strict `Y`-up coordinate convention: `Y` is vertical, the horizontal wind plane is `X/Z`, and self-weight acts along `-Y`.
+The clean user-facing Abaqus/CAE database contains the **24 refined models only**, with one gravity load and one wind load per model. The automated solver decks still use the same circumferential pressure law in sectorized form for coarse-versus-refined verification.
+The refined study uses one uniform high mesh policy for all 24 towers (`40` circumferential divisions, `2` axial subdivisions per segment). Refined node counts range from `840` to `1000` nodes, which keeps every case within the Abaqus Learning Edition limit while using the highest common density.
+Solver-deck mesh compliance (`mesh_summary.csv`) is tracked separately from CAE integrity: refined solver decks span `840` to `1000` nodes and remain within the Abaqus LE cap.
+CAE-native integrity (`cae_integrity_audit.json`) reports a model-node range of `840` to `1075`. This audit validates model-tree integrity and CAE consistency, not LE solve-cap compliance.
+A deterministic input-deck audit runs before solving and confirms that all 48 decks use identical material constants, gravity definition, and wind-pressure sector logic.
+The towers look squat in Abaqus because the geometry is genuinely squat: the Task 6 cooling towers are about `36.5 m` tall for a base diameter of about `78.6 m`, so the aspect ratio is below one. This is source geometry, not an Abaqus distortion.
 
-## 5. Results Summary
+## 4. Geometry Integrity Check
 
-All figures below are rendered from actual Abaqus ODB field data exported with `abaqus python`; they are not screenshots from Abaqus/CAE.
+The Task 7 generator preserves the exact Task 6 meridian coordinates. A geometry verification pass is written before solving and checks the mesh rings against the selected Task 6 source profile for every coarse and refined job.
 
-| Tower | Task 6 area (m^2) | Max disp. (mm) | Max von Mises (MPa) | Base reaction resultant (kN) | First buckling factor |
-|---|---:|---:|---:|---:|---:|
-| Radius baseline (S2 / BFGS) | 7741.67 | 8.101 | 3.896 | 37503.03 | 45.080 |
-| Height variant (S6 / BFGS) | 7741.72 | 10.407 | 4.444 | 37505.70 | 42.313 |
-| Joint reference (S7 / BFGS) | 7740.66 | 8.690 | 4.138 | 37498.95 | 43.947 |
+| Mesh | Max total-height diff (m) | Max ring-radius diff (m) | Max ring-z diff (m) |
+|---|---|---|---|
+| coarse | 0.000000e+00 | 0.000000e+00 | 0.000000e+00 |
+| refined | 0.000000e+00 | 0.000000e+00 | 0.000000e+00 |
 
-![Task 7 comparison metrics](../figures/comparison_metrics.png)
+## 5. Refined Structural Comparison Across All 24 Cases
 
-## 6. Field Visualizations
+| Case | Status | Task 6 area (m^2) | Max disp. (mm) | Max stress (MPa) | Buckling factor |
+|---|---|---|---|---|---|
+| S1 / BFGS | Warning case | 7782.01 | 4.264 | 2.262 | 20.907 |
+| S1 / PSO | Engineering-feasible | 7804.56 | 4.126 | 2.244 | 21.300 |
+| S1 / SA | Engineering-feasible | 7780.73 | 4.627 | 2.368 | 21.481 |
+| S2 / BFGS | Engineering-feasible | 7741.67 | 10.202 | 3.867 | 23.563 |
+| S2 / PSO | Math fallback | 9075.03 | 94.040 | 10.268 | -3.229 |
+| S2 / SA | Engineering-feasible | 7744.01 | 9.968 | 3.818 | 24.549 |
+| S3 / BFGS | Engineering-feasible | 7741.69 | 10.153 | 3.834 | 23.529 |
+| S3 / PSO | Engineering-feasible | 7743.34 | 9.850 | 3.794 | 23.496 |
+| S3 / SA | Engineering-feasible | 7742.77 | 9.036 | 3.526 | 23.834 |
+| S4 / BFGS | Engineering-feasible | 7779.85 | 3.831 | 2.282 | 20.267 |
+| S4 / PSO | Warning case | 7931.66 | 12.073 | 4.541 | 22.491 |
+| S4 / SA | Engineering-feasible | 7769.88 | 4.287 | 2.296 | 19.753 |
+| S5 / BFGS | Engineering-feasible | 7742.56 | 8.695 | 4.148 | 22.725 |
+| S5 / PSO | Engineering-feasible | 7747.93 | 11.481 | 4.941 | 19.566 |
+| S5 / SA | Engineering-feasible | 7749.52 | 10.229 | 4.642 | 23.232 |
+| S6 / BFGS | Engineering-feasible | 7741.72 | 10.522 | 5.312 | 24.772 |
+| S6 / PSO | Engineering-feasible | 7748.25 | 11.907 | 6.705 | 21.611 |
+| S6 / SA | Engineering-feasible | 7783.24 | 14.270 | 7.690 | 19.128 |
+| S7 / BFGS | Engineering-feasible | 7740.66 | 10.105 | 4.134 | 24.948 |
+| S7 / PSO | Math fallback | 8324.25 | 28.467 | 9.258 | 23.712 |
+| S7 / SA | Math fallback | 7890.85 | 12.541 | 6.711 | 26.587 |
+| S8 / BFGS | Warning case | 7813.24 | 10.319 | 5.446 | 19.273 |
+| S8 / PSO | Warning case | 7899.07 | 9.235 | 4.493 | 27.335 |
+| S8 / SA | Warning case | 7718.27 | 8.163 | 4.955 | 23.837 |
 
-### Radius baseline (S2 / BFGS)
+![Task 7 refined comparison metrics](results/figures/comparison_metrics.png)
 
-![Radius baseline (S2 / BFGS) stress](../figures/task7_radius_baseline_stress.png)
+## 6. Methodological Clarity and Global Ranking
 
-![Radius baseline (S2 / BFGS) displacement](../figures/task7_radius_baseline_displacement.png)
+### 6.1 Methodological Clarity
 
-![Radius baseline (S2 / BFGS) buckling mode 1](../figures/task7_radius_baseline_buckling_mode1.png)
+The global ranking is a rank-based weighted score on the refined results, designed to stay robust when one or two cases have extreme values.
+For each metric, rank `1` is best and rank `24` is worst, with deterministic tie-breaks by scenario/algorithm identifiers.
 
-### Height variant (S6 / BFGS)
+$$
+R_{k,i} = \\text{rank of case } i \\text{ on metric } k
+$$
 
-![Height variant (S6 / BFGS) stress](../figures/task7_height_variant_stress.png)
+$$
+S_i = 0.45 R_{\\mathrm{buckling},i} + 0.25 R_{\\mathrm{disp},i} + 0.20 R_{\\mathrm{stress},i} + 0.10 R_{\\mathrm{area},i}
+$$
 
-![Height variant (S6 / BFGS) displacement](../figures/task7_height_variant_displacement.png)
+$$
+J_i = S_i + P_i, \\quad P_i \\in \\{0,10,20\\}
+$$
 
-![Height variant (S6 / BFGS) buckling mode 1](../figures/task7_height_variant_buckling_mode1.png)
+Penalty points are `0` for engineering-feasible, `10` for mathematical fallback, and `20` for warning cases. The best model is the one with the lowest `J_i`.
 
-### Joint reference (S7 / BFGS)
+### 6.2 Global Weighted Top-3
 
-![Joint reference (S7 / BFGS) stress](../figures/task7_joint_reference_stress.png)
+| Rank | Case | Status | Weighted score | Penalty | Buckling factor | Max disp. (mm) | Max stress (MPa) | Area (m^2) |
+|---|---|---|---|---|---|---|---|---|
+| 1 | S7 / BFGS | Engineering-feasible | 6.750 | 0.0 | 24.948 | 10.105 | 4.134 | 7740.66 |
+| 2 | S3 / SA | Engineering-feasible | 7.050 | 0.0 | 23.834 | 9.036 | 3.526 | 7742.77 |
+| 3 | S2 / SA | Engineering-feasible | 7.500 | 0.0 | 24.549 | 9.968 | 3.818 | 7744.01 |
 
-![Joint reference (S7 / BFGS) displacement](../figures/task7_joint_reference_displacement.png)
+![Task 7 weighted ranking](results/figures/task7_weighted_ranking.png)
 
-![Joint reference (S7 / BFGS) buckling mode 1](../figures/task7_joint_reference_buckling_mode1.png)
+### 6.3 Top-3 by Criterion
 
-## 7. Mesh Sensitivity
+#### 6.3.1 Raw Top-3 (all statuses)
 
-The reference mesh-sensitivity check was run on the joint-reference tower because it is the most realistic candidate carried over from Task 6.
+This raw criterion table keeps all statuses visible, so warning and fallback cases can appear if they are numerically extreme on a single indicator.
 
-| Metric | Baseline | Refined | Relative change (%) |
-|---|---:|---:|---:|
-| max_displacement_m | 0.00868998 | 0.0100617 | 15.79 |
-| max_mises_pa | 4.13791e+06 | 4.11571e+06 | -0.54 |
-| buckling_factor_1 | 43.947 | 28.071 | -36.13 |
+| Criterion | Rank | Case | Status | Value |
+|---|---|---|---|---|
+| Buckling factor | 1 | S8 / PSO | Warning case | 27.335 |
+| Buckling factor | 2 | S7 / SA | Math fallback | 26.587 |
+| Buckling factor | 3 | S7 / BFGS | Engineering-feasible | 24.948 |
+| Max displacement | 1 | S4 / BFGS | Engineering-feasible | 3.831 mm |
+| Max displacement | 2 | S1 / PSO | Engineering-feasible | 4.126 mm |
+| Max displacement | 3 | S1 / BFGS | Warning case | 4.264 mm |
+| Max stress | 1 | S1 / PSO | Engineering-feasible | 2.244 MPa |
+| Max stress | 2 | S1 / BFGS | Warning case | 2.262 MPa |
+| Max stress | 3 | S4 / BFGS | Engineering-feasible | 2.282 MPa |
+| Task 6 area | 1 | S8 / SA | Warning case | 7718.27 m^2 |
+| Task 6 area | 2 | S7 / BFGS | Engineering-feasible | 7740.66 m^2 |
+| Task 6 area | 3 | S2 / BFGS | Engineering-feasible | 7741.67 m^2 |
 
-The joint-reference mesh check showed a large change in first buckling factor when the mesh was refined. That means the current buckling ranking is informative for screening, but it is not yet converged strongly enough to be treated as a final design decision without at least one more refinement pass.
+![Task 7 criterion leaders](results/figures/task7_criterion_top3.png)
 
-## 8. Recommendation
+#### 6.3.2 Engineering-eligible Top-3
 
-The recommended tower is **Radius baseline (S2 / BFGS)**. The selection rule is deliberately transparent: prioritize the highest first buckling factor, then the lower maximum displacement, then the lower maximum von Mises stress, and finally the lower Task 6 shell area.
+This decision-grade table filters to engineering-feasible entries only.
 
-Under that rule, `Radius baseline (S2 / BFGS)` ranked first with a first buckling factor of `45.080`, a maximum displacement of `8.101 mm`, and a maximum von Mises stress of `3.896 MPa`.
+| Criterion | Rank | Case | Status | Value |
+|---|---|---|---|---|
+| Buckling factor | 1 | S7 / BFGS | Engineering-feasible | 24.948 |
+| Buckling factor | 2 | S6 / BFGS | Engineering-feasible | 24.772 |
+| Buckling factor | 3 | S2 / SA | Engineering-feasible | 24.549 |
+| Max displacement | 1 | S4 / BFGS | Engineering-feasible | 3.831 mm |
+| Max displacement | 2 | S1 / PSO | Engineering-feasible | 4.126 mm |
+| Max displacement | 3 | S4 / SA | Engineering-feasible | 4.287 mm |
+| Max stress | 1 | S1 / PSO | Engineering-feasible | 2.244 MPa |
+| Max stress | 2 | S4 / BFGS | Engineering-feasible | 2.282 MPa |
+| Max stress | 3 | S4 / SA | Engineering-feasible | 2.296 MPa |
+| Task 6 area | 1 | S7 / BFGS | Engineering-feasible | 7740.66 m^2 |
+| Task 6 area | 2 | S2 / BFGS | Engineering-feasible | 7741.67 m^2 |
+| Task 6 area | 3 | S3 / BFGS | Engineering-feasible | 7741.69 m^2 |
 
-This recommendation should therefore be read as a **baseline screening result**, not as a mesh-converged final structural verdict.
+![Task 7 engineering criterion leaders](results/figures/task7_criterion_top3_engineering.png)
 
-## 9. Feedback into Task 6
+## 7. Scenario-by-Scenario Comparison
 
-The simpler radius-only tower outperformed the richer Task 6 variants structurally, which suggests Task 6 should keep a strong bias toward smooth radius control before adding extra height freedom.
+### S1
 
-The weakest buckling response came from the height-only wide-bound case, so future feasibility checks should continue to penalize abrupt height redistribution even when the geometry stays mathematically compliant.
+| Algorithm | Status | Weighted score | Task 6 area (m^2) | Max disp. (mm) | Max stress (MPa) | Buckling factor |
+|---|---|---|---|---|---|---|
+| BFGS | Warning case | 30.850 | 7782.01 | 4.264 | 2.262 | 20.907 |
+| PSO | Engineering-feasible | 10.150 | 7804.56 | 4.126 | 2.244 | 21.300 |
+| SA | Engineering-feasible | 10.950 | 7780.73 | 4.627 | 2.368 | 21.481 |
 
-## 10. Limitations and Next Steps
+**Winner:** S1 / PSO with weighted score `10.150`.
+The score gap to second place (S1 / SA) is `0.800` points.
+**Spread/Risk:** displacement spans `4.126` to `4.627` mm, stress spans `2.244` to `2.368` MPa, and buckling spans `20.907` to `21.481`.
+**Status caveat:** warning-only entries are present for BFGS and are not decision-grade designs.
+**Critical note:** scenario fairness is reduced by mixed compliance statuses; ranking penalties keep the comparison visible but do not make warning/fallback cases equivalent to engineering-feasible designs.
 
-This is a comparative baseline study. The shell is linear elastic, the thickness is constant, and the wind field is represented by an explicit sector-based circumferential pressure law rather than a full code-based site model.
-If the project is extended, the next upgrades should be: refined wind action based on a chosen design standard, shell-thickness sensitivity, and possibly geometric or material nonlinearity for the recommended tower only.
+### S2
+
+| Algorithm | Status | Weighted score | Task 6 area (m^2) | Max disp. (mm) | Max stress (MPa) | Buckling factor |
+|---|---|---|---|---|---|---|
+| BFGS | Engineering-feasible | 9.850 | 7741.67 | 10.202 | 3.867 | 23.563 |
+| PSO | Math fallback | 34.000 | 9075.03 | 94.040 | 10.268 | -3.229 |
+| SA | Engineering-feasible | 7.500 | 7744.01 | 9.968 | 3.818 | 24.549 |
+
+**Winner:** S2 / SA with weighted score `7.500`.
+The score gap to second place (S2 / BFGS) is `2.350` points.
+**Spread/Risk:** displacement spans `9.968` to `94.040` mm, stress spans `3.818` to `10.268` MPa, and buckling spans `-3.229` to `24.549`.
+**Status caveat:** mathematical fallback entries are present for PSO.
+**Critical note:** scenario fairness is reduced by mixed compliance statuses; ranking penalties keep the comparison visible but do not make warning/fallback cases equivalent to engineering-feasible designs.
+
+### S3
+
+| Algorithm | Status | Weighted score | Task 6 area (m^2) | Max disp. (mm) | Max stress (MPa) | Buckling factor |
+|---|---|---|---|---|---|---|
+| BFGS | Engineering-feasible | 9.950 | 7741.69 | 10.153 | 3.834 | 23.529 |
+| PSO | Engineering-feasible | 9.650 | 7743.34 | 9.850 | 3.794 | 23.496 |
+| SA | Engineering-feasible | 7.050 | 7742.77 | 9.036 | 3.526 | 23.834 |
+
+**Winner:** S3 / SA with weighted score `7.050`.
+The score gap to second place (S3 / PSO) is `2.600` points.
+**Spread/Risk:** displacement spans `9.036` to `10.153` mm, stress spans `3.526` to `3.834` MPa, and buckling spans `23.496` to `23.834`.
+**Status caveat:** all three entries are engineering-feasible.
+**Critical note:** the winner remains robust inside this scenario under the current weighted scoring contract.
+
+### S4
+
+| Algorithm | Status | Weighted score | Task 6 area (m^2) | Max disp. (mm) | Max stress (MPa) | Buckling factor |
+|---|---|---|---|---|---|---|
+| BFGS | Engineering-feasible | 10.800 | 7779.85 | 3.831 | 2.282 | 20.267 |
+| PSO | Warning case | 36.300 | 7931.66 | 12.073 | 4.541 | 22.491 |
+| SA | Engineering-feasible | 12.100 | 7769.88 | 4.287 | 2.296 | 19.753 |
+
+**Winner:** S4 / BFGS with weighted score `10.800`.
+The score gap to second place (S4 / SA) is `1.300` points.
+**Spread/Risk:** displacement spans `3.831` to `12.073` mm, stress spans `2.282` to `4.541` MPa, and buckling spans `19.753` to `22.491`.
+**Status caveat:** warning-only entries are present for PSO and are not decision-grade designs.
+**Critical note:** scenario fairness is reduced by mixed compliance statuses; ranking penalties keep the comparison visible but do not make warning/fallback cases equivalent to engineering-feasible designs.
+
+### S5
+
+| Algorithm | Status | Weighted score | Task 6 area (m^2) | Max disp. (mm) | Max stress (MPa) | Buckling factor |
+|---|---|---|---|---|---|---|
+| BFGS | Engineering-feasible | 10.600 | 7742.56 | 8.695 | 4.148 | 22.725 |
+| PSO | Engineering-feasible | 18.150 | 7747.93 | 11.481 | 4.941 | 19.566 |
+| SA | Engineering-feasible | 13.350 | 7749.52 | 10.229 | 4.642 | 23.232 |
+
+**Winner:** S5 / BFGS with weighted score `10.600`.
+The score gap to second place (S5 / SA) is `2.750` points.
+**Spread/Risk:** displacement spans `8.695` to `11.481` mm, stress spans `4.148` to `4.941` MPa, and buckling spans `19.566` to `23.232`.
+**Status caveat:** all three entries are engineering-feasible.
+**Critical note:** the winner remains robust inside this scenario under the current weighted scoring contract.
+
+### S6
+
+| Algorithm | Status | Weighted score | Task 6 area (m^2) | Max disp. (mm) | Max stress (MPa) | Buckling factor |
+|---|---|---|---|---|---|---|
+| BFGS | Engineering-feasible | 10.150 | 7741.72 | 10.522 | 5.312 | 24.772 |
+| PSO | Engineering-feasible | 16.600 | 7748.25 | 11.907 | 6.705 | 21.611 |
+| SA | Engineering-feasible | 21.950 | 7783.24 | 14.270 | 7.690 | 19.128 |
+
+**Winner:** S6 / BFGS with weighted score `10.150`.
+The score gap to second place (S6 / PSO) is `6.450` points.
+**Spread/Risk:** displacement spans `10.522` to `14.270` mm, stress spans `5.312` to `7.690` MPa, and buckling spans `19.128` to `24.772`.
+**Status caveat:** all three entries are engineering-feasible.
+**Critical note:** the winner remains robust inside this scenario under the current weighted scoring contract.
+
+### S7
+
+| Algorithm | Status | Weighted score | Task 6 area (m^2) | Max disp. (mm) | Max stress (MPa) | Buckling factor |
+|---|---|---|---|---|---|---|
+| BFGS | Engineering-feasible | 6.750 | 7740.66 | 10.105 | 4.134 | 24.948 |
+| PSO | Math fallback | 26.250 | 8324.25 | 28.467 | 9.258 | 23.712 |
+| SA | Math fallback | 22.350 | 7890.85 | 12.541 | 6.711 | 26.587 |
+
+**Winner:** S7 / BFGS with weighted score `6.750`.
+The score gap to second place (S7 / SA) is `15.600` points.
+**Spread/Risk:** displacement spans `10.105` to `28.467` mm, stress spans `4.134` to `9.258` MPa, and buckling spans `23.712` to `26.587`.
+**Status caveat:** mathematical fallback entries are present for PSO, SA.
+**Critical note:** scenario fairness is reduced by mixed compliance statuses; ranking penalties keep the comparison visible but do not make warning/fallback cases equivalent to engineering-feasible designs.
+
+### S8
+
+| Algorithm | Status | Weighted score | Task 6 area (m^2) | Max disp. (mm) | Max stress (MPa) | Buckling factor |
+|---|---|---|---|---|---|---|
+| BFGS | Warning case | 39.600 | 7813.24 | 10.319 | 5.446 | 19.273 |
+| PSO | Warning case | 27.400 | 7899.07 | 9.235 | 4.493 | 27.335 |
+| SA | Warning case | 27.700 | 7718.27 | 8.163 | 4.955 | 23.837 |
+
+**Winner:** S8 / PSO with weighted score `27.400`.
+The score gap to second place (S8 / SA) is `0.300` points.
+**Spread/Risk:** displacement spans `8.163` to `10.319` mm, stress spans `4.493` to `5.446` MPa, and buckling spans `19.273` to `27.335`.
+**Status caveat:** warning-only entries are present for BFGS, PSO, SA and are not decision-grade designs.
+**Critical note:** this scenario is tightly clustered, so small modeling shifts can reorder first and second place.
+
+## 8. Convergence Summary
+
+The verification workflow solves both coarse and refined meshes for every case. The acceptance criteria are: displacement change below `5.0%`, stress change below `5.0%`, and first buckling-factor change below `10.0%`.
+
+At the current stage, **0 of 24 comparison pairs** satisfy all three convergence criteria.
+Because the study is currently at `0/24` all-pass convergence, the ranking should be interpreted as comparative screening quality, not final structural qualification.
+
+| Case | Status | Delta disp. (%) | Pass | Delta stress (%) | Pass | Delta buckling (%) | Pass | All pass |
+|---|---|---|---|---|---|---|---|---|
+| S1 / BFGS | Warning case | 8.66 | no | 3.95 | yes | -51.38 | no | no |
+| S1 / PSO | Engineering-feasible | 17.03 | no | 8.32 | no | -51.39 | no | no |
+| S1 / SA | Engineering-feasible | 9.59 | no | 2.24 | yes | -49.67 | no | no |
+| S2 / BFGS | Engineering-feasible | 27.17 | no | 0.60 | yes | -48.05 | no | no |
+| S2 / PSO | Math fallback | -11.47 | no | -60.11 | no | -5.64 | yes | no |
+| S2 / SA | Engineering-feasible | 25.49 | no | -1.19 | yes | -46.75 | no | no |
+| S3 / BFGS | Engineering-feasible | 26.57 | no | -0.73 | yes | -48.06 | no | no |
+| S3 / PSO | Engineering-feasible | 27.31 | no | 1.44 | yes | -50.01 | no | no |
+| S3 / SA | Engineering-feasible | 21.16 | no | -3.57 | yes | -46.37 | no | no |
+| S4 / BFGS | Engineering-feasible | -5.76 | no | 7.01 | no | -51.16 | no | no |
+| S4 / PSO | Warning case | 16.53 | no | -3.15 | yes | -158.30 | no | no |
+| S4 / SA | Engineering-feasible | -7.69 | no | 1.43 | yes | -49.02 | no | no |
+| S5 / BFGS | Engineering-feasible | -5.89 | no | 10.45 | no | -46.31 | no | no |
+| S5 / PSO | Engineering-feasible | 1.17 | yes | 23.43 | no | -49.25 | no | no |
+| S5 / SA | Engineering-feasible | -2.76 | yes | 5.00 | no | -45.85 | no | no |
+| S6 / BFGS | Engineering-feasible | 2.08 | yes | 20.49 | no | -41.81 | no | no |
+| S6 / PSO | Engineering-feasible | 17.42 | no | 39.74 | no | -54.85 | no | no |
+| S6 / SA | Engineering-feasible | 15.36 | no | 38.65 | no | -55.49 | no | no |
+| S7 / BFGS | Engineering-feasible | 17.31 | no | 0.69 | yes | -43.58 | no | no |
+| S7 / PSO | Math fallback | 11.87 | no | -19.73 | no | -240.70 | no | no |
+| S7 / SA | Math fallback | -6.17 | no | -19.68 | no | -63.19 | no | no |
+| S8 / BFGS | Warning case | 2.71 | yes | 10.91 | no | -53.42 | no | no |
+| S8 / PSO | Warning case | 7.91 | no | -0.58 | yes | -49.86 | no | no |
+| S8 / SA | Warning case | 5.04 | no | 15.88 | no | -53.02 | no | no |
+
+![Winner mesh comparison](results/figures/task7_s7_bfgs_mesh_comparison.png)
+
+The global winner is therefore reported as **provisional**: the ranking is valid for comparative screening, but convergence evidence is not yet strong enough for a final structural sign-off.
+
+## 9. Warning Cases from Scenario S8
+
+Scenario S8 is kept intentionally as a warning family. None of the Task 6 S8 runs are mathematically compliant or engineering-feasible, so these Abaqus models are useful only as structural cautionary examples and not as candidate towers for recommendation.
+
+![Scenario S8 warning metrics](results/figures/s8_warning_metrics.png)
+
+## 10. Field Visualizations of the Global Top-3
+
+All detailed field figures are rendered from actual Abaqus ODB data with Python, not from Abaqus screenshots.
+Task 7 figures use a true-scale equal-axis policy (no axis stretching). This differs from some legacy Task 6 renderings that used a different plotting style.
+
+### S7 / BFGS
+
+![S7 / BFGS stress](results/figures/task7_s7_bfgs_stress.png)
+
+![S7 / BFGS displacement](results/figures/task7_s7_bfgs_displacement.png)
+
+![S7 / BFGS buckling](results/figures/task7_s7_bfgs_buckling_mode1.png)
+
+### S3 / SA
+
+![S3 / SA stress](results/figures/task7_s3_sa_stress.png)
+
+![S3 / SA displacement](results/figures/task7_s3_sa_displacement.png)
+
+![S3 / SA buckling](results/figures/task7_s3_sa_buckling_mode1.png)
+
+### S2 / SA
+
+![S2 / SA stress](results/figures/task7_s2_sa_stress.png)
+
+![S2 / SA displacement](results/figures/task7_s2_sa_displacement.png)
+
+![S2 / SA buckling](results/figures/task7_s2_sa_buckling_mode1.png)
+
+## 11. Recommendation for Later Tasks
+
+The current Task 7 recommendation is **S7 / BFGS** with a `provisional` status. Its weighted score is `6.750` and its refined response gives a first buckling factor of `24.948`, a maximum displacement of `10.105 mm`, and a maximum stress of `4.134 MPa`.
+
+The main practical outcome for the project is that Task 6 geometric alternatives can now be compared with one consistent structural score, explicit warning handling, and scenario-level interpretation suitable for Task 9 communication.

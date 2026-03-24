@@ -1,0 +1,9 @@
+{
+  "status": "pass",
+  "cae_path": "C:\\\\Users\\\\achille.larregle\\\\OneDrive - ESTIA\\\\Bureau\\\\CRANFIELD\\\\CRANFIELD COURSE\\\\GroupProject2026\\\\group_project\\\\tasks\\\\Task_07_Abaqus\\\\results\\\\cae\\\\Task7_Montresor_WindStudy.cae",
+  "expected_model_count": 24,
+  "actual_model_count": 24,
+  "node_count_min": 840,
+  "node_count_max": 1075,
+  "failures": []
+}

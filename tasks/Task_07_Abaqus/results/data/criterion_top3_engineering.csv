@@ -1,0 +1,13 @@
+criterion_key,criterion_label,rank,case_id,case_label,selection_status,value
+buckling_factor_1,Buckling factor,1,s7_bfgs,S7 / BFGS,engineering_feasible,24.948000000000
+buckling_factor_1,Buckling factor,2,s6_bfgs,S6 / BFGS,engineering_feasible,24.772000000000
+buckling_factor_1,Buckling factor,3,s2_sa,S2 / SA,engineering_feasible,24.549000000000
+max_displacement_m,Max displacement,1,s4_bfgs,S4 / BFGS,engineering_feasible,0.003830735339
+max_displacement_m,Max displacement,2,s1_pso,S1 / PSO,engineering_feasible,0.004125629086
+max_displacement_m,Max displacement,3,s4_sa,S4 / SA,engineering_feasible,0.004286723677
+max_mises_pa,Max stress,1,s1_pso,S1 / PSO,engineering_feasible,2243798.750000000000
+max_mises_pa,Max stress,2,s4_bfgs,S4 / BFGS,engineering_feasible,2281516.250000000000
+max_mises_pa,Max stress,3,s4_sa,S4 / SA,engineering_feasible,2296242.500000000000
+task6_area_m2,Task 6 area,1,s7_bfgs,S7 / BFGS,engineering_feasible,7740.659882815151
+task6_area_m2,Task 6 area,2,s2_bfgs,S2 / BFGS,engineering_feasible,7741.672759154888
+task6_area_m2,Task 6 area,3,s3_bfgs,S3 / BFGS,engineering_feasible,7741.691824035523

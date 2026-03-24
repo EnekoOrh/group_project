@@ -1,0 +1,86 @@
+<Description>
+   ABAQUS/ABQcaeK rank 0 encountered a SEGMENTATION FAULT
+
+</Description>
+
+<Context>
+   CAE
+</Context>
+
+<Callstack>
+  1)  ABQSMARfmInterface.dll          rfm_EncodedSegment::Read                
+  2)  ABQSMARfmInterface.dll          rfm_FileReprEncoded::Read               
+  3)  ABQSMARfmInterface.dll          rfm_SpaceReprFile::Read                 
+  4)  ABQSMARfmInterface.dll          rfm_IOBuffer::PrepRead                  
+  5)  ABQSMARfmInterface.dll          rfm_IOBuffer::ReadIntArray              
+  6)  ABQSMARfmInterface.dll          rfm_TableRepr::rfm_TableRepr            
+  7)  ABQSMARfmInterface.dll          rfm_DatabaseRepr::Table                 
+  8)  ABQSMARfmInterface.dll          rfm_Database::Table                     
+  9)  ABQSMARfmInterface.dll          rom_Transporter::SetupTable             
+ 10)  ABQSMARfmInterface.dll          rom_Transporter::GetClassBagForRead     
+</Callstack>
+
+<Memory>
+   <Current>            0 GB </Current>
+   <Resident>           0 GB </Resident>
+   <Physical>          15 GB </Physical>
+   <Limit>              0 GB </Limit>
+   <Accessible>        15 GB </Accessible>
+   <Free>               4 GB </Free>
+   <Allocator>            DL </Allocator>
+</Memory>
+
+<Swap>
+       <Size>          26 GB </Size>
+       <Used>          14 GB </Used>
+       <Free>          12 GB </Free>
+</Swap>
+
+<Directories>
+  <current> C:\Users\achille.larregle\OneDrive - ESTIA\Bureau\CRANFIELD\CRANFIELD COURSE\GroupProject2026\group_project\tasks\Task_07_Abaqus\results\cae </current> <free>     23 GB </free>   <used>    453 GB </used> 
+     <temp> C:\Users\ACHILL~1.LAR\AppData\Local\Temp </temp>    <free>     23 GB </free>
+</Directories>
+
+<Installation>
+     <Version> Learning Edition 2025 2025 HF2 </Version>
+       <Build> 2025_03_14-14.12.51 RELr427 199052 </Build>
+</Installation>
+
+<Description>
+   ABAQUS/ABQcaeK rank 0 received the ABORT signal
+
+</Description>
+
+<Context>
+   CAE
+</Context>
+
+<Callstack>
+</Callstack>
+
+<Memory>
+   <Current>            0 GB </Current>
+   <Resident>           0 GB </Resident>
+   <Physical>          15 GB </Physical>
+   <Limit>              0 GB </Limit>
+   <Accessible>        15 GB </Accessible>
+   <Free>               4 GB </Free>
+   <Allocator>            DL </Allocator>
+</Memory>
+
+<Swap>
+       <Size>          26 GB </Size>
+       <Used>          14 GB </Used>
+       <Free>          12 GB </Free>
+</Swap>
+
+<Directories>
+  <current> C:\Users\achille.larregle\OneDrive - ESTIA\Bureau\CRANFIELD\CRANFIELD COURSE\GroupProject2026\group_project\tasks\Task_07_Abaqus\results\cae </current> <free>     23 GB </free>   <used>    453 GB </used> 
+     <temp> C:\Users\ACHILL~1.LAR\AppData\Local\Temp </temp>    <free>     23 GB </free>
+</Directories>
+
+<Installation>
+     <Version> Learning Edition 2025 2025 HF2 </Version>
+       <Build> 2025_03_14-14.12.51 RELr427 199052 </Build>
+</Installation>
+

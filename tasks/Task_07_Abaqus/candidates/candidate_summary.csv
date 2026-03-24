@@ -1,4 +1,25 @@
-case_id,label,scenario_id,algorithm,source_run_index,decision_mode,task6_area_m2,task6_volume_m3,task6_total_height_m
-radius_baseline,S2 / BFGS radius baseline,S2,BFGS,2,radii,7741.672759,70320.133572,36.500000
-height_variant,S6 / BFGS height variant,S6,BFGS,1,heights,7741.717219,70320.145609,36.496849
-joint_reference,S7 / BFGS joint reference,S7,BFGS,1,joint,7740.659883,70320.132928,36.496904
+case_id,model_name,label,scenario_id,algorithm,selection_status,selection_basis,source_run_index,decision_mode,task6_area_m2,task6_volume_m3,task6_total_height_m,task6_penalized_objective
+s1_bfgs,S1_BFGS,S1 / BFGS,S1,BFGS,warning_noncompliant,best_penalized_warning,6,radii,7782.005334,70428.049974,36.500000,211178.340481
+s1_pso,S1_PSO,S1 / PSO,S1,PSO,engineering_feasible,lowest_area_engineering_feasible,7,radii,7804.557658,70336.925589,36.500000,221102.850844
+s1_sa,S1_SA,S1 / SA,S1,SA,engineering_feasible,lowest_area_engineering_feasible,5,radii,7780.730870,70341.353594,36.500000,213015.530350
+s2_bfgs,S2_BFGS,S2 / BFGS,S2,BFGS,engineering_feasible,lowest_area_engineering_feasible,2,radii,7741.672759,70320.133572,36.500000,7741.673481
+s2_pso,S2_PSO,S2 / PSO,S2,PSO,mathematical_fallback,lowest_area_mathematical_fallback,0,radii,9075.026775,70338.727523,36.500000,9072.707787
+s2_sa,S2_SA,S2 / SA,S2,SA,engineering_feasible,lowest_area_engineering_feasible,5,radii,7744.009829,70321.185322,36.500000,7744.066655
+s3_bfgs,S3_BFGS,S3 / BFGS,S3,BFGS,engineering_feasible,lowest_area_engineering_feasible,6,radii,7741.691824,70320.133595,36.500000,7741.692546
+s3_pso,S3_PSO,S3 / PSO,S3,PSO,engineering_feasible,lowest_area_engineering_feasible,6,radii,7743.335201,70320.085183,36.500000,7743.335331
+s3_sa,S3_SA,S3 / SA,S3,SA,engineering_feasible,lowest_area_engineering_feasible,6,radii,7742.773502,70320.369670,36.500000,7742.779029
+s4_bfgs,S4_BFGS,S4 / BFGS,S4,BFGS,engineering_feasible,lowest_area_engineering_feasible,1,radii,7779.854558,70382.690635,36.500000,125740.211976
+s4_pso,S4_PSO,S4 / PSO,S4,PSO,warning_noncompliant,best_penalized_warning,1,radii,7931.661396,70173.310550,36.500000,415548.207030
+s4_sa,S4_SA,S4 / SA,S4,SA,engineering_feasible,lowest_area_engineering_feasible,7,radii,7769.884472,70317.197326,36.500000,129241.346605
+s5_bfgs,S5_BFGS,S5 / BFGS,S5,BFGS,engineering_feasible,lowest_area_engineering_feasible,0,heights,7742.564312,70320.163882,36.496807,7742.794922
+s5_pso,S5_PSO,S5 / PSO,S5,PSO,engineering_feasible,lowest_area_engineering_feasible,6,heights,7747.929445,70319.965754,36.497594,7748.056823
+s5_sa,S5_SA,S5 / SA,S5,SA,engineering_feasible,lowest_area_engineering_feasible,6,heights,7749.523844,70319.454727,36.494153,7750.305686
+s6_bfgs,S6_BFGS,S6 / BFGS,S6,BFGS,engineering_feasible,lowest_area_engineering_feasible,1,heights,7741.717219,70320.145609,36.496849,7741.941593
+s6_pso,S6_PSO,S6 / PSO,S6,PSO,engineering_feasible,lowest_area_engineering_feasible,3,heights,7748.252004,70318.201865,36.497869,7748.485017
+s6_sa,S6_SA,S6 / SA,S6,SA,engineering_feasible,lowest_area_engineering_feasible,0,heights,7783.240030,70321.039455,36.503270,7783.524583
+s7_bfgs,S7_BFGS,S7 / BFGS,S7,BFGS,engineering_feasible,lowest_area_engineering_feasible,1,joint,7740.659883,70320.132928,36.496904,7740.876396
+s7_pso,S7_PSO,S7 / PSO,S7,PSO,mathematical_fallback,lowest_area_mathematical_fallback,9,joint,8324.248028,70324.798765,36.496635,8324.034387
+s7_sa,S7_SA,S7 / SA,S7,SA,mathematical_fallback,lowest_area_mathematical_fallback,9,joint,7890.852003,70307.929349,36.482594,7903.567028
+s8_bfgs,S8_BFGS,S8 / BFGS,S8,BFGS,warning_noncompliant,best_penalized_warning,5,joint,7813.243532,90037.725720,36.402034,45886.169968
+s8_pso,S8_PSO,S8 / PSO,S8,PSO,warning_noncompliant,best_penalized_warning,8,joint,7899.070055,89892.727803,37.082826,328577.873637
+s8_sa,S8_SA,S8 / SA,S8,SA,warning_noncompliant,best_penalized_warning,0,joint,7718.267930,89924.568214,36.418965,54621.259476

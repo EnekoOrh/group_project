@@ -3,11 +3,26 @@
   "units": "SI",
   "task6_raw_runs_csv": "tasks/Task_06_Cooling_Tower/results/data/raw_runs.csv",
   "task6_scenario_definitions_json": "tasks/Task_06_Cooling_Tower/results/data/scenario_definitions.json",
-  "selected_case_ids": [
-    "radius_baseline",
-    "height_variant",
-    "joint_reference"
-  ],
+  "selection": {
+    "scenario_ids": [
+      "S1",
+      "S2",
+      "S3",
+      "S4",
+      "S5",
+      "S6",
+      "S7",
+      "S8"
+    ],
+    "algorithms": [
+      "SA",
+      "PSO",
+      "BFGS"
+    ],
+    "warning_scenarios": [
+      "S8"
+    ]
+  },
   "material": {
     "name": "EquivalentReinforcedConcrete_C30_37",
     "youngs_modulus_pa": 33000000000.0,
@@ -22,29 +37,55 @@
     "reference_speed_m_s": 30.0,
     "air_density_kg_m3": 1.25,
     "pressure_coefficient_model": "clip(0.8*cos(theta), -0.5, 0.8)",
+    "pressure_field_expression": "min(0.8,max(-0.5,0.8*X/sqrt(X*X+Z*Z)))",
     "wind_direction_axis": "+X",
-    "notes": "Comparative one-direction wind case with circumferential pressure sectors."
+    "notes": "Comparative one-direction wind case with circumferential pressure sectors in the solver decks and a continuous field representation in the clean Abaqus/CAE study."
   },
   "gravity": {
     "acceleration_m_s2": 9.81,
     "direction": [
       0.0,
-      0.0,
-      -1.0
+      -1.0,
+      0.0
     ]
   },
   "mesh": {
     "circumferential_divisions": 16,
     "axial_subdivisions_per_segment": 1,
-    "reference_case_for_sensitivity": "joint_reference",
-    "refined_circumferential_divisions": 24,
+    "refined_circumferential_divisions": 40,
     "refined_axial_subdivisions_per_segment": 2,
     "element_type": "S4R"
+  },
+  "presentation": {
+    "mesh_level": "refined"
+  },
+  "convergence_criteria_percent": {
+    "max_displacement_m": 5.0,
+    "max_mises_pa": 5.0,
+    "buckling_factor_1": 10.0
   },
   "buckling": {
     "num_eigenvalues": 5
   },
   "jobs": {
     "cpus": 1
+  },
+  "ranking": {
+    "weights": {
+      "buckling_factor_1": 0.45,
+      "max_displacement_m": 0.25,
+      "max_mises_pa": 0.2,
+      "task6_area_m2": 0.1
+    },
+    "status_penalty_rank_points": {
+      "engineering_feasible": 0.0,
+      "mathematical_fallback": 10.0,
+      "warning_noncompliant": 20.0
+    },
+    "criterion_top_count": 3
+  },
+  "report": {
+    "shortlist_count": 5,
+    "field_figure_count": 3
   }
 }

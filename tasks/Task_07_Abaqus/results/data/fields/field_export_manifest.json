@@ -1,36 +1,436 @@
 {
   "cases": [
     {
-      "job_name": "task7_radius_baseline",
-      "case_id": "radius_baseline",
+      "job_name": "task7_s1_bfgs_coarse",
+      "case_id": "s1_bfgs",
       "case_variant": "comparison",
+      "mesh_level": "coarse",
       "node_count": 176,
       "element_count": 160,
-      "buckling_scale_factor": 2.9334152407124643
+      "buckling_scale_factor": 2.785170846579194
     },
     {
-      "job_name": "task7_height_variant",
-      "case_id": "height_variant",
+      "job_name": "task7_s1_bfgs_refined",
+      "case_id": "s1_bfgs",
       "case_variant": "comparison",
+      "mesh_level": "refined",
+      "node_count": 840,
+      "element_count": 800,
+      "buckling_scale_factor": 2.983880870932791
+    },
+    {
+      "job_name": "task7_s1_pso_coarse",
+      "case_id": "s1_pso",
+      "case_variant": "comparison",
+      "mesh_level": "coarse",
       "node_count": 176,
       "element_count": 160,
-      "buckling_scale_factor": 3.00989025951842
+      "buckling_scale_factor": 2.719926730522805
     },
     {
-      "job_name": "task7_joint_reference",
-      "case_id": "joint_reference",
+      "job_name": "task7_s1_pso_refined",
+      "case_id": "s1_pso",
       "case_variant": "comparison",
+      "mesh_level": "refined",
+      "node_count": 840,
+      "element_count": 800,
+      "buckling_scale_factor": 2.9616329944883897
+    },
+    {
+      "job_name": "task7_s1_sa_coarse",
+      "case_id": "s1_sa",
+      "case_variant": "comparison",
+      "mesh_level": "coarse",
       "node_count": 176,
       "element_count": 160,
-      "buckling_scale_factor": 2.9395371987667236
+      "buckling_scale_factor": 2.796520627231133
     },
     {
-      "job_name": "task7_joint_reference_refined",
-      "case_id": "joint_reference",
-      "case_variant": "mesh_sensitivity",
-      "node_count": 504,
-      "element_count": 480,
-      "buckling_scale_factor": 3.17335822890416
+      "job_name": "task7_s1_sa_refined",
+      "case_id": "s1_sa",
+      "case_variant": "comparison",
+      "mesh_level": "refined",
+      "node_count": 840,
+      "element_count": 800,
+      "buckling_scale_factor": 2.999277883141043
+    },
+    {
+      "job_name": "task7_s2_bfgs_coarse",
+      "case_id": "s2_bfgs",
+      "case_variant": "comparison",
+      "mesh_level": "coarse",
+      "node_count": 176,
+      "element_count": 160,
+      "buckling_scale_factor": 2.934369673573334
+    },
+    {
+      "job_name": "task7_s2_bfgs_refined",
+      "case_id": "s2_bfgs",
+      "case_variant": "comparison",
+      "mesh_level": "refined",
+      "node_count": 840,
+      "element_count": 800,
+      "buckling_scale_factor": 3.0486224831883986
+    },
+    {
+      "job_name": "task7_s2_pso_coarse",
+      "case_id": "s2_pso",
+      "case_variant": "comparison",
+      "mesh_level": "coarse",
+      "node_count": 176,
+      "element_count": 160,
+      "buckling_scale_factor": 3.184112144770398
+    },
+    {
+      "job_name": "task7_s2_pso_refined",
+      "case_id": "s2_pso",
+      "case_variant": "comparison",
+      "mesh_level": "refined",
+      "node_count": 840,
+      "element_count": 800,
+      "buckling_scale_factor": 3.1806057382668858
+    },
+    {
+      "job_name": "task7_s2_sa_coarse",
+      "case_id": "s2_sa",
+      "case_variant": "comparison",
+      "mesh_level": "coarse",
+      "node_count": 176,
+      "element_count": 160,
+      "buckling_scale_factor": 2.90915851713428
+    },
+    {
+      "job_name": "task7_s2_sa_refined",
+      "case_id": "s2_sa",
+      "case_variant": "comparison",
+      "mesh_level": "refined",
+      "node_count": 840,
+      "element_count": 800,
+      "buckling_scale_factor": 3.2553271735507496
+    },
+    {
+      "job_name": "task7_s3_bfgs_coarse",
+      "case_id": "s3_bfgs",
+      "case_variant": "comparison",
+      "mesh_level": "coarse",
+      "node_count": 176,
+      "element_count": 160,
+      "buckling_scale_factor": 2.934007225198118
+    },
+    {
+      "job_name": "task7_s3_bfgs_refined",
+      "case_id": "s3_bfgs",
+      "case_variant": "comparison",
+      "mesh_level": "refined",
+      "node_count": 840,
+      "element_count": 800,
+      "buckling_scale_factor": 3.0754424491428445
+    },
+    {
+      "job_name": "task7_s3_pso_coarse",
+      "case_id": "s3_pso",
+      "case_variant": "comparison",
+      "mesh_level": "coarse",
+      "node_count": 176,
+      "element_count": 160,
+      "buckling_scale_factor": 2.894131075933179
+    },
+    {
+      "job_name": "task7_s3_pso_refined",
+      "case_id": "s3_pso",
+      "case_variant": "comparison",
+      "mesh_level": "refined",
+      "node_count": 840,
+      "element_count": 800,
+      "buckling_scale_factor": 2.5580532794315385
+    },
+    {
+      "job_name": "task7_s3_sa_coarse",
+      "case_id": "s3_sa",
+      "case_variant": "comparison",
+      "mesh_level": "coarse",
+      "node_count": 176,
+      "element_count": 160,
+      "buckling_scale_factor": 2.8356579334636214
+    },
+    {
+      "job_name": "task7_s3_sa_refined",
+      "case_id": "s3_sa",
+      "case_variant": "comparison",
+      "mesh_level": "refined",
+      "node_count": 840,
+      "element_count": 800,
+      "buckling_scale_factor": 3.240573481998172
+    },
+    {
+      "job_name": "task7_s4_bfgs_coarse",
+      "case_id": "s4_bfgs",
+      "case_variant": "comparison",
+      "mesh_level": "coarse",
+      "node_count": 208,
+      "element_count": 192,
+      "buckling_scale_factor": 2.785308675802078
+    },
+    {
+      "job_name": "task7_s4_bfgs_refined",
+      "case_id": "s4_bfgs",
+      "case_variant": "comparison",
+      "mesh_level": "refined",
+      "node_count": 1000,
+      "element_count": 960,
+      "buckling_scale_factor": 2.9943346454190283
+    },
+    {
+      "job_name": "task7_s4_pso_coarse",
+      "case_id": "s4_pso",
+      "case_variant": "comparison",
+      "mesh_level": "coarse",
+      "node_count": 208,
+      "element_count": 192,
+      "buckling_scale_factor": 3.0905909056635736
+    },
+    {
+      "job_name": "task7_s4_pso_refined",
+      "case_id": "s4_pso",
+      "case_variant": "comparison",
+      "mesh_level": "refined",
+      "node_count": 1000,
+      "element_count": 960,
+      "buckling_scale_factor": 3.319942913984751
+    },
+    {
+      "job_name": "task7_s4_sa_coarse",
+      "case_id": "s4_sa",
+      "case_variant": "comparison",
+      "mesh_level": "coarse",
+      "node_count": 208,
+      "element_count": 192,
+      "buckling_scale_factor": 2.869352820699767
+    },
+    {
+      "job_name": "task7_s4_sa_refined",
+      "case_id": "s4_sa",
+      "case_variant": "comparison",
+      "mesh_level": "refined",
+      "node_count": 1000,
+      "element_count": 960,
+      "buckling_scale_factor": 3.040388935669913
+    },
+    {
+      "job_name": "task7_s5_bfgs_coarse",
+      "case_id": "s5_bfgs",
+      "case_variant": "comparison",
+      "mesh_level": "coarse",
+      "node_count": 176,
+      "element_count": 160,
+      "buckling_scale_factor": 3.0138361213719174
+    },
+    {
+      "job_name": "task7_s5_bfgs_refined",
+      "case_id": "s5_bfgs",
+      "case_variant": "comparison",
+      "mesh_level": "refined",
+      "node_count": 840,
+      "element_count": 800,
+      "buckling_scale_factor": 3.210661466251537
+    },
+    {
+      "job_name": "task7_s5_pso_coarse",
+      "case_id": "s5_pso",
+      "case_variant": "comparison",
+      "mesh_level": "coarse",
+      "node_count": 176,
+      "element_count": 160,
+      "buckling_scale_factor": 3.195237013335682
+    },
+    {
+      "job_name": "task7_s5_pso_refined",
+      "case_id": "s5_pso",
+      "case_variant": "comparison",
+      "mesh_level": "refined",
+      "node_count": 840,
+      "element_count": 800,
+      "buckling_scale_factor": 3.282121430259851
+    },
+    {
+      "job_name": "task7_s5_sa_coarse",
+      "case_id": "s5_sa",
+      "case_variant": "comparison",
+      "mesh_level": "coarse",
+      "node_count": 176,
+      "element_count": 160,
+      "buckling_scale_factor": 3.045333817718944
+    },
+    {
+      "job_name": "task7_s5_sa_refined",
+      "case_id": "s5_sa",
+      "case_variant": "comparison",
+      "mesh_level": "refined",
+      "node_count": 840,
+      "element_count": 800,
+      "buckling_scale_factor": 3.2218670307804014
+    },
+    {
+      "job_name": "task7_s6_bfgs_coarse",
+      "case_id": "s6_bfgs",
+      "case_variant": "comparison",
+      "mesh_level": "coarse",
+      "node_count": 176,
+      "element_count": 160,
+      "buckling_scale_factor": 3.0145434867030643
+    },
+    {
+      "job_name": "task7_s6_bfgs_refined",
+      "case_id": "s6_bfgs",
+      "case_variant": "comparison",
+      "mesh_level": "refined",
+      "node_count": 840,
+      "element_count": 800,
+      "buckling_scale_factor": 3.1092561779349253
+    },
+    {
+      "job_name": "task7_s6_pso_coarse",
+      "case_id": "s6_pso",
+      "case_variant": "comparison",
+      "mesh_level": "coarse",
+      "node_count": 176,
+      "element_count": 160,
+      "buckling_scale_factor": 2.9739358000160663
+    },
+    {
+      "job_name": "task7_s6_pso_refined",
+      "case_id": "s6_pso",
+      "case_variant": "comparison",
+      "mesh_level": "refined",
+      "node_count": 840,
+      "element_count": 800,
+      "buckling_scale_factor": 2.8709495909102976
+    },
+    {
+      "job_name": "task7_s6_sa_coarse",
+      "case_id": "s6_sa",
+      "case_variant": "comparison",
+      "mesh_level": "coarse",
+      "node_count": 176,
+      "element_count": 160,
+      "buckling_scale_factor": 3.0085918074495686
+    },
+    {
+      "job_name": "task7_s6_sa_refined",
+      "case_id": "s6_sa",
+      "case_variant": "comparison",
+      "mesh_level": "refined",
+      "node_count": 840,
+      "element_count": 800,
+      "buckling_scale_factor": 2.8215424239944746
+    },
+    {
+      "job_name": "task7_s7_bfgs_coarse",
+      "case_id": "s7_bfgs",
+      "case_variant": "comparison",
+      "mesh_level": "coarse",
+      "node_count": 176,
+      "element_count": 160,
+      "buckling_scale_factor": 2.940150907374525
+    },
+    {
+      "job_name": "task7_s7_bfgs_refined",
+      "case_id": "s7_bfgs",
+      "case_variant": "comparison",
+      "mesh_level": "refined",
+      "node_count": 840,
+      "element_count": 800,
+      "buckling_scale_factor": 3.171178976791611
+    },
+    {
+      "job_name": "task7_s7_pso_coarse",
+      "case_id": "s7_pso",
+      "case_variant": "comparison",
+      "mesh_level": "coarse",
+      "node_count": 176,
+      "element_count": 160,
+      "buckling_scale_factor": 2.6328867503234394
+    },
+    {
+      "job_name": "task7_s7_pso_refined",
+      "case_id": "s7_pso",
+      "case_variant": "comparison",
+      "mesh_level": "refined",
+      "node_count": 840,
+      "element_count": 800,
+      "buckling_scale_factor": 3.0861610125112335
+    },
+    {
+      "job_name": "task7_s7_sa_coarse",
+      "case_id": "s7_sa",
+      "case_variant": "comparison",
+      "mesh_level": "coarse",
+      "node_count": 176,
+      "element_count": 160,
+      "buckling_scale_factor": 2.824248855052989
+    },
+    {
+      "job_name": "task7_s7_sa_refined",
+      "case_id": "s7_sa",
+      "case_variant": "comparison",
+      "mesh_level": "refined",
+      "node_count": 840,
+      "element_count": 800,
+      "buckling_scale_factor": 3.2175740898581577
+    },
+    {
+      "job_name": "task7_s8_bfgs_coarse",
+      "case_id": "s8_bfgs",
+      "case_variant": "comparison",
+      "mesh_level": "coarse",
+      "node_count": 176,
+      "element_count": 160,
+      "buckling_scale_factor": 3.1081645168595937
+    },
+    {
+      "job_name": "task7_s8_bfgs_refined",
+      "case_id": "s8_bfgs",
+      "case_variant": "comparison",
+      "mesh_level": "refined",
+      "node_count": 840,
+      "element_count": 800,
+      "buckling_scale_factor": 3.175111711875642
+    },
+    {
+      "job_name": "task7_s8_pso_coarse",
+      "case_id": "s8_pso",
+      "case_variant": "comparison",
+      "mesh_level": "coarse",
+      "node_count": 176,
+      "element_count": 160,
+      "buckling_scale_factor": 2.788079760450125
+    },
+    {
+      "job_name": "task7_s8_pso_refined",
+      "case_id": "s8_pso",
+      "case_variant": "comparison",
+      "mesh_level": "refined",
+      "node_count": 840,
+      "element_count": 800,
+      "buckling_scale_factor": 3.2501366877708615
+    },
+    {
+      "job_name": "task7_s8_sa_coarse",
+      "case_id": "s8_sa",
+      "case_variant": "comparison",
+      "mesh_level": "coarse",
+      "node_count": 176,
+      "element_count": 160,
+      "buckling_scale_factor": 3.6393870574545484
+    },
+    {
+      "job_name": "task7_s8_sa_refined",
+      "case_id": "s8_sa",
+      "case_variant": "comparison",
+      "mesh_level": "refined",
+      "node_count": 840,
+      "element_count": 800,
+      "buckling_scale_factor": 3.290703976427052
     }
   ]
 }

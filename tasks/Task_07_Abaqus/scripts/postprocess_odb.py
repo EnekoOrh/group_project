@@ -1,4 +1,4 @@
-import argparse
+﻿import argparse
 import csv
 import json
 import math
@@ -41,15 +41,7 @@ def _process_case(case):
 
         max_disp = max(float(value.magnitude) for value in u_field.values)
         max_mises = max(float(value.mises) for value in s_field.values)
-
-        if "RF" in static_frame.fieldOutputs.keys():
-            rf_field = static_frame.fieldOutputs["RF"]
-        else:
-            rf_field = None
-        if rf_field is None:
-            reaction = [float("nan"), float("nan"), float("nan")]
-        else:
-            reaction = _sum_field_vectors(rf_field.values)
+        reaction = _sum_field_vectors(static_frame.fieldOutputs["RF"].values) if "RF" in static_frame.fieldOutputs.keys() else [float("nan")] * 3
 
         buckle_step = odb.steps["BUCKLING"]
         first_mode = buckle_step.frames[1] if len(buckle_step.frames) > 1 else buckle_step.frames[0]
@@ -57,10 +49,19 @@ def _process_case(case):
 
         return {
             "job_name": case["job_name"],
+            "model_name": case["model_name"],
             "case_id": case["case_id"],
             "case_label": case["case_label"],
+            "scenario_id": case["scenario_id"],
+            "algorithm": case["algorithm"],
+            "selection_status": case["selection_status"],
+            "selection_basis": case["selection_basis"],
+            "selection_note": case["selection_note"],
+            "is_warning_case": case["is_warning_case"],
             "case_variant": case["case_variant"],
+            "mesh_level": case.get("mesh_level", "coarse"),
             "task6_area_m2": float(case["task6_area_m2"]),
+            "task6_penalized_objective": float(case["task6_penalized_objective"]),
             "max_displacement_m": max_disp,
             "max_mises_pa": max_mises,
             "base_reaction_fx_n": reaction[0],
@@ -80,50 +81,74 @@ def _write_csv(path, rows):
         writer.writerows(rows)
 
 
-def _write_mesh_sensitivity(path, rows):
-    baseline = None
-    refined = None
+def _rel_change(refined_value, coarse_value):
+    if abs(coarse_value) < 1e-12:
+        return float("nan")
+    return 100.0 * (refined_value - coarse_value) / coarse_value
+
+
+def _comparison_pairs(rows):
+    case_map = {}
     for row in rows:
-        if row["case_id"] != "joint_reference":
+        if row["case_variant"] != "comparison":
             continue
-        if row["case_variant"] == "comparison":
-            baseline = row
-        elif row["case_variant"] == "mesh_sensitivity":
-            refined = row
+        if row["case_id"] not in case_map:
+            case_map[row["case_id"]] = {"case_label": row["case_label"]}
+        case_map[row["case_id"]][row["mesh_level"]] = row
+    return case_map
 
-    if baseline is None or refined is None:
-        return
 
-    def rel_change(refined_value, base_value):
-        if abs(base_value) < 1e-12:
-            return float("nan")
-        return 100.0 * (refined_value - base_value) / base_value
+def _bool_str(value):
+    return "yes" if value else "no"
 
-    output = [
-        {
-            "metric": "max_displacement_m",
-            "baseline": baseline["max_displacement_m"],
-            "refined": refined["max_displacement_m"],
-            "relative_change_percent": rel_change(refined["max_displacement_m"], baseline["max_displacement_m"]),
-        },
-        {
-            "metric": "max_mises_pa",
-            "baseline": baseline["max_mises_pa"],
-            "refined": refined["max_mises_pa"],
-            "relative_change_percent": rel_change(refined["max_mises_pa"], baseline["max_mises_pa"]),
-        },
-        {
-            "metric": "buckling_factor_1",
-            "baseline": baseline["buckling_factor_1"],
-            "refined": refined["buckling_factor_1"],
-            "relative_change_percent": rel_change(refined["buckling_factor_1"], baseline["buckling_factor_1"]),
-        },
-    ]
 
-    with open(path, "w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(output[0].keys()))
-        writer.writeheader()
-        writer.writerows(output)
+def _write_mesh_sensitivity(path, rows, thresholds):
+    pairs = _comparison_pairs(rows)
+    output = []
+    ordered_case_ids = sorted(pairs.keys(), key=lambda case_id: (int(case_id.split("_")[0][1:]), case_id.split("_")[1]))
+
+    for case_id in ordered_case_ids:
+        case_rows = pairs[case_id]
+        coarse = case_rows.get("coarse")
+        refined = case_rows.get("refined")
+        if coarse is None or refined is None:
+            continue
+
+        disp_delta = _rel_change(refined["max_displacement_m"], coarse["max_displacement_m"])
+        stress_delta = _rel_change(refined["max_mises_pa"], coarse["max_mises_pa"])
+        buckle_delta = _rel_change(refined["buckling_factor_1"], coarse["buckling_factor_1"])
+
+        pass_disp = abs(disp_delta) <= float(thresholds.get("max_displacement_m", 5.0))
+        pass_stress = abs(stress_delta) <= float(thresholds.get("max_mises_pa", 5.0))
+        pass_buckle = abs(buckle_delta) <= float(thresholds.get("buckling_factor_1", 10.0))
+
+        output.append(
+            {
+                "case_id": case_id,
+                "case_label": coarse["case_label"],
+                "scenario_id": coarse["scenario_id"],
+                "algorithm": coarse["algorithm"],
+                "selection_status": coarse["selection_status"],
+                "coarse_job_name": coarse["job_name"],
+                "refined_job_name": refined["job_name"],
+                "coarse_max_displacement_m": coarse["max_displacement_m"],
+                "refined_max_displacement_m": refined["max_displacement_m"],
+                "delta_max_displacement_percent": disp_delta,
+                "pass_max_displacement": _bool_str(pass_disp),
+                "coarse_max_mises_pa": coarse["max_mises_pa"],
+                "refined_max_mises_pa": refined["max_mises_pa"],
+                "delta_max_mises_percent": stress_delta,
+                "pass_max_mises": _bool_str(pass_stress),
+                "coarse_buckling_factor_1": coarse["buckling_factor_1"],
+                "refined_buckling_factor_1": refined["buckling_factor_1"],
+                "delta_buckling_factor_1_percent": buckle_delta,
+                "pass_buckling_factor_1": _bool_str(pass_buckle),
+                "all_criteria_pass": _bool_str(pass_disp and pass_stress and pass_buckle),
+            }
+        )
+
+    if output:
+        _write_csv(path, output)
 
 
 def main():
@@ -134,12 +159,11 @@ def main():
     args = parser.parse_args()
 
     manifest = _load_manifest(args.manifest)
-    rows = []
-    for case in manifest["cases"]:
-        rows.append(_process_case(case))
-
+    rows = [_process_case(case) for case in manifest["cases"]]
+    mesh_order = {"coarse": 0, "refined": 1, "confirmation": 2}
+    rows.sort(key=lambda row: (int(row["scenario_id"][1:]), row["algorithm"], mesh_order.get(row["mesh_level"], 99)))
     _write_csv(args.output_csv, rows)
-    _write_mesh_sensitivity(args.mesh_csv, rows)
+    _write_mesh_sensitivity(args.mesh_csv, rows, manifest.get("convergence_criteria_percent", {}))
     print(f"Postprocessed {len(rows)} ODB file(s).")
 
 

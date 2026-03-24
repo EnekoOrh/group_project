@@ -1,0 +1,59 @@
+{
+  "status": "pass",
+  "checks_total": 9,
+  "checks_failed": 0,
+  "checks": [
+    {
+      "check_name": "case_count_matches_selection",
+      "status": "pass",
+      "message": "refined_rows=24, selected_cases=24"
+    },
+    {
+      "check_name": "convergence_rows_cover_all_cases",
+      "status": "pass",
+      "message": "convergence_rows=24, selected_cases=24"
+    },
+    {
+      "check_name": "weighted_csv_matches_computed_order",
+      "status": "pass",
+      "message": "csv_rows=24, expected_rows=24"
+    },
+    {
+      "check_name": "criterion_top3_raw_matches_expected",
+      "status": "pass",
+      "message": "csv_rows=12, expected_rows=12"
+    },
+    {
+      "check_name": "criterion_top3_engineering_matches_expected",
+      "status": "pass",
+      "message": "csv_rows=12, expected_rows=12"
+    },
+    {
+      "check_name": "criterion_top3_engineering_status_only_engineering",
+      "status": "pass",
+      "message": "engineering-only criterion leaderboard contains only engineering-feasible cases"
+    },
+    {
+      "check_name": "solver_mesh_within_le_cap",
+      "status": "pass",
+      "message": "solver refined node range = 840..1000 (LE cap=1000)"
+    },
+    {
+      "check_name": "cae_audit_status_pass",
+      "status": "pass",
+      "message": "cae status=pass, node range=840..1075"
+    },
+    {
+      "check_name": "mesh_narrative_non_contradictory",
+      "status": "pass",
+      "message": "solver refined node range=840..1000 ; CAE integrity range=840..1075"
+    }
+  ],
+  "solver_mesh_refined": {
+    "case_count": 24,
+    "node_min": 840,
+    "node_max": 1000,
+    "within_le_cap": true
+  },
+  "cae_audit_path": "C:\\Users\\achille.larregle\\OneDrive - ESTIA\\Bureau\\CRANFIELD\\CRANFIELD COURSE\\GroupProject2026\\group_project\\tasks\\Task_07_Abaqus\\results\\data\\cae_integrity_audit.json"
+}

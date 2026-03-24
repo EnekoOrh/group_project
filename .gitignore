@@ -16,5 +16,8 @@ __pycache__
 # OS
 .DS_Store
 
+# Abaqus scratch at repo root
+abaqus*.rec
+
 
 

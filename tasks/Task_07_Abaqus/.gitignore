@@ -12,3 +12,7 @@ results/jobs/**
 *.jnl
 *.rec
 *.rpy
+!results/cae/
+!results/cae/*.cae
+results/cae/*.log
+report_latex/build/

@@ -43,6 +43,7 @@ def _export_case(case, output_dir):
             "case_id": case["case_id"],
             "case_label": case["case_label"],
             "case_variant": case["case_variant"],
+            "mesh_level": case.get("mesh_level", "coarse"),
             "instance_name": instance_name,
             "nodes": [{"label": label, "x": coords[0], "y": coords[1], "z": coords[2]} for label, coords in sorted(node_xyz.items())],
             "elements": [
@@ -123,8 +124,8 @@ def _export_case(case, output_dir):
             mode_vectors[label] = (ux, uy, uz, umag)
             mode_magnitudes.append(umag)
 
-        z_values = [coords[2] for coords in node_xyz.values()]
-        tower_height = max(z_values) - min(z_values)
+        y_values = [coords[1] for coords in node_xyz.values()]
+        tower_height = max(y_values) - min(y_values)
         max_mode = max(mode_magnitudes) if mode_magnitudes else 1.0
         display_scale = 0.10 * tower_height / max(max_mode, 1e-12)
 
@@ -157,6 +158,7 @@ def _export_case(case, output_dir):
             "job_name": case["job_name"],
             "case_id": case["case_id"],
             "case_variant": case["case_variant"],
+            "mesh_level": case.get("mesh_level", "coarse"),
             "node_count": len(node_xyz),
             "element_count": len(element_conn),
             "buckling_scale_factor": display_scale,

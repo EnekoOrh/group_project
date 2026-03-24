@@ -1,0 +1,81 @@
+<Description>
+   ABAQUS/ABQcaeG rank 0 encountered a SEGMENTATION FAULT
+
+</Description>
+
+<Context>
+   ABQcaeG
+</Context>
+
+<Callstack>
+  1)  ABQSMACinAttributesGui.dll      ldcG_LCRepository::~ldcG_LCRepository   
+  2)  ABQSMACinAttributesGui.dll      ldcG_LCGui::~ldcG_LCGui                 
+  3)  ABQSMACinAttributesGui.dll      lbiG_LoadGui::~lbiG_LoadGui             
+  4)  ABQSMACinAttributesGui.dll      lbiG_LoadGui::~lbiG_LoadGui             
+  5)  ABQSMAInbVwrMduCom.dll          mduC_ModuleLoaderBase::~mduC_ModuleLoaderBase
+  6)  ABQSMAIngVwrGui.dll             mduG_ModuleManagerRole::DeleteModules   
+  7)  ABQSMAIngVwrGui.dll             gui_Actor::~gui_Actor                   
+  8)  ABQSMAIngVwrGui.dll             omi_SingletonBase<gui_Actor>::Delete    
+  9)  ABQcaeG.exe                   unknown                                 
+</Callstack>
+
+<Memory>
+   <Current>            0 GB </Current>
+   <Resident>           0 GB </Resident>
+   <Physical>          15 GB </Physical>
+   <Limit>              0 GB </Limit>
+   <Accessible>        15 GB </Accessible>
+   <Free>               5 GB </Free>
+   <Allocator>            DL </Allocator>
+</Memory>
+
+<Swap>
+       <Size>          26 GB </Size>
+       <Used>          13 GB </Used>
+       <Free>          12 GB </Free>
+</Swap>
+
+<Directories>
+  <current> C:\Users\achille.larregle\OneDrive - ESTIA\Bureau\CRANFIELD\CRANFIELD COURSE\GroupProject2026\group_project\tasks\Task_07_Abaqus\results\cae </current> <free>     23 GB </free>   <used>    453 GB </used> 
+     <temp> C:\Users\ACHILL~1.LAR\AppData\Local\Temp </temp>    <free>     23 GB </free>
+</Directories>
+
+<Installation>
+</Installation>
+
+<Description>
+   ABAQUS/ABQcaeG rank 0 received the ABORT signal
+
+</Description>
+
+<Context>
+   ABQcaeG
+</Context>
+
+<Callstack>
+</Callstack>
+
+<Memory>
+   <Current>            0 GB </Current>
+   <Resident>           0 GB </Resident>
+   <Physical>          15 GB </Physical>
+   <Limit>              0 GB </Limit>
+   <Accessible>        15 GB </Accessible>
+   <Free>               5 GB </Free>
+   <Allocator>            DL </Allocator>
+</Memory>
+
+<Swap>
+       <Size>          26 GB </Size>
+       <Used>          13 GB </Used>
+       <Free>          12 GB </Free>
+</Swap>
+
+<Directories>
+  <current> C:\Users\achille.larregle\OneDrive - ESTIA\Bureau\CRANFIELD\CRANFIELD COURSE\GroupProject2026\group_project\tasks\Task_07_Abaqus\results\cae </current> <free>     23 GB </free>   <used>    453 GB </used> 
+     <temp> C:\Users\ACHILL~1.LAR\AppData\Local\Temp </temp>    <free>     23 GB </free>
+</Directories>
+
+<Installation>
+</Installation>
+
