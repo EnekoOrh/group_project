@@ -1,5 +1,5 @@
 
-\chapter{Objective}
+\chapter{1. Objective}
 
 
 This Task 7 study expands the previous three-tower screening into a full structural comparison across the eight Task 6 scenarios and the three optimization algorithms SA, PSO, and BFGS.
@@ -7,7 +7,7 @@ This Task 7 study expands the previous three-tower screening into a full structu
 The engineering objective is to identify which Task 6 concepts remain convincing once the towers are checked under self-weight, one-direction wind loading, and linear buckling in Abaqus.
 
 
-\chapter{Selection Rule and Scenario Matrix}
+\chapter{2. Selection Rule and Scenario Matrix}
 
 
 The Task 7 matrix contains \textbf{24 refined presentation models}. For scenarios S1 to S7, the preferred choice is the lowest-area engineering-feasible Task 6 run for each scenario/algorithm pair. If no engineering-feasible run exists, the workflow falls back to the lowest-area mathematically compliant run. If neither exists, the best penalized run is kept only as a warning case. Scenario S8 is intentionally carried as warning-only because it has no compliant Task 6 solution in the current study.
@@ -24,7 +24,7 @@ Across the 24 selected cases, there are \textbf{16 engineering-feasible selectio
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}llllll@{}}
 \hline
-\textbf{Case} & \textbf{Status} & \textbf{Selection basis} & \textbf{Task 6 run} & \textbf{Decision mode} & \textbf{Task 6 area (m\textasciicircum{}2)} \\
+Case & Status & Selection basis & Task 6 run & Decision mode & Task 6 area (m\textasciicircum{}2) \\
 \hline
 S1 / BFGS & Warning case & best\_penalized\_warning & 6 & radii & 7782.01 \\
 S1 / PSO & Engineering-feasible & lowest\_area\_engineering\_feasible & 7 & radii & 7804.56 \\
@@ -63,12 +63,12 @@ S8 / SA & Warning case & best\_penalized\_warning & 0 & joint & 7718.27 \\
 \end{figure}
 
 
-\chapter{Material, Loading, and CAE Setup}
+\chapter{3. Material, Loading, and CAE Setup}
 
 
-The structural baseline keeps the same assumptions for every model: equivalent reinforced concrete with \(E = 33 GPa\), \(nu = 0.20\), and \texttt{rho = 2500 kg/m\textasciicircum{}3}, together with a constant shell thickness of \texttt{0.20 m}.
+The structural baseline keeps the same assumptions for every model: equivalent reinforced concrete with \texttt{E = 33 GPa}, \texttt{nu = 0.20}, and \texttt{rho = 2500 kg/m\textasciicircum{}3}, together with a constant shell thickness of \texttt{0.20 m}.
 
-The reference wind speed is \texttt{30.0 m/s}, which gives a dynamic pressure of \texttt{562.5 Pa} through \(q = 0.5 rho V^2\).
+The reference wind speed is \texttt{30.0 m/s}, which gives a dynamic pressure of \texttt{562.5 Pa} through \texttt{q = 0.5 rho V\textasciicircum{}2}.
 
 Wind loading is interpreted as one-direction external action: windward sectors receive positive external pressure and leeward sectors receive suction. This is not internal cabin-style pressurization.
 
@@ -93,7 +93,7 @@ A deterministic input-deck audit runs before solving and confirms that all 48 de
 The towers look squat in Abaqus because the geometry is genuinely squat: the Task 6 cooling towers are about \texttt{36.5 m} tall for a base diameter of about \texttt{78.6 m}, so the aspect ratio is below one. This is source geometry, not an Abaqus distortion.
 
 
-\chapter{Geometry Integrity Check}
+\chapter{4. Geometry Integrity Check}
 
 
 The Task 7 generator preserves the exact Task 6 meridian coordinates. A geometry verification pass is written before solving and checks the mesh rings against the selected Task 6 source profile for every coarse and refined job.
@@ -107,7 +107,7 @@ The Task 7 generator preserves the exact Task 6 meridian coordinates. A geometry
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}llll@{}}
 \hline
-\textbf{Mesh} & \textbf{Max total-height diff (m)} & \textbf{Max ring-radius diff (m)} & \textbf{Max ring-z diff (m)} \\
+Mesh & Max total-height diff (m) & Max ring-radius diff (m) & Max ring-z diff (m) \\
 \hline
 coarse & 0.000000e+00 & 0.000000e+00 & 0.000000e+00 \\
 refined & 0.000000e+00 & 0.000000e+00 & 0.000000e+00 \\
@@ -117,7 +117,7 @@ refined & 0.000000e+00 & 0.000000e+00 & 0.000000e+00 \\
 \end{table}
 
 
-\chapter{Refined Structural Comparison Across All 24 Cases}
+\chapter{5. Refined Structural Comparison Across All 24 Cases}
 
 
 \begin{table}[H]
@@ -128,7 +128,7 @@ refined & 0.000000e+00 & 0.000000e+00 & 0.000000e+00 \\
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}llllll@{}}
 \hline
-\textbf{Case} & \textbf{Status} & \textbf{Task 6 area (m\textasciicircum{}2)} & \textbf{Max disp. (mm)} & \textbf{Max stress (MPa)} & \textbf{Buckling factor} \\
+Case & Status & Task 6 area (m\textasciicircum{}2) & Max disp. (mm) & Max stress (MPa) & Buckling factor \\
 \hline
 S1 / BFGS & Warning case & 7782.01 & 4.264 & 2.262 & 20.907 \\
 S1 / PSO & Engineering-feasible & 7804.56 & 4.126 & 2.244 & 21.300 \\
@@ -167,10 +167,10 @@ S8 / SA & Warning case & 7718.27 & 8.163 & 4.955 & 23.837 \\
 \end{figure}
 
 
-\chapter{Methodological Clarity and Global Ranking}
+\chapter{6. Methodological Clarity and Global Ranking}
 
 
-\section{Methodological Clarity}
+\section{6.1 Methodological Clarity}
 
 
 The global ranking is a rank-based weighted score on the refined results, designed to stay robust when one or two cases have extreme values.
@@ -193,10 +193,10 @@ J_i = S_i + P_i, \\quad P_i \\in \\{0,10,20\\}
 \]
 
 
-Penalty points are \texttt{0} for engineering-feasible, \texttt{10} for mathematical fallback, and \texttt{20} for warning cases. The best model is the one with the lowest \(J_{i}\).
+Penalty points are \texttt{0} for engineering-feasible, \texttt{10} for mathematical fallback, and \texttt{20} for warning cases. The best model is the one with the lowest \texttt{J\_i}.
 
 
-\section{Global Weighted Top-3}
+\section{6.2 Global Weighted Top-5}
 
 
 \begin{table}[H]
@@ -207,11 +207,13 @@ Penalty points are \texttt{0} for engineering-feasible, \texttt{10} for mathemat
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}lllllllll@{}}
 \hline
-\textbf{Rank} & \textbf{Case} & \textbf{Status} & \textbf{Weighted score} & \textbf{Penalty} & \textbf{Buckling factor} & \textbf{Max disp. (mm)} & \textbf{Max stress (MPa)} & \textbf{Area (m\textasciicircum{}2)} \\
+Rank & Case & Status & Weighted score & Penalty & Buckling factor & Max disp. (mm) & Max stress (MPa) & Area (m\textasciicircum{}2) \\
 \hline
 1 & S7 / BFGS & Engineering-feasible & 6.750 & 0.0 & 24.948 & 10.105 & 4.134 & 7740.66 \\
 2 & S3 / SA & Engineering-feasible & 7.050 & 0.0 & 23.834 & 9.036 & 3.526 & 7742.77 \\
 3 & S2 / SA & Engineering-feasible & 7.500 & 0.0 & 24.549 & 9.968 & 3.818 & 7744.01 \\
+4 & S3 / PSO & Engineering-feasible & 9.650 & 0.0 & 23.496 & 9.850 & 3.794 & 7743.34 \\
+5 & S2 / BFGS & Engineering-feasible & 9.850 & 0.0 & 23.563 & 10.202 & 3.867 & 7741.67 \\
 \hline
 \end{tabular}%
 }
@@ -225,10 +227,10 @@ Penalty points are \texttt{0} for engineering-feasible, \texttt{10} for mathemat
 \end{figure}
 
 
-\section{Top-3 by Criterion}
+\section{6.3 Top-3 by Criterion}
 
 
-\subsection{Raw Top-3 (all statuses)}
+\subsection{6.3.1 Raw Top-3 (all statuses)}
 
 
 This raw criterion table keeps all statuses visible, so warning and fallback cases can appear if they are numerically extreme on a single indicator.
@@ -242,7 +244,7 @@ This raw criterion table keeps all statuses visible, so warning and fallback cas
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}lllll@{}}
 \hline
-\textbf{Criterion} & \textbf{Rank} & \textbf{Case} & \textbf{Status} & \textbf{Value} \\
+Criterion & Rank & Case & Status & Value \\
 \hline
 Buckling factor & 1 & S8 / PSO & Warning case & 27.335 \\
 Buckling factor & 2 & S7 / SA & Math fallback & 26.587 \\
@@ -269,7 +271,7 @@ Task 6 area & 3 & S2 / BFGS & Engineering-feasible & 7741.67 m\textasciicircum{}
 \end{figure}
 
 
-\subsection{Engineering-eligible Top-3}
+\subsection{6.3.2 Engineering-eligible Top-3}
 
 
 This decision-grade table filters to engineering-feasible entries only.
@@ -283,7 +285,7 @@ This decision-grade table filters to engineering-feasible entries only.
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}lllll@{}}
 \hline
-\textbf{Criterion} & \textbf{Rank} & \textbf{Case} & \textbf{Status} & \textbf{Value} \\
+Criterion & Rank & Case & Status & Value \\
 \hline
 Buckling factor & 1 & S7 / BFGS & Engineering-feasible & 24.948 \\
 Buckling factor & 2 & S6 / BFGS & Engineering-feasible & 24.772 \\
@@ -310,7 +312,7 @@ Task 6 area & 3 & S3 / BFGS & Engineering-feasible & 7741.69 m\textasciicircum{}
 \end{figure}
 
 
-\chapter{Scenario-by-Scenario Comparison}
+\chapter{7. Scenario-by-Scenario Comparison}
 
 
 \section{S1}
@@ -324,7 +326,7 @@ Task 6 area & 3 & S3 / BFGS & Engineering-feasible & 7741.69 m\textasciicircum{}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}lllllll@{}}
 \hline
-\textbf{Algorithm} & \textbf{Status} & \textbf{Weighted score} & \textbf{Task 6 area (m\textasciicircum{}2)} & \textbf{Max disp. (mm)} & \textbf{Max stress (MPa)} & \textbf{Buckling factor} \\
+Algorithm & Status & Weighted score & Task 6 area (m\textasciicircum{}2) & Max disp. (mm) & Max stress (MPa) & Buckling factor \\
 \hline
 BFGS & Warning case & 30.850 & 7782.01 & 4.264 & 2.262 & 20.907 \\
 PSO & Engineering-feasible & 10.150 & 7804.56 & 4.126 & 2.244 & 21.300 \\
@@ -357,7 +359,7 @@ The score gap to second place (S1 / SA) is \texttt{0.800} points.
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}lllllll@{}}
 \hline
-\textbf{Algorithm} & \textbf{Status} & \textbf{Weighted score} & \textbf{Task 6 area (m\textasciicircum{}2)} & \textbf{Max disp. (mm)} & \textbf{Max stress (MPa)} & \textbf{Buckling factor} \\
+Algorithm & Status & Weighted score & Task 6 area (m\textasciicircum{}2) & Max disp. (mm) & Max stress (MPa) & Buckling factor \\
 \hline
 BFGS & Engineering-feasible & 9.850 & 7741.67 & 10.202 & 3.867 & 23.563 \\
 PSO & Math fallback & 34.000 & 9075.03 & 94.040 & 10.268 & -3.229 \\
@@ -390,7 +392,7 @@ The score gap to second place (S2 / BFGS) is \texttt{2.350} points.
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}lllllll@{}}
 \hline
-\textbf{Algorithm} & \textbf{Status} & \textbf{Weighted score} & \textbf{Task 6 area (m\textasciicircum{}2)} & \textbf{Max disp. (mm)} & \textbf{Max stress (MPa)} & \textbf{Buckling factor} \\
+Algorithm & Status & Weighted score & Task 6 area (m\textasciicircum{}2) & Max disp. (mm) & Max stress (MPa) & Buckling factor \\
 \hline
 BFGS & Engineering-feasible & 9.950 & 7741.69 & 10.153 & 3.834 & 23.529 \\
 PSO & Engineering-feasible & 9.650 & 7743.34 & 9.850 & 3.794 & 23.496 \\
@@ -423,7 +425,7 @@ The score gap to second place (S3 / PSO) is \texttt{2.600} points.
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}lllllll@{}}
 \hline
-\textbf{Algorithm} & \textbf{Status} & \textbf{Weighted score} & \textbf{Task 6 area (m\textasciicircum{}2)} & \textbf{Max disp. (mm)} & \textbf{Max stress (MPa)} & \textbf{Buckling factor} \\
+Algorithm & Status & Weighted score & Task 6 area (m\textasciicircum{}2) & Max disp. (mm) & Max stress (MPa) & Buckling factor \\
 \hline
 BFGS & Engineering-feasible & 10.800 & 7779.85 & 3.831 & 2.282 & 20.267 \\
 PSO & Warning case & 36.300 & 7931.66 & 12.073 & 4.541 & 22.491 \\
@@ -456,7 +458,7 @@ The score gap to second place (S4 / SA) is \texttt{1.300} points.
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}lllllll@{}}
 \hline
-\textbf{Algorithm} & \textbf{Status} & \textbf{Weighted score} & \textbf{Task 6 area (m\textasciicircum{}2)} & \textbf{Max disp. (mm)} & \textbf{Max stress (MPa)} & \textbf{Buckling factor} \\
+Algorithm & Status & Weighted score & Task 6 area (m\textasciicircum{}2) & Max disp. (mm) & Max stress (MPa) & Buckling factor \\
 \hline
 BFGS & Engineering-feasible & 10.600 & 7742.56 & 8.695 & 4.148 & 22.725 \\
 PSO & Engineering-feasible & 18.150 & 7747.93 & 11.481 & 4.941 & 19.566 \\
@@ -489,7 +491,7 @@ The score gap to second place (S5 / SA) is \texttt{2.750} points.
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}lllllll@{}}
 \hline
-\textbf{Algorithm} & \textbf{Status} & \textbf{Weighted score} & \textbf{Task 6 area (m\textasciicircum{}2)} & \textbf{Max disp. (mm)} & \textbf{Max stress (MPa)} & \textbf{Buckling factor} \\
+Algorithm & Status & Weighted score & Task 6 area (m\textasciicircum{}2) & Max disp. (mm) & Max stress (MPa) & Buckling factor \\
 \hline
 BFGS & Engineering-feasible & 10.150 & 7741.72 & 10.522 & 5.312 & 24.772 \\
 PSO & Engineering-feasible & 16.600 & 7748.25 & 11.907 & 6.705 & 21.611 \\
@@ -522,7 +524,7 @@ The score gap to second place (S6 / PSO) is \texttt{6.450} points.
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}lllllll@{}}
 \hline
-\textbf{Algorithm} & \textbf{Status} & \textbf{Weighted score} & \textbf{Task 6 area (m\textasciicircum{}2)} & \textbf{Max disp. (mm)} & \textbf{Max stress (MPa)} & \textbf{Buckling factor} \\
+Algorithm & Status & Weighted score & Task 6 area (m\textasciicircum{}2) & Max disp. (mm) & Max stress (MPa) & Buckling factor \\
 \hline
 BFGS & Engineering-feasible & 6.750 & 7740.66 & 10.105 & 4.134 & 24.948 \\
 PSO & Math fallback & 26.250 & 8324.25 & 28.467 & 9.258 & 23.712 \\
@@ -555,7 +557,7 @@ The score gap to second place (S7 / SA) is \texttt{15.600} points.
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}lllllll@{}}
 \hline
-\textbf{Algorithm} & \textbf{Status} & \textbf{Weighted score} & \textbf{Task 6 area (m\textasciicircum{}2)} & \textbf{Max disp. (mm)} & \textbf{Max stress (MPa)} & \textbf{Buckling factor} \\
+Algorithm & Status & Weighted score & Task 6 area (m\textasciicircum{}2) & Max disp. (mm) & Max stress (MPa) & Buckling factor \\
 \hline
 BFGS & Warning case & 39.600 & 7813.24 & 10.319 & 5.446 & 19.273 \\
 PSO & Warning case & 27.400 & 7899.07 & 9.235 & 4.493 & 27.335 \\
@@ -577,7 +579,7 @@ The score gap to second place (S8 / SA) is \texttt{0.300} points.
 \textbf{Critical note:} this scenario is tightly clustered, so small modeling shifts can reorder first and second place.
 
 
-\chapter{Convergence Summary}
+\chapter{8. Convergence Summary}
 
 
 The verification workflow solves both coarse and refined meshes for every case. The acceptance criteria are: displacement change below \texttt{5.0\%}, stress change below \texttt{5.0\%}, and first buckling-factor change below \texttt{10.0\%}.
@@ -596,7 +598,7 @@ Because the study is currently at \texttt{0/24} all-pass convergence, the rankin
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}lllllllll@{}}
 \hline
-\textbf{Case} & \textbf{Status} & \textbf{Delta disp. (\%)} & \textbf{Pass} & \textbf{Delta stress (\%)} & \textbf{Pass} & \textbf{Delta buckling (\%)} & \textbf{Pass} & \textbf{All pass} \\
+Case & Status & Delta disp. (\%) & Pass & Delta stress (\%) & Pass & Delta buckling (\%) & Pass & All pass \\
 \hline
 S1 / BFGS & Warning case & 8.66 & no & 3.95 & yes & -51.38 & no & no \\
 S1 / PSO & Engineering-feasible & 17.03 & no & 8.32 & no & -51.39 & no & no \\
@@ -638,7 +640,7 @@ S8 / SA & Warning case & 5.04 & no & 15.88 & no & -53.02 & no & no \\
 The global winner is therefore reported as \textbf{provisional}: the ranking is valid for comparative screening, but convergence evidence is not yet strong enough for a final structural sign-off.
 
 
-\chapter{Warning Cases from Scenario S8}
+\chapter{9. Warning Cases from Scenario S8}
 
 
 Scenario S8 is kept intentionally as a warning family. None of the Task 6 S8 runs are mathematically compliant or engineering-feasible, so these Abaqus models are useful only as structural cautionary examples and not as candidate towers for recommendation.
@@ -651,7 +653,7 @@ Scenario S8 is kept intentionally as a warning family. None of the Task 6 S8 run
 \end{figure}
 
 
-\chapter{Field Visualizations of the Global Top-3}
+\chapter{10. Field Visualizations of the Global Top-5}
 
 
 All detailed field figures are rendered from actual Abaqus ODB data with Python, not from Abaqus screenshots.
@@ -664,23 +666,26 @@ Task 7 figures use a true-scale equal-axis policy (no axis stretching). This dif
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.95\textwidth]{../results/figures/task7_s7_bfgs_stress.png}
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s7_bfgs_stress.png}
 \caption{S7 / BFGS stress}
-\end{figure}
-
-
-\begin{figure}[H]
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
 \centering
-\includegraphics[width=0.95\textwidth]{../results/figures/task7_s7_bfgs_displacement.png}
+\includegraphics[width=\textwidth]{../results/figures/task7_s7_bfgs_displacement.png}
 \caption{S7 / BFGS displacement}
-\end{figure}
-
-
-\begin{figure}[H]
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
 \centering
-\includegraphics[width=0.95\textwidth]{../results/figures/task7_s7_bfgs_buckling_mode1.png}
+\includegraphics[width=\textwidth]{../results/figures/task7_s7_bfgs_buckling_mode1.png}
 \caption{S7 / BFGS buckling}
+\end{subfigure}
+\caption{Combined visual fields}
 \end{figure}
+
+
+\textbf{Performance Discussion (Rank 1):} The \texttt{S7 / BFGS} model (Engineering-feasible) achieved an overall weighted score of \texttt{6.750}. It demonstrates strong structural integrity with a first buckling factor of \texttt{24.948}. Under the applied wind load, the maximum observed displacement is bounded at \texttt{10.105 mm}, and peak von Mises stresses reach \texttt{4.134 MPa}. As the top-ranked candidate, this geometry offers the most convincing balance of minimal material footprint, acceptable deflection, and a high margin against linear buckling.
 
 
 \section{S3 / SA}
@@ -688,23 +693,26 @@ Task 7 figures use a true-scale equal-axis policy (no axis stretching). This dif
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.95\textwidth]{../results/figures/task7_s3_sa_stress.png}
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s3_sa_stress.png}
 \caption{S3 / SA stress}
-\end{figure}
-
-
-\begin{figure}[H]
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
 \centering
-\includegraphics[width=0.95\textwidth]{../results/figures/task7_s3_sa_displacement.png}
+\includegraphics[width=\textwidth]{../results/figures/task7_s3_sa_displacement.png}
 \caption{S3 / SA displacement}
-\end{figure}
-
-
-\begin{figure}[H]
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
 \centering
-\includegraphics[width=0.95\textwidth]{../results/figures/task7_s3_sa_buckling_mode1.png}
+\includegraphics[width=\textwidth]{../results/figures/task7_s3_sa_buckling_mode1.png}
 \caption{S3 / SA buckling}
+\end{subfigure}
+\caption{Combined visual fields}
 \end{figure}
+
+
+\textbf{Performance Discussion (Rank 2):} The \texttt{S3 / SA} model (Engineering-feasible) achieved an overall weighted score of \texttt{7.050}. It demonstrates strong structural integrity with a first buckling factor of \texttt{23.834}. Under the applied wind load, the maximum observed displacement is bounded at \texttt{9.036 mm}, and peak von Mises stresses reach \texttt{3.526 MPa}. As a high-ranking runner-up, it presents an extremely competitive alternative, trading minimal surface area differences for robust stress and displacement behavior.
 
 
 \section{S2 / SA}
@@ -712,29 +720,572 @@ Task 7 figures use a true-scale equal-axis policy (no axis stretching). This dif
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.95\textwidth]{../results/figures/task7_s2_sa_stress.png}
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s2_sa_stress.png}
 \caption{S2 / SA stress}
-\end{figure}
-
-
-\begin{figure}[H]
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
 \centering
-\includegraphics[width=0.95\textwidth]{../results/figures/task7_s2_sa_displacement.png}
+\includegraphics[width=\textwidth]{../results/figures/task7_s2_sa_displacement.png}
 \caption{S2 / SA displacement}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s2_sa_buckling_mode1.png}
+\caption{S2 / SA buckling}
+\end{subfigure}
+\caption{Combined visual fields}
 \end{figure}
+
+
+\textbf{Performance Discussion (Rank 3):} The \texttt{S2 / SA} model (Engineering-feasible) achieved an overall weighted score of \texttt{7.500}. It demonstrates strong structural integrity with a first buckling factor of \texttt{24.549}. Under the applied wind load, the maximum observed displacement is bounded at \texttt{9.968 mm}, and peak von Mises stresses reach \texttt{3.818 MPa}. As a high-ranking runner-up, it presents an extremely competitive alternative, trading minimal surface area differences for robust stress and displacement behavior.
+
+
+\section{S3 / PSO}
 
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.95\textwidth]{../results/figures/task7_s2_sa_buckling_mode1.png}
-\caption{S2 / SA buckling}
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s3_pso_stress.png}
+\caption{S3 / PSO stress}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s3_pso_displacement.png}
+\caption{S3 / PSO displacement}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s3_pso_buckling_mode1.png}
+\caption{S3 / PSO buckling}
+\end{subfigure}
+\caption{Combined visual fields}
 \end{figure}
 
 
-\chapter{Recommendation for Later Tasks}
+\textbf{Performance Discussion (Rank 4):} The \texttt{S3 / PSO} model (Engineering-feasible) achieved an overall weighted score of \texttt{9.650}. It demonstrates strong structural integrity with a first buckling factor of \texttt{23.496}. Under the applied wind load, the maximum observed displacement is bounded at \texttt{9.850 mm}, and peak von Mises stresses reach \texttt{3.794 MPa}. Although ranking slightly lower within the top 5, it remains a structurally sound and convincing concept that safely satisfies engineering constraints.
+
+
+\section{S2 / BFGS}
+
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s2_bfgs_stress.png}
+\caption{S2 / BFGS stress}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s2_bfgs_displacement.png}
+\caption{S2 / BFGS displacement}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s2_bfgs_buckling_mode1.png}
+\caption{S2 / BFGS buckling}
+\end{subfigure}
+\caption{Combined visual fields}
+\end{figure}
+
+
+\textbf{Performance Discussion (Rank 5):} The \texttt{S2 / BFGS} model (Engineering-feasible) achieved an overall weighted score of \texttt{9.850}. It demonstrates strong structural integrity with a first buckling factor of \texttt{23.563}. Under the applied wind load, the maximum observed displacement is bounded at \texttt{10.202 mm}, and peak von Mises stresses reach \texttt{3.867 MPa}. Although ranking slightly lower within the top 5, it remains a structurally sound and convincing concept that safely satisfies engineering constraints.
+
+
+\chapter{11. Recommendation for Later Tasks}
 
 
 The current Task 7 recommendation is \textbf{S7 / BFGS} with a \texttt{provisional} status. Its weighted score is \texttt{6.750} and its refined response gives a first buckling factor of \texttt{24.948}, a maximum displacement of \texttt{10.105 mm}, and a maximum stress of \texttt{4.134 MPa}.
 
 
 The main practical outcome for the project is that Task 6 geometric alternatives can now be compared with one consistent structural score, explicit warning handling, and scenario-level interpretation suitable for Task 9 communication.
+
+
+\chapter{12. Annex: Complete Field Visualizations}
+
+
+This section contains the field visualizations for the remaining 19 candidates out of the total 24 refined presentation models, organized by Scenario.
+
+
+\section{Scenario S1}
+
+
+\subsection{S1 / BFGS}
+
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s1_bfgs_stress.png}
+\caption{S1 / BFGS stress}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s1_bfgs_displacement.png}
+\caption{S1 / BFGS displacement}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s1_bfgs_buckling_mode1.png}
+\caption{S1 / BFGS buckling}
+\end{subfigure}
+\caption{Combined visual fields}
+\end{figure}
+
+
+\subsection{S1 / PSO}
+
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s1_pso_stress.png}
+\caption{S1 / PSO stress}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s1_pso_displacement.png}
+\caption{S1 / PSO displacement}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s1_pso_buckling_mode1.png}
+\caption{S1 / PSO buckling}
+\end{subfigure}
+\caption{Combined visual fields}
+\end{figure}
+
+
+\subsection{S1 / SA}
+
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s1_sa_stress.png}
+\caption{S1 / SA stress}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s1_sa_displacement.png}
+\caption{S1 / SA displacement}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s1_sa_buckling_mode1.png}
+\caption{S1 / SA buckling}
+\end{subfigure}
+\caption{Combined visual fields}
+\end{figure}
+
+
+\section{Scenario S2}
+
+
+\subsection{S2 / PSO}
+
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s2_pso_stress.png}
+\caption{S2 / PSO stress}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s2_pso_displacement.png}
+\caption{S2 / PSO displacement}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s2_pso_buckling_mode1.png}
+\caption{S2 / PSO buckling}
+\end{subfigure}
+\caption{Combined visual fields}
+\end{figure}
+
+
+\section{Scenario S3}
+
+
+\subsection{S3 / BFGS}
+
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s3_bfgs_stress.png}
+\caption{S3 / BFGS stress}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s3_bfgs_displacement.png}
+\caption{S3 / BFGS displacement}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s3_bfgs_buckling_mode1.png}
+\caption{S3 / BFGS buckling}
+\end{subfigure}
+\caption{Combined visual fields}
+\end{figure}
+
+
+\section{Scenario S4}
+
+
+\subsection{S4 / BFGS}
+
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s4_bfgs_stress.png}
+\caption{S4 / BFGS stress}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s4_bfgs_displacement.png}
+\caption{S4 / BFGS displacement}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s4_bfgs_buckling_mode1.png}
+\caption{S4 / BFGS buckling}
+\end{subfigure}
+\caption{Combined visual fields}
+\end{figure}
+
+
+\subsection{S4 / PSO}
+
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s4_pso_stress.png}
+\caption{S4 / PSO stress}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s4_pso_displacement.png}
+\caption{S4 / PSO displacement}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s4_pso_buckling_mode1.png}
+\caption{S4 / PSO buckling}
+\end{subfigure}
+\caption{Combined visual fields}
+\end{figure}
+
+
+\subsection{S4 / SA}
+
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s4_sa_stress.png}
+\caption{S4 / SA stress}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s4_sa_displacement.png}
+\caption{S4 / SA displacement}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s4_sa_buckling_mode1.png}
+\caption{S4 / SA buckling}
+\end{subfigure}
+\caption{Combined visual fields}
+\end{figure}
+
+
+\section{Scenario S5}
+
+
+\subsection{S5 / BFGS}
+
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s5_bfgs_stress.png}
+\caption{S5 / BFGS stress}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s5_bfgs_displacement.png}
+\caption{S5 / BFGS displacement}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s5_bfgs_buckling_mode1.png}
+\caption{S5 / BFGS buckling}
+\end{subfigure}
+\caption{Combined visual fields}
+\end{figure}
+
+
+\subsection{S5 / PSO}
+
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s5_pso_stress.png}
+\caption{S5 / PSO stress}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s5_pso_displacement.png}
+\caption{S5 / PSO displacement}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s5_pso_buckling_mode1.png}
+\caption{S5 / PSO buckling}
+\end{subfigure}
+\caption{Combined visual fields}
+\end{figure}
+
+
+\subsection{S5 / SA}
+
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s5_sa_stress.png}
+\caption{S5 / SA stress}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s5_sa_displacement.png}
+\caption{S5 / SA displacement}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s5_sa_buckling_mode1.png}
+\caption{S5 / SA buckling}
+\end{subfigure}
+\caption{Combined visual fields}
+\end{figure}
+
+
+\section{Scenario S6}
+
+
+\subsection{S6 / BFGS}
+
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s6_bfgs_stress.png}
+\caption{S6 / BFGS stress}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s6_bfgs_displacement.png}
+\caption{S6 / BFGS displacement}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s6_bfgs_buckling_mode1.png}
+\caption{S6 / BFGS buckling}
+\end{subfigure}
+\caption{Combined visual fields}
+\end{figure}
+
+
+\subsection{S6 / PSO}
+
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s6_pso_stress.png}
+\caption{S6 / PSO stress}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s6_pso_displacement.png}
+\caption{S6 / PSO displacement}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s6_pso_buckling_mode1.png}
+\caption{S6 / PSO buckling}
+\end{subfigure}
+\caption{Combined visual fields}
+\end{figure}
+
+
+\subsection{S6 / SA}
+
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s6_sa_stress.png}
+\caption{S6 / SA stress}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s6_sa_displacement.png}
+\caption{S6 / SA displacement}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s6_sa_buckling_mode1.png}
+\caption{S6 / SA buckling}
+\end{subfigure}
+\caption{Combined visual fields}
+\end{figure}
+
+
+\section{Scenario S7}
+
+
+\subsection{S7 / PSO}
+
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s7_pso_stress.png}
+\caption{S7 / PSO stress}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s7_pso_displacement.png}
+\caption{S7 / PSO displacement}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s7_pso_buckling_mode1.png}
+\caption{S7 / PSO buckling}
+\end{subfigure}
+\caption{Combined visual fields}
+\end{figure}
+
+
+\subsection{S7 / SA}
+
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s7_sa_stress.png}
+\caption{S7 / SA stress}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s7_sa_displacement.png}
+\caption{S7 / SA displacement}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s7_sa_buckling_mode1.png}
+\caption{S7 / SA buckling}
+\end{subfigure}
+\caption{Combined visual fields}
+\end{figure}
+
+
+\section{Scenario S8}
+
+
+\subsection{S8 / BFGS}
+
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s8_bfgs_stress.png}
+\caption{S8 / BFGS stress}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s8_bfgs_displacement.png}
+\caption{S8 / BFGS displacement}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s8_bfgs_buckling_mode1.png}
+\caption{S8 / BFGS buckling}
+\end{subfigure}
+\caption{Combined visual fields}
+\end{figure}
+
+
+\subsection{S8 / PSO}
+
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s8_pso_stress.png}
+\caption{S8 / PSO stress}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s8_pso_displacement.png}
+\caption{S8 / PSO displacement}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s8_pso_buckling_mode1.png}
+\caption{S8 / PSO buckling}
+\end{subfigure}
+\caption{Combined visual fields}
+\end{figure}
+
+
+\subsection{S8 / SA}
+
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s8_sa_stress.png}
+\caption{S8 / SA stress}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s8_sa_displacement.png}
+\caption{S8 / SA displacement}
+\end{subfigure}\hfill
+\begin{subfigure}{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{../results/figures/task7_s8_sa_buckling_mode1.png}
+\caption{S8 / SA buckling}
+\end{subfigure}
+\caption{Combined visual fields}
+\end{figure}

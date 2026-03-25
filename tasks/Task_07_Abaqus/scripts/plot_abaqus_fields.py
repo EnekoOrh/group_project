@@ -61,7 +61,7 @@ def _set_equal_3d(ax, points):
 
 def _base_axes_style(ax):
     ax.set_axis_off()
-    ax.view_init(elev=18, azim=-55)
+    ax.view_init(elev=0, azim=-70)
     try:
         ax.set_proj_type("ortho")
     except Exception:
@@ -79,6 +79,26 @@ def _plot_surface(polygons, scalar_values, cmap_name, title, subtitle, output_pa
     poly = Poly3DCollection(polygons, facecolors=facecolors, linewidths=0.15, edgecolors=(0.1, 0.1, 0.1, 0.18))
     ax.add_collection3d(poly)
     flat_points = [vertex for polygon in polygons for vertex in polygon]
+    
+    def _add_wind_arrows(ax_ref, points):
+        arr = np.asarray(points, dtype=float)
+        maxs = arr.max(axis=0)
+        mins = arr.min(axis=0)
+        max_x = float(maxs[0])
+        min_y = float(mins[1])
+        height = float(maxs[2])
+        
+        heights = [height * 0.25, height * 0.50, height * 0.75]
+        # Place arrows at the front-edge of the graph (min_y is closest to camera for azim=-70)
+        start_x = max_x + 10.0
+        start_y = min_y - 20.0
+        length = 25.0
+        
+        for z in heights:
+            ax_ref.quiver(start_x, start_y, z, -length, 0.0, 0.0,
+                          color='dodgerblue', linewidth=3.0, arrow_length_ratio=0.15, alpha=0.95)
+
+    _add_wind_arrows(ax, flat_points)
     _set_equal_3d(ax, flat_points)
     _base_axes_style(ax)
     fig.suptitle(title, fontsize=15, y=0.96)
@@ -228,9 +248,9 @@ def _plot_case(selected_row, mesh_summary_map, fields_dir: Path, output_dir: Pat
     }
     element_stress = {int(row["element_label"]): float(row["mises_pa_avg"]) / 1e6 for row in static_element}
 
-    original_polygons, element_labels = _build_face_polygons(mesh, original_node_map, ["x", "y", "z"])
-    deformed_polygons, _ = _build_face_polygons(mesh, deformed_node_map, ["x", "y", "z"])
-    buckle_polygons, _ = _build_face_polygons(mesh, buckle_node_map, ["x", "y", "z"])
+    original_polygons, element_labels = _build_face_polygons(mesh, original_node_map, ["x", "z", "y"])
+    deformed_polygons, _ = _build_face_polygons(mesh, deformed_node_map, ["x", "z", "y"])
+    buckle_polygons, _ = _build_face_polygons(mesh, buckle_node_map, ["x", "z", "y"])
 
     stress_values = [element_stress[label] for label in element_labels]
     disp_values = [float(np.mean([deformed_node_map[node_id]["umag"] for node_id in element["connectivity"]])) * 1000.0 for element in mesh["elements"]]

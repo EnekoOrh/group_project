@@ -1,4 +1,4 @@
-﻿import argparse
+import argparse
 import csv
 import json
 import math
@@ -18,9 +18,9 @@ from task7_common import (
 
 
 STATUS_STYLE = {
-    STATUS_ENGINEERING: {"linestyle": "-", "alpha": 1.0, "suffix": "engineering-feasible"},
-    STATUS_MATH_FALLBACK: {"linestyle": "--", "alpha": 0.95, "suffix": "math fallback"},
-    STATUS_WARNING: {"linestyle": ":", "alpha": 0.90, "suffix": "warning"},
+    STATUS_ENGINEERING: {"linestyle": ":", "alpha": 1.0, "suffix": "engineering-feasible"},
+    STATUS_MATH_FALLBACK: {"linestyle": ":", "alpha": 1.0, "suffix": "math fallback"},
+    STATUS_WARNING: {"linestyle": ":", "alpha": 1.0, "suffix": "warning"},
 }
 ALGORITHM_COLORS = {"SA": "#C0392B", "PSO": "#1F618D", "BFGS": "#117A65"}
 

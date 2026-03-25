@@ -118,13 +118,15 @@ $$
 
 Penalty points are `0` for engineering-feasible, `10` for mathematical fallback, and `20` for warning cases. The best model is the one with the lowest `J_i`.
 
-### 6.2 Global Weighted Top-3
+### 6.2 Global Weighted Top-5
 
 | Rank | Case | Status | Weighted score | Penalty | Buckling factor | Max disp. (mm) | Max stress (MPa) | Area (m^2) |
 |---|---|---|---|---|---|---|---|---|
 | 1 | S7 / BFGS | Engineering-feasible | 6.750 | 0.0 | 24.948 | 10.105 | 4.134 | 7740.66 |
 | 2 | S3 / SA | Engineering-feasible | 7.050 | 0.0 | 23.834 | 9.036 | 3.526 | 7742.77 |
 | 3 | S2 / SA | Engineering-feasible | 7.500 | 0.0 | 24.549 | 9.968 | 3.818 | 7744.01 |
+| 4 | S3 / PSO | Engineering-feasible | 9.650 | 0.0 | 23.496 | 9.850 | 3.794 | 7743.34 |
+| 5 | S2 / BFGS | Engineering-feasible | 9.850 | 0.0 | 23.563 | 10.202 | 3.867 | 7741.67 |
 
 ![Task 7 weighted ranking](../figures/task7_weighted_ranking.png)
 
@@ -330,37 +332,140 @@ Scenario S8 is kept intentionally as a warning family. None of the Task 6 S8 run
 
 ![Scenario S8 warning metrics](../figures/s8_warning_metrics.png)
 
-## 10. Field Visualizations of the Global Top-3
+## 10. Field Visualizations of the Global Top-5
 
 All detailed field figures are rendered from actual Abaqus ODB data with Python, not from Abaqus screenshots.
 Task 7 figures use a true-scale equal-axis policy (no axis stretching). This differs from some legacy Task 6 renderings that used a different plotting style.
 
 ### S7 / BFGS
 
-![S7 / BFGS stress](../figures/task7_s7_bfgs_stress.png)
+![S7 / BFGS stress](../figures/task7_s7_bfgs_stress.png) ![S7 / BFGS displacement](../figures/task7_s7_bfgs_displacement.png) ![S7 / BFGS buckling](../figures/task7_s7_bfgs_buckling_mode1.png)
 
-![S7 / BFGS displacement](../figures/task7_s7_bfgs_displacement.png)
-
-![S7 / BFGS buckling](../figures/task7_s7_bfgs_buckling_mode1.png)
+**Performance Discussion (Rank 1):** The `S7 / BFGS` model (Engineering-feasible) achieved an overall weighted score of `6.750`. It demonstrates strong structural integrity with a first buckling factor of `24.948`. Under the applied wind load, the maximum observed displacement is bounded at `10.105 mm`, and peak von Mises stresses reach `4.134 MPa`. As the top-ranked candidate, this geometry offers the most convincing balance of minimal material footprint, acceptable deflection, and a high margin against linear buckling.
 
 ### S3 / SA
 
-![S3 / SA stress](../figures/task7_s3_sa_stress.png)
+![S3 / SA stress](../figures/task7_s3_sa_stress.png) ![S3 / SA displacement](../figures/task7_s3_sa_displacement.png) ![S3 / SA buckling](../figures/task7_s3_sa_buckling_mode1.png)
 
-![S3 / SA displacement](../figures/task7_s3_sa_displacement.png)
-
-![S3 / SA buckling](../figures/task7_s3_sa_buckling_mode1.png)
+**Performance Discussion (Rank 2):** The `S3 / SA` model (Engineering-feasible) achieved an overall weighted score of `7.050`. It demonstrates strong structural integrity with a first buckling factor of `23.834`. Under the applied wind load, the maximum observed displacement is bounded at `9.036 mm`, and peak von Mises stresses reach `3.526 MPa`. As a high-ranking runner-up, it presents an extremely competitive alternative, trading minimal surface area differences for robust stress and displacement behavior.
 
 ### S2 / SA
 
-![S2 / SA stress](../figures/task7_s2_sa_stress.png)
+![S2 / SA stress](../figures/task7_s2_sa_stress.png) ![S2 / SA displacement](../figures/task7_s2_sa_displacement.png) ![S2 / SA buckling](../figures/task7_s2_sa_buckling_mode1.png)
 
-![S2 / SA displacement](../figures/task7_s2_sa_displacement.png)
+**Performance Discussion (Rank 3):** The `S2 / SA` model (Engineering-feasible) achieved an overall weighted score of `7.500`. It demonstrates strong structural integrity with a first buckling factor of `24.549`. Under the applied wind load, the maximum observed displacement is bounded at `9.968 mm`, and peak von Mises stresses reach `3.818 MPa`. As a high-ranking runner-up, it presents an extremely competitive alternative, trading minimal surface area differences for robust stress and displacement behavior.
 
-![S2 / SA buckling](../figures/task7_s2_sa_buckling_mode1.png)
+### S3 / PSO
+
+![S3 / PSO stress](../figures/task7_s3_pso_stress.png) ![S3 / PSO displacement](../figures/task7_s3_pso_displacement.png) ![S3 / PSO buckling](../figures/task7_s3_pso_buckling_mode1.png)
+
+**Performance Discussion (Rank 4):** The `S3 / PSO` model (Engineering-feasible) achieved an overall weighted score of `9.650`. It demonstrates strong structural integrity with a first buckling factor of `23.496`. Under the applied wind load, the maximum observed displacement is bounded at `9.850 mm`, and peak von Mises stresses reach `3.794 MPa`. Although ranking slightly lower within the top 5, it remains a structurally sound and convincing concept that safely satisfies engineering constraints.
+
+### S2 / BFGS
+
+![S2 / BFGS stress](../figures/task7_s2_bfgs_stress.png) ![S2 / BFGS displacement](../figures/task7_s2_bfgs_displacement.png) ![S2 / BFGS buckling](../figures/task7_s2_bfgs_buckling_mode1.png)
+
+**Performance Discussion (Rank 5):** The `S2 / BFGS` model (Engineering-feasible) achieved an overall weighted score of `9.850`. It demonstrates strong structural integrity with a first buckling factor of `23.563`. Under the applied wind load, the maximum observed displacement is bounded at `10.202 mm`, and peak von Mises stresses reach `3.867 MPa`. Although ranking slightly lower within the top 5, it remains a structurally sound and convincing concept that safely satisfies engineering constraints.
 
 ## 11. Recommendation for Later Tasks
 
 The current Task 7 recommendation is **S7 / BFGS** with a `provisional` status. Its weighted score is `6.750` and its refined response gives a first buckling factor of `24.948`, a maximum displacement of `10.105 mm`, and a maximum stress of `4.134 MPa`.
 
 The main practical outcome for the project is that Task 6 geometric alternatives can now be compared with one consistent structural score, explicit warning handling, and scenario-level interpretation suitable for Task 9 communication.
+
+## 12. Annex: Complete Field Visualizations
+
+This section contains the field visualizations for the remaining 19 candidates out of the total 24 refined presentation models, organized by Scenario.
+
+### Scenario S1
+
+#### S1 / BFGS
+
+![S1 / BFGS stress](../figures/task7_s1_bfgs_stress.png) ![S1 / BFGS displacement](../figures/task7_s1_bfgs_displacement.png) ![S1 / BFGS buckling](../figures/task7_s1_bfgs_buckling_mode1.png)
+
+#### S1 / PSO
+
+![S1 / PSO stress](../figures/task7_s1_pso_stress.png) ![S1 / PSO displacement](../figures/task7_s1_pso_displacement.png) ![S1 / PSO buckling](../figures/task7_s1_pso_buckling_mode1.png)
+
+#### S1 / SA
+
+![S1 / SA stress](../figures/task7_s1_sa_stress.png) ![S1 / SA displacement](../figures/task7_s1_sa_displacement.png) ![S1 / SA buckling](../figures/task7_s1_sa_buckling_mode1.png)
+
+### Scenario S2
+
+#### S2 / PSO
+
+![S2 / PSO stress](../figures/task7_s2_pso_stress.png) ![S2 / PSO displacement](../figures/task7_s2_pso_displacement.png) ![S2 / PSO buckling](../figures/task7_s2_pso_buckling_mode1.png)
+
+### Scenario S3
+
+#### S3 / BFGS
+
+![S3 / BFGS stress](../figures/task7_s3_bfgs_stress.png) ![S3 / BFGS displacement](../figures/task7_s3_bfgs_displacement.png) ![S3 / BFGS buckling](../figures/task7_s3_bfgs_buckling_mode1.png)
+
+### Scenario S4
+
+#### S4 / BFGS
+
+![S4 / BFGS stress](../figures/task7_s4_bfgs_stress.png) ![S4 / BFGS displacement](../figures/task7_s4_bfgs_displacement.png) ![S4 / BFGS buckling](../figures/task7_s4_bfgs_buckling_mode1.png)
+
+#### S4 / PSO
+
+![S4 / PSO stress](../figures/task7_s4_pso_stress.png) ![S4 / PSO displacement](../figures/task7_s4_pso_displacement.png) ![S4 / PSO buckling](../figures/task7_s4_pso_buckling_mode1.png)
+
+#### S4 / SA
+
+![S4 / SA stress](../figures/task7_s4_sa_stress.png) ![S4 / SA displacement](../figures/task7_s4_sa_displacement.png) ![S4 / SA buckling](../figures/task7_s4_sa_buckling_mode1.png)
+
+### Scenario S5
+
+#### S5 / BFGS
+
+![S5 / BFGS stress](../figures/task7_s5_bfgs_stress.png) ![S5 / BFGS displacement](../figures/task7_s5_bfgs_displacement.png) ![S5 / BFGS buckling](../figures/task7_s5_bfgs_buckling_mode1.png)
+
+#### S5 / PSO
+
+![S5 / PSO stress](../figures/task7_s5_pso_stress.png) ![S5 / PSO displacement](../figures/task7_s5_pso_displacement.png) ![S5 / PSO buckling](../figures/task7_s5_pso_buckling_mode1.png)
+
+#### S5 / SA
+
+![S5 / SA stress](../figures/task7_s5_sa_stress.png) ![S5 / SA displacement](../figures/task7_s5_sa_displacement.png) ![S5 / SA buckling](../figures/task7_s5_sa_buckling_mode1.png)
+
+### Scenario S6
+
+#### S6 / BFGS
+
+![S6 / BFGS stress](../figures/task7_s6_bfgs_stress.png) ![S6 / BFGS displacement](../figures/task7_s6_bfgs_displacement.png) ![S6 / BFGS buckling](../figures/task7_s6_bfgs_buckling_mode1.png)
+
+#### S6 / PSO
+
+![S6 / PSO stress](../figures/task7_s6_pso_stress.png) ![S6 / PSO displacement](../figures/task7_s6_pso_displacement.png) ![S6 / PSO buckling](../figures/task7_s6_pso_buckling_mode1.png)
+
+#### S6 / SA
+
+![S6 / SA stress](../figures/task7_s6_sa_stress.png) ![S6 / SA displacement](../figures/task7_s6_sa_displacement.png) ![S6 / SA buckling](../figures/task7_s6_sa_buckling_mode1.png)
+
+### Scenario S7
+
+#### S7 / PSO
+
+![S7 / PSO stress](../figures/task7_s7_pso_stress.png) ![S7 / PSO displacement](../figures/task7_s7_pso_displacement.png) ![S7 / PSO buckling](../figures/task7_s7_pso_buckling_mode1.png)
+
+#### S7 / SA
+
+![S7 / SA stress](../figures/task7_s7_sa_stress.png) ![S7 / SA displacement](../figures/task7_s7_sa_displacement.png) ![S7 / SA buckling](../figures/task7_s7_sa_buckling_mode1.png)
+
+### Scenario S8
+
+#### S8 / BFGS
+
+![S8 / BFGS stress](../figures/task7_s8_bfgs_stress.png) ![S8 / BFGS displacement](../figures/task7_s8_bfgs_displacement.png) ![S8 / BFGS buckling](../figures/task7_s8_bfgs_buckling_mode1.png)
+
+#### S8 / PSO
+
+![S8 / PSO stress](../figures/task7_s8_pso_stress.png) ![S8 / PSO displacement](../figures/task7_s8_pso_displacement.png) ![S8 / PSO buckling](../figures/task7_s8_pso_buckling_mode1.png)
+
+#### S8 / SA
+
+![S8 / SA stress](../figures/task7_s8_sa_stress.png) ![S8 / SA displacement](../figures/task7_s8_sa_displacement.png) ![S8 / SA buckling](../figures/task7_s8_sa_buckling_mode1.png)
+

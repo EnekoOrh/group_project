@@ -3,155 +3,61 @@ import os
 import re
 from typing import List
 
-
+# Match inline markdown like **text** or `text`
+BOLD_RE = re.compile(r"\*\*(.*?)\*\*")
+CODE_RE = re.compile(r"`(.*?)`")
+# Match mathematical inline like $E = 33 GPa$
+MATH_RE = re.compile(r"\$(.*?)\$")
+# Standard markdown image ![caption](path)
 IMAGE_RE = re.compile(r"!\[(.*?)\]\((.*?)\)")
-HEADING_PREFIX_RE = re.compile(r"^\d+(\.\d+)*\.?\s+")
-
-
-def _escape_latex(text: str) -> str:
-    replacements = {
-        "\\": r"\textbackslash{}",
-        "&": r"\&",
-        "%": r"\%",
-        "$": r"\$",
-        "#": r"\#",
-        "_": r"\_",
-        "{": r"\{",
-        "}": r"\}",
-        "~": r"\textasciitilde{}",
-        "^": r"\textasciicircum{}",
-    }
-    out = []
-    for ch in text:
-        out.append(replacements.get(ch, ch))
-    return "".join(out)
 
 
 def _clean_heading(text: str) -> str:
-    return HEADING_PREFIX_RE.sub("", text.strip())
-
-
-def _is_math_code(code: str) -> bool:
-    lowered = code.lower()
-    if "/" in code or "\\" in code:
-        return False
-    if lowered.endswith(".csv") or lowered.endswith(".json") or lowered.endswith(".png") or lowered.endswith(".md"):
-        return False
-    if lowered.startswith("results/") or lowered.startswith("tasks/"):
-        return False
-
-    math_tokens = ["=", "pi", "sqrt", "^", "_", "<=", ">=", "sum(", "A_i", "V_i", "J("]
-    return any(tok in code for tok in math_tokens)
-
-
-def _code_to_math(code: str) -> str:
-    expr = code.strip()
-    expr = expr.replace("<=", r"\leq")
-    expr = expr.replace(">=", r"\geq")
-    expr = re.sub(r"\bpi\b", r"\\pi", expr)
-    expr = re.sub(r"\bsum\((.*?)\)", r"\\sum(\1)", expr)
-    expr = expr.replace("*", r" \cdot ")
-    expr = expr.replace("..", r"\ldots ")
-    expr = re.sub(r"\b(\d+)e-([0-9]+)\b", r"\1 \\times 10^{-\2}", expr)
-    expr = re.sub(r"\b([A-Za-z])_([A-Za-z][A-Za-z0-9]*)\b", r"\1_{\2}", expr)
-
-    # Convert sqrt(...) to \sqrt{...} with shallow balanced parsing.
-    while "sqrt(" in expr:
-        start = expr.find("sqrt(")
-        idx = start + 5
-        depth = 1
-        end = idx
-        while end < len(expr) and depth > 0:
-            if expr[end] == "(":
-                depth += 1
-            elif expr[end] == ")":
-                depth -= 1
-            end += 1
-        if depth != 0:
-            break
-        inside = expr[idx : end - 1]
-        expr = expr[:start] + r"\sqrt{" + inside + "}" + expr[end:]
-
-    return r"\(" + expr + r"\)"
+    text = text.replace("[Annex]", "").strip()
+    return text
 
 
 def _convert_inline(text: str) -> str:
-    # Preserve inline code first.
-    code_spans: List[str] = []
-    bold_spans: List[str] = []
-
-    def repl_code(match: re.Match[str]) -> str:
-        code_spans.append(match.group(1))
-        return f"@@CODE{len(code_spans)-1}@@"
-
-    text = re.sub(r"`([^`]+)`", repl_code, text)
-
-    # Preserve bold markdown before escaping to avoid turning \textbf into literal text.
-    def repl_bold(match: re.Match[str]) -> str:
-        bold_spans.append(match.group(1))
-        return f"@@BOLD{len(bold_spans)-1}@@"
-
-    text = re.sub(r"\*\*(.+?)\*\*", repl_bold, text)
-
-    # Escape remaining text.
-    text = _escape_latex(text)
-
-    # Restore code spans.
-    for i, code in enumerate(code_spans):
-        replacement = _code_to_math(code) if _is_math_code(code) else r"\texttt{" + _escape_latex(code) + "}"
-        text = text.replace(f"@@CODE{i}@@", replacement)
-
-    # Restore bold spans.
-    for i, content in enumerate(bold_spans):
-        text = text.replace(f"@@BOLD{i}@@", r"\textbf{" + _escape_latex(content) + "}")
-
-    text = text.replace("m²", r"m$^2$")
-    text = text.replace("m³", r"m$^3$")
-    text = text.replace("m\u00c2\u00b2", r"m$^2$")
-    text = text.replace("m\u00c2\u00b3", r"m$^3$")
-
+    text = text.replace("%", r"\%").replace("&", r"\&").replace("#", r"\#").replace("_", r"\_").replace("^", r"\textasciicircum{}")
+    text = BOLD_RE.sub(r"\\textbf{\1}", text)
+    text = CODE_RE.sub(r"\\texttt{\1}", text)
+    text = MATH_RE.sub(r"\\(\1\\)", text)
     return text
 
 
 def _normalize_image_path(path: str) -> str:
-    path = path.strip()
-    path = path.replace("\\", "/")
-    if path.startswith("results/figures/"):
-        return "../" + path
-    return path
+    # LaTeX project structure handles paths slightly differently, normalize path so latexmk works
+    return path.replace("results/figures/", "../results/figures/")
 
 
-def _render_table(table_lines: List[str]) -> List[str]:
-    rows = []
-    for line in table_lines:
-        line = line.strip()
-        if not line.startswith("|"):
-            continue
-        cells = [c.strip() for c in line.strip("|").split("|")]
-        rows.append(cells)
+def _render_table(block: List[str]) -> List[str]:
+    out: List[str] = []
+    if len(block) < 3:
+        return out
 
-    if len(rows) < 2:
-        return [_convert_inline(line) + r"\\" for line in table_lines]
+    parts = [p.strip() for p in block[0].split("|")[1:-1]]
+    num_cols = len(parts)
 
-    header = rows[0]
-    body = rows[2:]  # Skip markdown separator row.
-    cols = len(header)
-    colspec = "@{}" + "l" * cols + "@{}"
-
-    out = []
     out.append(r"\begin{table}[H]")
     out.append(r"\centering")
     out.append(r"\scriptsize")
     out.append(r"\setlength{\tabcolsep}{4pt}")
     out.append(r"\renewcommand{\arraystretch}{1.1}")
     out.append(r"\resizebox{\textwidth}{!}{%")
-    out.append(r"\begin{tabular}{" + colspec + "}")
+    out.append(r"\begin{tabular}{@" + "{}" + ("l" * num_cols) + "@{}}")
     out.append(r"\hline")
-    out.append(" & ".join(r"\textbf{" + _convert_inline(c) + "}" for c in header) + r" \\")
-    out.append(r"\hline")
-    for row in body:
-        padded = row + [""] * (cols - len(row))
-        out.append(" & ".join(_convert_inline(c) for c in padded[:cols]) + r" \\")
+
+    for i, line in enumerate(block):
+        if i == 1:
+            # Skip divider
+            continue
+        cells = [c.strip() for c in line.split("|")[1:-1]]
+        safe_cells = [_convert_inline(c) for c in cells]
+        tex_line = " & ".join(safe_cells) + r" \\"
+        out.append(tex_line)
+        if i == 0:
+            out.append(r"\hline")
+
     out.append(r"\hline")
     out.append(r"\end{tabular}%")
     out.append(r"}")
@@ -245,21 +151,36 @@ def convert_markdown_to_tex(md_text: str) -> str:
             continue
 
         # Images.
-        image_match = IMAGE_RE.match(stripped)
-        if image_match:
-            if in_list:
-                out.append(r"\end{itemize}")
-                in_list = False
-            caption = _convert_inline(image_match.group(1).strip() or "Figure")
-            path = _normalize_image_path(image_match.group(2))
-            out.append(r"\begin{figure}[H]")
-            out.append(r"\centering")
-            out.append(r"\includegraphics[width=0.95\textwidth]{" + path + "}")
-            out.append(r"\caption{" + caption + "}")
-            out.append(r"\end{figure}")
-            out.append("")
-            i += 1
-            continue
+        if "![" in stripped and "](" in stripped:
+            images = re.findall(r"!\[(.*?)\]\((.*?)\)", stripped)
+            if images:
+                if in_list:
+                    out.append(r"\end{itemize}")
+                    in_list = False
+                out.append(r"\begin{figure}[H]")
+                out.append(r"\centering")
+                
+                if len(images) == 3:
+                    for j, (img_caption, img_path) in enumerate(images):
+                        img_caption = _convert_inline(img_caption.strip() or "Figure")
+                        path = _normalize_image_path(img_path)
+                        out.append(r"\begin{subfigure}{0.32\textwidth}")
+                        out.append(r"\centering")
+                        out.append(r"\includegraphics[width=\textwidth]{" + path + "}")
+                        out.append(r"\caption{" + img_caption + "}")
+                        out.append(r"\end{subfigure}" + (r"\hfill" if j < 2 else ""))
+                    out.append(r"\caption{Combined visual fields}")
+                else:
+                    for img_caption, img_path in images:
+                        img_caption = _convert_inline(img_caption.strip() or "Figure")
+                        path = _normalize_image_path(img_path)
+                        out.append(r"\includegraphics[width=0.95\textwidth]{" + path + "}")
+                        out.append(r"\caption{" + img_caption + "}")
+                
+                out.append(r"\end{figure}")
+                out.append("")
+                i += 1
+                continue
 
         # Bullets.
         if stripped.startswith("- "):
@@ -292,7 +213,6 @@ def convert_markdown_to_tex(md_text: str) -> str:
 
     return "\n".join(out).rstrip() + "\n"
 
-
 def main() -> None:
     parser = argparse.ArgumentParser(description="Sync Task 7 markdown report into a LaTeX section file.")
     parser.add_argument(
@@ -324,7 +244,6 @@ def main() -> None:
         f.write(tex)
 
     print(f"Generated TeX from markdown: {output_tex}")
-
 
 if __name__ == "__main__":
     main()

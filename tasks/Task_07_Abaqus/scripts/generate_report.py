@@ -694,8 +694,8 @@ def main():
     criterion_entries_engineering = _criterion_top_entries(
         refined_rows, ranking_cfg["criterion_top_count"], allowed_statuses=[STATUS_ENGINEERING]
     )
-    top3_overall = ranked_entries[:3]
-    winner = top3_overall[0]["row"]
+    top5_overall = ranked_entries[:5]
+    winner = top5_overall[0]["row"]
 
     weighted_csv_path = results_data_dir / "weighted_ranking.csv"
     criterion_csv_path = results_data_dir / "criterion_top3.csv"
@@ -820,9 +820,9 @@ def main():
     lines.append("")
     lines.append("Penalty points are `0` for engineering-feasible, `10` for mathematical fallback, and `20` for warning cases. The best model is the one with the lowest `J_i`.")
     lines.append("")
-    lines.append("### 6.2 Global Weighted Top-3")
+    lines.append("### 6.2 Global Weighted Top-5")
     lines.append("")
-    lines.append(_weighted_top_table(top3_overall))
+    lines.append(_weighted_top_table(top5_overall))
     lines.append("")
     lines.append("![Task 7 weighted ranking](../figures/task7_weighted_ranking.png)")
     lines.append("")
@@ -887,20 +887,35 @@ def main():
     lines.append("")
     lines.append("![Scenario S8 warning metrics](../figures/s8_warning_metrics.png)")
     lines.append("")
-    lines.append("## 10. Field Visualizations of the Global Top-3")
+    lines.append("## 10. Field Visualizations of the Global Top-5")
     lines.append("")
     lines.append("All detailed field figures are rendered from actual Abaqus ODB data with Python, not from Abaqus screenshots.")
     lines.append("Task 7 figures use a true-scale equal-axis policy (no axis stretching). This differs from some legacy Task 6 renderings that used a different plotting style.")
     lines.append("")
-    for entry in top3_overall:
+    for entry in top5_overall:
         row = entry["row"]
         lines.append(f"### {row['case_label']}")
         lines.append("")
-        lines.append(f"![{row['case_label']} stress](../figures/task7_{row['case_id']}_stress.png)")
+        lines.append(f"![{row['case_label']} stress](../figures/task7_{row['case_id']}_stress.png) ![{row['case_label']} displacement](../figures/task7_{row['case_id']}_displacement.png) ![{row['case_label']} buckling](../figures/task7_{row['case_id']}_buckling_mode1.png)")
         lines.append("")
-        lines.append(f"![{row['case_label']} displacement](../figures/task7_{row['case_id']}_displacement.png)")
-        lines.append("")
-        lines.append(f"![{row['case_label']} buckling](../figures/task7_{row['case_id']}_buckling_mode1.png)")
+        
+        rank = entry["overall_rank"]
+        score = entry["weighted_score"]
+        buckling = float(row["buckling_factor_1"])
+        disp = 1000.0 * float(row["max_displacement_m"])
+        stress = float(row["max_mises_pa"]) / 1e6
+        status_text = STATUS_TEXT[row["selection_status"]]
+        
+        discussion = f"**Performance Discussion (Rank {rank}):** The `{row['case_label']}` model ({status_text}) achieved an overall weighted score of `{score:.3f}`. It demonstrates strong structural integrity with a first buckling factor of `{buckling:.3f}`. Under the applied wind load, the maximum observed displacement is bounded at `{disp:.3f} mm`, and peak von Mises stresses reach `{stress:.3f} MPa`."
+        
+        if rank == 1:
+            discussion += " As the top-ranked candidate, this geometry offers the most convincing balance of minimal material footprint, acceptable deflection, and a high margin against linear buckling."
+        elif rank in [2, 3]:
+            discussion += " As a high-ranking runner-up, it presents an extremely competitive alternative, trading minimal surface area differences for robust stress and displacement behavior."
+        else:
+            discussion += " Although ranking slightly lower within the top 5, it remains a structurally sound and convincing concept that safely satisfies engineering constraints."
+        
+        lines.append(discussion)
         lines.append("")
 
     lines.append("## 11. Recommendation for Later Tasks")
@@ -914,6 +929,28 @@ def main():
     lines.append(
         "The main practical outcome for the project is that Task 6 geometric alternatives can now be compared with one consistent structural score, explicit warning handling, and scenario-level interpretation suitable for Task 9 communication."
     )
+    lines.append("")
+    lines.append("## 12. Annex: Complete Field Visualizations")
+    lines.append("")
+    lines.append("This section contains the field visualizations for the remaining 19 candidates out of the total 24 refined presentation models, organized by Scenario.")
+    lines.append("")
+    annex_entries = [entry for entry in ranked_entries if entry not in top5_overall]
+    
+    annex_by_scenario = defaultdict(list)
+    for entry in annex_entries:
+        annex_by_scenario[entry["row"]["scenario_id"]].append(entry)
+        
+    for scenario_id in config["selection"]["scenario_ids"]:
+        if scenario_id in annex_by_scenario:
+            lines.append(f"### Scenario {scenario_id}")
+            lines.append("")
+            scenario_entries = sorted(annex_by_scenario[scenario_id], key=lambda e: e["row"]["algorithm"])
+            for entry in scenario_entries:
+                row = entry["row"]
+                lines.append(f"#### {row['case_label']}")
+                lines.append("")
+                lines.append(f"![{row['case_label']} stress](../figures/task7_{row['case_id']}_stress.png) ![{row['case_label']} displacement](../figures/task7_{row['case_id']}_displacement.png) ![{row['case_label']} buckling](../figures/task7_{row['case_id']}_buckling_mode1.png)")
+                lines.append("")
 
     report_text = "\n".join(lines) + "\n"
     root_report_text = report_text.replace("(../figures/", "(results/figures/")
