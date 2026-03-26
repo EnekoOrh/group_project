@@ -1,6 +1,13 @@
 check_name,status,message
 case_count_matches_selection,pass,"refined_rows=24, selected_cases=24"
 convergence_rows_cover_all_cases,pass,"convergence_rows=24, selected_cases=24"
+decomposition_rows_cover_all_cases,pass,"decomposition_rows=24, selected_cases=24"
+plot_audit_rows_cover_all_cases,pass,"plot_audit_rows=24, refined_rows=24"
+plot_audit_all_pass,pass,all plot-view audit rows have overall_pass=yes
+plot_audit_perpendicularity_pass,pass,all plot-view audit rows pass perpendicularity
+plot_audit_left_to_right_pass,pass,all plot-view audit rows pass left-to-right projection
+plot_audit_arrow_clearance_pass,pass,all plot-view audit rows pass arrow-clearance checks
+plot_audit_json_status_pass,pass,plot_audit_json_status=pass
 weighted_csv_matches_computed_order,pass,"csv_rows=24, expected_rows=24"
 criterion_top3_raw_matches_expected,pass,"csv_rows=12, expected_rows=12"
 criterion_top3_engineering_matches_expected,pass,"csv_rows=12, expected_rows=12"
@@ -8,3 +15,7 @@ criterion_top3_engineering_status_only_engineering,pass,engineering-only criteri
 solver_mesh_within_le_cap,pass,solver refined node range = 840..1000 (LE cap=1000)
 cae_audit_status_pass,pass,"cae status=pass, node range=840..1075"
 mesh_narrative_non_contradictory,pass,solver refined node range=840..1000 ; CAE integrity range=840..1075
+scale_audit_present,pass,scale_audit_rows=48
+scale_audit_all_pass,pass,all comparison rows in scale_geometry_audit.csv are pass
+unit_contract_rows_cover_manifest,pass,"unit_audit_rows=96, refined_rows=24"
+unit_contract_all_pass,pass,all rows in unit_load_contract_audit.csv are pass

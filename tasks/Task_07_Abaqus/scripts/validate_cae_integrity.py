@@ -8,7 +8,10 @@ from abaqus import openMdb, mdb
 
 
 EXPECTED_STEP_NAMES = ["Initial", "STATIC_WIND", "BUCKLING"]
-EXPECTED_LOAD_NAMES = ["SelfWeight", "Wind"]
+EXPECTED_LOAD_NAME_SETS = [
+    sorted(["SelfWeight", "Wind"]),
+    sorted(["SelfWeight", "SelfWeightBuckling", "Wind", "WindBuckling"]),
+]
 EXPECTED_BC_NAMES = ["FixBase"]
 
 
@@ -75,7 +78,7 @@ def main():
         node_counts.append(node_count)
 
         steps_ok = steps == sorted(EXPECTED_STEP_NAMES)
-        loads_ok = loads == sorted(EXPECTED_LOAD_NAMES)
+        loads_ok = loads in EXPECTED_LOAD_NAME_SETS
         bcs_ok = bcs == sorted(EXPECTED_BC_NAMES)
         row_status = "pass" if (steps_ok and loads_ok and bcs_ok) else "fail"
 
@@ -94,7 +97,7 @@ def main():
         if not steps_ok:
             failures.append("{0}: steps mismatch expected={1} actual={2}".format(model_name, EXPECTED_STEP_NAMES, steps))
         if not loads_ok:
-            failures.append("{0}: loads mismatch expected={1} actual={2}".format(model_name, EXPECTED_LOAD_NAMES, loads))
+            failures.append("{0}: loads mismatch expected one of {1} actual={2}".format(model_name, EXPECTED_LOAD_NAME_SETS, loads))
         if not bcs_ok:
             failures.append("{0}: bcs mismatch expected={1} actual={2}".format(model_name, EXPECTED_BC_NAMES, bcs))
 

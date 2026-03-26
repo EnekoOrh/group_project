@@ -142,16 +142,33 @@ def _populate_model(case, config, model=None):
     instance = assembly.Instance(name='Tower-1', part=part, dependent=ON)
 
     model.StaticStep(name='STATIC_WIND', previous='Initial', nlgeom=OFF)
-    model.BuckleStep(name='BUCKLING', previous='STATIC_WIND', numEigen=int(config['buckling']['num_eigenvalues']))
+    num_eigen = int(config['buckling']['num_eigenvalues'])
+    model.BuckleStep(
+        name='BUCKLING',
+        previous='STATIC_WIND',
+        numEigen=num_eigen,
+        vectors=max(2 * num_eigen, 20),
+        maxIterations=120,
+    )
 
     model.ExpressionField(name='WindCp', expression=config['wind']['pressure_field_expression'])
     gravity = config['gravity']
+    gravity_comp1 = float(gravity['direction'][0]) * float(gravity['acceleration_m_s2'])
+    gravity_comp2 = float(gravity['direction'][1]) * float(gravity['acceleration_m_s2'])
+    gravity_comp3 = float(gravity['direction'][2]) * float(gravity['acceleration_m_s2'])
     model.Gravity(
         name='SelfWeight',
         createStepName='STATIC_WIND',
-        comp1=float(gravity['direction'][0]) * float(gravity['acceleration_m_s2']),
-        comp2=float(gravity['direction'][1]) * float(gravity['acceleration_m_s2']),
-        comp3=float(gravity['direction'][2]) * float(gravity['acceleration_m_s2']),
+        comp1=gravity_comp1,
+        comp2=gravity_comp2,
+        comp3=gravity_comp3,
+    )
+    model.Gravity(
+        name='SelfWeightBuckling',
+        createStepName='BUCKLING',
+        comp1=gravity_comp1,
+        comp2=gravity_comp2,
+        comp3=gravity_comp3,
     )
 
     q_ref = 0.5 * float(config['wind']['air_density_kg_m3']) * float(config['wind']['reference_speed_m_s']) ** 2
@@ -159,6 +176,14 @@ def _populate_model(case, config, model=None):
     model.Pressure(
         name='Wind',
         createStepName='STATIC_WIND',
+        region=wind_region,
+        magnitude=-q_ref,
+        distributionType=FIELD,
+        field='WindCp',
+    )
+    model.Pressure(
+        name='WindBuckling',
+        createStepName='BUCKLING',
         region=wind_region,
         magnitude=-q_ref,
         distributionType=FIELD,

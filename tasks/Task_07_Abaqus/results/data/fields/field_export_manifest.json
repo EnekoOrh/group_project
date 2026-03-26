@@ -432,5 +432,295 @@
       "element_count": 800,
       "buckling_scale_factor": 3.290703976427052
     }
+  ],
+  "skipped_cases": [
+    {
+      "job_name": "task7_s1_bfgs_refined_gravity_only",
+      "case_variant": "load_decomposition",
+      "load_case": "gravity_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s1_bfgs_refined_wind_only",
+      "case_variant": "load_decomposition",
+      "load_case": "wind_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s1_pso_refined_gravity_only",
+      "case_variant": "load_decomposition",
+      "load_case": "gravity_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s1_pso_refined_wind_only",
+      "case_variant": "load_decomposition",
+      "load_case": "wind_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s1_sa_refined_gravity_only",
+      "case_variant": "load_decomposition",
+      "load_case": "gravity_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s1_sa_refined_wind_only",
+      "case_variant": "load_decomposition",
+      "load_case": "wind_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s2_bfgs_refined_gravity_only",
+      "case_variant": "load_decomposition",
+      "load_case": "gravity_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s2_bfgs_refined_wind_only",
+      "case_variant": "load_decomposition",
+      "load_case": "wind_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s2_pso_refined_gravity_only",
+      "case_variant": "load_decomposition",
+      "load_case": "gravity_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s2_pso_refined_wind_only",
+      "case_variant": "load_decomposition",
+      "load_case": "wind_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s2_sa_refined_gravity_only",
+      "case_variant": "load_decomposition",
+      "load_case": "gravity_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s2_sa_refined_wind_only",
+      "case_variant": "load_decomposition",
+      "load_case": "wind_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s3_bfgs_refined_gravity_only",
+      "case_variant": "load_decomposition",
+      "load_case": "gravity_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s3_bfgs_refined_wind_only",
+      "case_variant": "load_decomposition",
+      "load_case": "wind_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s3_pso_refined_gravity_only",
+      "case_variant": "load_decomposition",
+      "load_case": "gravity_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s3_pso_refined_wind_only",
+      "case_variant": "load_decomposition",
+      "load_case": "wind_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s3_sa_refined_gravity_only",
+      "case_variant": "load_decomposition",
+      "load_case": "gravity_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s3_sa_refined_wind_only",
+      "case_variant": "load_decomposition",
+      "load_case": "wind_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s4_bfgs_refined_gravity_only",
+      "case_variant": "load_decomposition",
+      "load_case": "gravity_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s4_bfgs_refined_wind_only",
+      "case_variant": "load_decomposition",
+      "load_case": "wind_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s4_pso_refined_gravity_only",
+      "case_variant": "load_decomposition",
+      "load_case": "gravity_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s4_pso_refined_wind_only",
+      "case_variant": "load_decomposition",
+      "load_case": "wind_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s4_sa_refined_gravity_only",
+      "case_variant": "load_decomposition",
+      "load_case": "gravity_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s4_sa_refined_wind_only",
+      "case_variant": "load_decomposition",
+      "load_case": "wind_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s5_bfgs_refined_gravity_only",
+      "case_variant": "load_decomposition",
+      "load_case": "gravity_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s5_bfgs_refined_wind_only",
+      "case_variant": "load_decomposition",
+      "load_case": "wind_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s5_pso_refined_gravity_only",
+      "case_variant": "load_decomposition",
+      "load_case": "gravity_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s5_pso_refined_wind_only",
+      "case_variant": "load_decomposition",
+      "load_case": "wind_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s5_sa_refined_gravity_only",
+      "case_variant": "load_decomposition",
+      "load_case": "gravity_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s5_sa_refined_wind_only",
+      "case_variant": "load_decomposition",
+      "load_case": "wind_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s6_bfgs_refined_gravity_only",
+      "case_variant": "load_decomposition",
+      "load_case": "gravity_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s6_bfgs_refined_wind_only",
+      "case_variant": "load_decomposition",
+      "load_case": "wind_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s6_pso_refined_gravity_only",
+      "case_variant": "load_decomposition",
+      "load_case": "gravity_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s6_pso_refined_wind_only",
+      "case_variant": "load_decomposition",
+      "load_case": "wind_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s6_sa_refined_gravity_only",
+      "case_variant": "load_decomposition",
+      "load_case": "gravity_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s6_sa_refined_wind_only",
+      "case_variant": "load_decomposition",
+      "load_case": "wind_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s7_bfgs_refined_gravity_only",
+      "case_variant": "load_decomposition",
+      "load_case": "gravity_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s7_bfgs_refined_wind_only",
+      "case_variant": "load_decomposition",
+      "load_case": "wind_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s7_pso_refined_gravity_only",
+      "case_variant": "load_decomposition",
+      "load_case": "gravity_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s7_pso_refined_wind_only",
+      "case_variant": "load_decomposition",
+      "load_case": "wind_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s7_sa_refined_gravity_only",
+      "case_variant": "load_decomposition",
+      "load_case": "gravity_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s7_sa_refined_wind_only",
+      "case_variant": "load_decomposition",
+      "load_case": "wind_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s8_bfgs_refined_gravity_only",
+      "case_variant": "load_decomposition",
+      "load_case": "gravity_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s8_bfgs_refined_wind_only",
+      "case_variant": "load_decomposition",
+      "load_case": "wind_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s8_pso_refined_gravity_only",
+      "case_variant": "load_decomposition",
+      "load_case": "gravity_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s8_pso_refined_wind_only",
+      "case_variant": "load_decomposition",
+      "load_case": "wind_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s8_sa_refined_gravity_only",
+      "case_variant": "load_decomposition",
+      "load_case": "gravity_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    },
+    {
+      "job_name": "task7_s8_sa_refined_wind_only",
+      "case_variant": "load_decomposition",
+      "load_case": "wind_only",
+      "reason": "field export reserved for comparison combined-load jobs"
+    }
   ]
 }

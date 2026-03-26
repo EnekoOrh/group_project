@@ -177,11 +177,22 @@ def main():
     output_dir = args.output_dir
     export_summary = []
 
+    skipped_cases = []
     for case in manifest["cases"]:
+        if case.get("case_variant") != "comparison" or case.get("load_case", "combined") != "combined":
+            skipped_cases.append(
+                {
+                    "job_name": case["job_name"],
+                    "case_variant": case.get("case_variant", ""),
+                    "load_case": case.get("load_case", ""),
+                    "reason": "field export reserved for comparison combined-load jobs",
+                }
+            )
+            continue
         export_summary.append(_export_case(case, output_dir))
 
     with open(output_dir + "/field_export_manifest.json", "w", encoding="utf-8") as handle:
-        json.dump({"cases": export_summary}, handle, indent=2)
+        json.dump({"cases": export_summary, "skipped_cases": skipped_cases}, handle, indent=2)
 
     print("Exported Task 7 ODB field data.")
 

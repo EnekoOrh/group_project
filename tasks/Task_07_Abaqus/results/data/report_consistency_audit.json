@@ -1,6 +1,6 @@
 {
   "status": "pass",
-  "checks_total": 9,
+  "checks_total": 20,
   "checks_failed": 0,
   "checks": [
     {
@@ -12,6 +12,41 @@
       "check_name": "convergence_rows_cover_all_cases",
       "status": "pass",
       "message": "convergence_rows=24, selected_cases=24"
+    },
+    {
+      "check_name": "decomposition_rows_cover_all_cases",
+      "status": "pass",
+      "message": "decomposition_rows=24, selected_cases=24"
+    },
+    {
+      "check_name": "plot_audit_rows_cover_all_cases",
+      "status": "pass",
+      "message": "plot_audit_rows=24, refined_rows=24"
+    },
+    {
+      "check_name": "plot_audit_all_pass",
+      "status": "pass",
+      "message": "all plot-view audit rows have overall_pass=yes"
+    },
+    {
+      "check_name": "plot_audit_perpendicularity_pass",
+      "status": "pass",
+      "message": "all plot-view audit rows pass perpendicularity"
+    },
+    {
+      "check_name": "plot_audit_left_to_right_pass",
+      "status": "pass",
+      "message": "all plot-view audit rows pass left-to-right projection"
+    },
+    {
+      "check_name": "plot_audit_arrow_clearance_pass",
+      "status": "pass",
+      "message": "all plot-view audit rows pass arrow-clearance checks"
+    },
+    {
+      "check_name": "plot_audit_json_status_pass",
+      "status": "pass",
+      "message": "plot_audit_json_status=pass"
     },
     {
       "check_name": "weighted_csv_matches_computed_order",
@@ -47,6 +82,26 @@
       "check_name": "mesh_narrative_non_contradictory",
       "status": "pass",
       "message": "solver refined node range=840..1000 ; CAE integrity range=840..1075"
+    },
+    {
+      "check_name": "scale_audit_present",
+      "status": "pass",
+      "message": "scale_audit_rows=48"
+    },
+    {
+      "check_name": "scale_audit_all_pass",
+      "status": "pass",
+      "message": "all comparison rows in scale_geometry_audit.csv are pass"
+    },
+    {
+      "check_name": "unit_contract_rows_cover_manifest",
+      "status": "pass",
+      "message": "unit_audit_rows=96, refined_rows=24"
+    },
+    {
+      "check_name": "unit_contract_all_pass",
+      "status": "pass",
+      "message": "all rows in unit_load_contract_audit.csv are pass"
     }
   ],
   "solver_mesh_refined": {
@@ -55,5 +110,7 @@
     "node_max": 1000,
     "within_le_cap": true
   },
-  "cae_audit_path": "C:\\Users\\achille.larregle\\OneDrive - ESTIA\\Bureau\\CRANFIELD\\CRANFIELD COURSE\\GroupProject2026\\group_project\\tasks\\Task_07_Abaqus\\results\\data\\cae_integrity_audit.json"
+  "cae_audit_path": "C:\\Users\\achille.larregle\\OneDrive - ESTIA\\Bureau\\CRANFIELD\\CRANFIELD COURSE\\GroupProject2026\\group_project\\tasks\\Task_07_Abaqus\\results\\data\\cae_integrity_audit.json",
+  "plot_audit_csv_path": "C:\\Users\\achille.larregle\\OneDrive - ESTIA\\Bureau\\CRANFIELD\\CRANFIELD COURSE\\GroupProject2026\\group_project\\tasks\\Task_07_Abaqus\\results\\data\\plot_view_audit.csv",
+  "plot_audit_json_path": "C:\\Users\\achille.larregle\\OneDrive - ESTIA\\Bureau\\CRANFIELD\\CRANFIELD COURSE\\GroupProject2026\\group_project\\tasks\\Task_07_Abaqus\\results\\data\\plot_view_audit.json"
 }

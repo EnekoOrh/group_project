@@ -105,6 +105,7 @@ $ConfigPath = Join-Path $TaskDir "config\\study_config.json"
 $CasesPath = Join-Path $TaskDir "candidates\\selected_cases.json"
 $ManifestPath = Join-Path $ResultsDir "data\\job_manifest.json"
 $InputAuditCsv = Join-Path $ResultsDir "data\\input_contract_audit.csv"
+$UnitAuditCsv = Join-Path $ResultsDir "data\\unit_load_contract_audit.csv"
 $CaeAuditCsv = Join-Path $ResultsDir "data\\cae_integrity_audit.csv"
 $CaeAuditJson = Join-Path $ResultsDir "data\\cae_integrity_audit.json"
 $SummaryCsv = Join-Path $ResultsDir "data\\abaqus_summary.csv"
@@ -126,7 +127,7 @@ python (Join-Path $PSScriptRoot "build_abaqus_inputs.py")
 Assert-LastExitCode "Abaqus input build"
 
 Write-Host "Validating generated input deck contracts..."
-python (Join-Path $PSScriptRoot "validate_input_contracts.py") --manifest $ManifestPath --config $ConfigPath --output-csv $InputAuditCsv
+python (Join-Path $PSScriptRoot "validate_input_contracts.py") --manifest $ManifestPath --config $ConfigPath --output-csv $InputAuditCsv --unit-output-csv $UnitAuditCsv
 Assert-LastExitCode "Abaqus input contract validation"
 
 if (-not $SkipCae) {

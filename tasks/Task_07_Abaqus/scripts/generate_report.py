@@ -1,6 +1,7 @@
 import argparse
 import csv
 import json
+import math
 from collections import defaultdict
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence
@@ -50,7 +51,7 @@ def _load_csv(path: Path):
 def _rows_by_case(rows):
     grouped = {}
     for row in rows:
-        if row["case_variant"] != "comparison":
+        if row["case_variant"] != "comparison" or row.get("load_case", "combined") != "combined":
             continue
         grouped.setdefault(row["case_id"], {})[row["mesh_level"]] = row
     return grouped
@@ -182,7 +183,7 @@ def _selection_matrix(cases):
                 f"{case['task6_area_m2']:.2f}",
             ]
         )
-    return _format_table(["Case", "Status", "Selection basis", "Task 6 run", "Decision mode", "Task 6 area (m^2)"], rows)
+    return _format_table(["Case", "Status", "Selection basis", "Task 6 run", "Decision mode", "Task 6 area (m²)"], rows)
 
 
 def _refined_table(refined_rows):
@@ -198,7 +199,7 @@ def _refined_table(refined_rows):
                 f"{float(row['buckling_factor_1']):.3f}",
             ]
         )
-    return _format_table(["Case", "Status", "Task 6 area (m^2)", "Max disp. (mm)", "Max stress (MPa)", "Buckling factor"], rows)
+    return _format_table(["Case", "Status", "Task 6 area (m²)", "Max disp. (mm)", "Max stress (MPa)", "Buckling factor"], rows)
 
 
 def _scenario_table(rows, ranking_by_case):
@@ -217,7 +218,7 @@ def _scenario_table(rows, ranking_by_case):
             ]
         )
     return _format_table(
-        ["Algorithm", "Status", "Weighted score", "Task 6 area (m^2)", "Max disp. (mm)", "Max stress (MPa)", "Buckling factor"],
+        ["Algorithm", "Status", "Weighted score", "Task 6 area (m²)", "Max disp. (mm)", "Max stress (MPa)", "Buckling factor"],
         body,
     )
 
@@ -247,6 +248,8 @@ def _convergence_table(rows):
 def _geometry_summary(rows):
     by_mesh = defaultdict(list)
     for row in rows:
+        if row.get("case_variant") and row.get("case_variant") != "comparison":
+            continue
         by_mesh[row["mesh_level"]].append(row)
     body = []
     for mesh_level in ["coarse", "refined"]:
@@ -264,11 +267,252 @@ def _geometry_summary(rows):
     return _format_table(["Mesh", "Max total-height diff (m)", "Max ring-radius diff (m)", "Max ring-z diff (m)"], body)
 
 
+def _scale_audit_summary(rows):
+    if not rows:
+        return "Scale audit file is missing."
+
+    comparison_rows = [row for row in rows if row.get("case_variant", "comparison") == "comparison"]
+    if not comparison_rows:
+        return "Scale audit has no comparison rows."
+
+    max_radius = max(float(row["max_radius_abs_diff_m"]) for row in comparison_rows)
+    max_segment_h = max(float(row["max_segment_height_abs_diff_m"]) for row in comparison_rows)
+    max_total_h = max(float(row["total_height_abs_diff_m"]) for row in comparison_rows)
+    max_base_d = max(float(row["base_diameter_abs_diff_m"]) for row in comparison_rows)
+    max_top_d = max(float(row["top_diameter_abs_diff_m"]) for row in comparison_rows)
+    tol = float(comparison_rows[0]["tolerance_m"])
+    all_pass = all(row["status"] == "pass" for row in comparison_rows)
+
+    status_text = "all checks pass" if all_pass else "at least one check failed"
+    return (
+        f"Scale audit (`scale_geometry_audit.csv`) confirms {status_text} for `{len(comparison_rows)}` comparison jobs "
+        f"with tolerance `{tol:.1e} m`: max radius diff `{max_radius:.3e} m`, max segment-height diff `{max_segment_h:.3e} m`, "
+        f"max total-height diff `{max_total_h:.3e} m`, max base-diameter diff `{max_base_d:.3e} m`, max top-diameter diff `{max_top_d:.3e} m`."
+    )
+
+
+def _decomposition_case_rows(rows):
+    grouped = defaultdict(dict)
+    for row in rows:
+        if row.get("case_variant") != "load_decomposition":
+            continue
+        if row.get("mesh_level") != "refined":
+            continue
+        grouped[row["case_id"]][row.get("load_case", "")] = row
+    return grouped
+
+
+def _safe_ratio(num, den):
+    if abs(float(den)) < 1.0e-12:
+        return float("nan")
+    return float(num) / float(den)
+
+
+def _median(values):
+    clean = sorted(float(v) for v in values if math.isfinite(float(v)))
+    if not clean:
+        return float("nan")
+    count = len(clean)
+    mid = count // 2
+    if count % 2 == 1:
+        return clean[mid]
+    return 0.5 * (clean[mid - 1] + clean[mid])
+
+
+def _percentile(values, quantile):
+    clean = sorted(float(v) for v in values if math.isfinite(float(v)))
+    if not clean:
+        return float("nan")
+    if len(clean) == 1:
+        return clean[0]
+    q = min(max(float(quantile), 0.0), 1.0)
+    idx = q * (len(clean) - 1)
+    lo = int(math.floor(idx))
+    hi = int(math.ceil(idx))
+    if lo == hi:
+        return clean[lo]
+    alpha = idx - lo
+    return (1.0 - alpha) * clean[lo] + alpha * clean[hi]
+
+
+def _build_decomposition_entries(refined_rows, all_rows):
+    decomp_map = _decomposition_case_rows(all_rows)
+    entries = []
+    for row in refined_rows:
+        case_id = row["case_id"]
+        decomp = decomp_map.get(case_id, {})
+        gravity = decomp.get("gravity_only")
+        wind = decomp.get("wind_only")
+        if gravity is None or wind is None:
+            continue
+
+        combined_disp = 1000.0 * float(row["max_displacement_m"])
+        gravity_disp = 1000.0 * float(gravity["max_displacement_m"])
+        wind_disp = 1000.0 * float(wind["max_displacement_m"])
+        combined_stress = float(row["max_mises_pa"]) / 1.0e6
+        gravity_stress = float(gravity["max_mises_pa"]) / 1.0e6
+        wind_stress = float(wind["max_mises_pa"]) / 1.0e6
+        reaction_combined = float(row["base_reaction_resultant_n"])
+        reaction_gravity = float(gravity["base_reaction_resultant_n"])
+        reaction_wind = float(wind["base_reaction_resultant_n"])
+
+        disp_ratio = _safe_ratio(wind_disp, gravity_disp)
+        stress_ratio = _safe_ratio(wind_stress, gravity_stress)
+        reaction_ratio = _safe_ratio(reaction_wind, reaction_gravity)
+        disp_driver = "wind" if wind_disp >= gravity_disp else "gravity"
+        stress_driver = "wind" if wind_stress >= gravity_stress else "gravity"
+
+        entries.append(
+            {
+                "case_id": case_id,
+                "case_label": row["case_label"],
+                "scenario_id": row["scenario_id"],
+                "algorithm": row["algorithm"],
+                "selection_status": row["selection_status"],
+                "combined_max_displacement_mm": combined_disp,
+                "gravity_only_max_displacement_mm": gravity_disp,
+                "wind_only_max_displacement_mm": wind_disp,
+                "wind_to_gravity_disp_ratio": disp_ratio,
+                "displacement_driver": disp_driver,
+                "combined_max_mises_mpa": combined_stress,
+                "gravity_only_max_mises_mpa": gravity_stress,
+                "wind_only_max_mises_mpa": wind_stress,
+                "wind_to_gravity_stress_ratio": stress_ratio,
+                "stress_driver": stress_driver,
+                "combined_reaction_resultant_n": reaction_combined,
+                "gravity_only_reaction_resultant_n": reaction_gravity,
+                "wind_only_reaction_resultant_n": reaction_wind,
+                "wind_to_gravity_reaction_ratio": reaction_ratio,
+            }
+        )
+    return entries
+
+
+def _write_decomposition_csv(path, entries):
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=[
+                "case_id",
+                "case_label",
+                "scenario_id",
+                "algorithm",
+                "selection_status",
+                "combined_max_displacement_mm",
+                "gravity_only_max_displacement_mm",
+                "wind_only_max_displacement_mm",
+                "wind_to_gravity_disp_ratio",
+                "displacement_driver",
+                "combined_max_mises_mpa",
+                "gravity_only_max_mises_mpa",
+                "wind_only_max_mises_mpa",
+                "wind_to_gravity_stress_ratio",
+                "stress_driver",
+                "combined_reaction_resultant_n",
+                "gravity_only_reaction_resultant_n",
+                "wind_only_reaction_resultant_n",
+                "wind_to_gravity_reaction_ratio",
+            ],
+        )
+        writer.writeheader()
+        writer.writerows(entries)
+
+
+def _write_decomposition_summary_csv(path, entries):
+    disp_ratios = [entry["wind_to_gravity_disp_ratio"] for entry in entries]
+    stress_ratios = [entry["wind_to_gravity_stress_ratio"] for entry in entries]
+    reaction_ratios = [entry["wind_to_gravity_reaction_ratio"] for entry in entries]
+    disp_wind = sum(1 for entry in entries if entry["displacement_driver"] == "wind")
+    stress_wind = sum(1 for entry in entries if entry["stress_driver"] == "wind")
+    total = len(entries)
+
+    rows = [
+        {
+            "metric": "displacement",
+            "cases_total": total,
+            "wind_dominant_cases": disp_wind,
+            "gravity_dominant_cases": total - disp_wind,
+            "median_wind_to_gravity_ratio": _median(disp_ratios),
+            "p90_wind_to_gravity_ratio": _percentile(disp_ratios, 0.90),
+        },
+        {
+            "metric": "stress",
+            "cases_total": total,
+            "wind_dominant_cases": stress_wind,
+            "gravity_dominant_cases": total - stress_wind,
+            "median_wind_to_gravity_ratio": _median(stress_ratios),
+            "p90_wind_to_gravity_ratio": _percentile(stress_ratios, 0.90),
+        },
+        {
+            "metric": "reaction_resultant",
+            "cases_total": total,
+            "wind_dominant_cases": sum(1 for ratio in reaction_ratios if math.isfinite(ratio) and ratio >= 1.0),
+            "gravity_dominant_cases": sum(1 for ratio in reaction_ratios if math.isfinite(ratio) and ratio < 1.0),
+            "median_wind_to_gravity_ratio": _median(reaction_ratios),
+            "p90_wind_to_gravity_ratio": _percentile(reaction_ratios, 0.90),
+        },
+    ]
+
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=[
+                "metric",
+                "cases_total",
+                "wind_dominant_cases",
+                "gravity_dominant_cases",
+                "median_wind_to_gravity_ratio",
+                "p90_wind_to_gravity_ratio",
+            ],
+        )
+        writer.writeheader()
+        writer.writerows(rows)
+    return rows
+
+
+def _decomposition_table(entries):
+    body = []
+    for entry in entries:
+        body.append(
+            [
+                entry["case_label"],
+                STATUS_TEXT[entry["selection_status"]],
+                f"{entry['gravity_only_max_displacement_mm']:.3f}",
+                f"{entry['wind_only_max_displacement_mm']:.3f}",
+                f"{entry['wind_to_gravity_disp_ratio']:.3f}" if math.isfinite(entry["wind_to_gravity_disp_ratio"]) else "n/a",
+                entry["displacement_driver"],
+                f"{entry['gravity_only_max_mises_mpa']:.3f}",
+                f"{entry['wind_only_max_mises_mpa']:.3f}",
+                f"{entry['wind_to_gravity_stress_ratio']:.3f}" if math.isfinite(entry["wind_to_gravity_stress_ratio"]) else "n/a",
+                entry["stress_driver"],
+            ]
+        )
+    return _format_table(
+        [
+            "Case",
+            "Status",
+            "Disp gravity (mm)",
+            "Disp wind (mm)",
+            "Wind/Gravity disp ratio",
+            "Disp driver",
+            "Stress gravity (MPa)",
+            "Stress wind (MPa)",
+            "Wind/Gravity stress ratio",
+            "Stress driver",
+        ],
+        body,
+    )
+
+
 def _mesh_policy_summary(rows, config):
     if not rows:
         return "A uniform refined mesh policy is applied to all refined jobs."
 
-    refined_rows = [row for row in rows if row["mesh_level"] == "refined"]
+    refined_rows = [
+        row
+        for row in rows
+        if row["mesh_level"] == "refined" and row.get("case_variant", "comparison") == "comparison"
+    ]
     if not refined_rows:
         return "A uniform refined mesh policy is applied to all refined jobs."
 
@@ -284,18 +528,31 @@ def _mesh_policy_summary(rows, config):
     )
 
 
-def _scenario_commentary_lines(rows, ranking_by_case):
+def _decomposition_map(entries):
+    return {entry["case_id"]: entry for entry in entries}
+
+
+def _convergence_map(rows):
+    return {row["case_id"]: row for row in rows}
+
+
+def _scenario_commentary_lines(rows, ranking_by_case, decomposition_by_case, convergence_by_case):
     ranked = sorted(rows, key=lambda row: (ranking_by_case[row["case_id"]]["weighted_score"], row["case_id"]))
     winner = ranked[0]
     winner_entry = ranking_by_case[winner["case_id"]]
-    comments = [f"**Winner:** {winner['case_label']} with weighted score `{winner_entry['weighted_score']:.3f}`."]
+    comments = []
     if len(ranked) > 1:
         runner_up = ranked[1]
         runner_entry = ranking_by_case[runner_up["case_id"]]
         score_gap = runner_entry["weighted_score"] - winner_entry["weighted_score"]
-        comments.append(f"The score gap to second place ({runner_up['case_label']}) is `{score_gap:.3f}` points.")
+        winner_text = (
+            f"**Winner:** {winner['case_label']} with weighted score `{winner_entry['weighted_score']:.3f}`; "
+            f"gap to second place ({runner_up['case_label']}) is `{score_gap:.3f}`."
+        )
     else:
         score_gap = 0.0
+        winner_text = f"**Winner:** {winner['case_label']} with weighted score `{winner_entry['weighted_score']:.3f}`."
+    comments.append(winner_text)
     disp_values = [1000.0 * float(row["max_displacement_m"]) for row in rows]
     stress_values = [float(row["max_mises_pa"]) / 1e6 for row in rows]
     buck_values = [float(row["buckling_factor_1"]) for row in rows]
@@ -318,10 +575,25 @@ def _scenario_commentary_lines(rows, ranking_by_case):
     else:
         comments.append("**Status caveat:** all three entries are engineering-feasible.")
 
+    winner_decomp = decomposition_by_case.get(winner["case_id"])
+    if winner_decomp is not None:
+        disp_ratio = float(winner_decomp["wind_to_gravity_disp_ratio"])
+        stress_ratio = float(winner_decomp["wind_to_gravity_stress_ratio"])
+        disp_ratio_text = f"{disp_ratio:.3f}" if math.isfinite(disp_ratio) else "n/a"
+        stress_ratio_text = f"{stress_ratio:.3f}" if math.isfinite(stress_ratio) else "n/a"
+        comments.append(
+            f"**Load dominance:** winner ratios are disp wind/gravity `{disp_ratio_text}` and stress wind/gravity `{stress_ratio_text}`; dominant drivers are displacement `{winner_decomp['displacement_driver']}` and stress `{winner_decomp['stress_driver']}`."
+        )
+
+    winner_convergence = convergence_by_case.get(winner["case_id"], {})
     mixed_status = len({row["selection_status"] for row in rows}) > 1
     if mixed_status:
         comments.append(
             "**Critical note:** scenario fairness is reduced by mixed compliance statuses; ranking penalties keep the comparison visible but do not make warning/fallback cases equivalent to engineering-feasible designs."
+        )
+    elif winner_convergence.get("all_criteria_pass") != "yes":
+        comments.append(
+            "**Critical note:** winner ranking is not yet convergence-locked on this scenario; keep this as screening guidance until mesh convergence is improved."
         )
     elif score_gap < 1.0:
         comments.append(
@@ -352,7 +624,7 @@ def _weighted_top_table(top_entries):
             ]
         )
     return _format_table(
-        ["Rank", "Case", "Status", "Weighted score", "Penalty", "Buckling factor", "Max disp. (mm)", "Max stress (MPa)", "Area (m^2)"],
+        ["Rank", "Case", "Status", "Weighted score", "Penalty", "Buckling factor", "Max disp. (mm)", "Max stress (MPa)", "Area (m²)"],
         rows,
     )
 
@@ -370,7 +642,7 @@ def _criterion_top_table(criterion_entries):
         elif metric_key == "max_mises_pa":
             value_text = f"{float(row[metric_key]) / 1e6:.3f} MPa"
         elif metric_key == "task6_area_m2":
-            value_text = f"{float(row[metric_key]):.2f} m^2"
+            value_text = f"{float(row[metric_key]):.2f} m²"
         else:
             value_text = f"{float(row[metric_key]):.3f}"
         rows.append(
@@ -456,7 +728,11 @@ def _write_criterion_top_csv(path, criterion_entries):
 
 
 def _solver_mesh_context(mesh_summary_rows):
-    refined_rows = [row for row in mesh_summary_rows if row.get("mesh_level") == "refined"]
+    refined_rows = [
+        row
+        for row in mesh_summary_rows
+        if row.get("mesh_level") == "refined" and row.get("case_variant", "comparison") == "comparison"
+    ]
     if not refined_rows:
         return None
 
@@ -487,7 +763,12 @@ def _run_report_consistency_audit(
     criterion_csv_path: Path,
     criterion_engineering_csv_path: Path,
     mesh_summary_rows,
+    scale_audit_rows,
+    unit_audit_rows,
+    decomposition_entries,
     cae_audit_json_path: Path,
+    plot_audit_csv_path: Path,
+    plot_audit_json_path: Path,
     output_json_path: Path,
     output_csv_path: Path,
 ):
@@ -506,6 +787,46 @@ def _run_report_consistency_audit(
         "convergence_rows_cover_all_cases",
         len(convergence_rows) == len(cases),
         f"convergence_rows={len(convergence_rows)}, selected_cases={len(cases)}",
+    )
+
+    add_check(
+        "decomposition_rows_cover_all_cases",
+        len(decomposition_entries) == len(cases),
+        f"decomposition_rows={len(decomposition_entries)}, selected_cases={len(cases)}",
+    )
+
+    plot_audit_rows = _load_csv(plot_audit_csv_path) if plot_audit_csv_path.exists() else []
+    add_check(
+        "plot_audit_rows_cover_all_cases",
+        len(plot_audit_rows) == len(refined_rows),
+        f"plot_audit_rows={len(plot_audit_rows)}, refined_rows={len(refined_rows)}",
+    )
+    add_check(
+        "plot_audit_all_pass",
+        bool(plot_audit_rows) and all(row.get("overall_pass") == "yes" for row in plot_audit_rows),
+        "all plot-view audit rows have overall_pass=yes",
+    )
+    add_check(
+        "plot_audit_perpendicularity_pass",
+        bool(plot_audit_rows) and all(row.get("perpendicular_pass") == "yes" for row in plot_audit_rows),
+        "all plot-view audit rows pass perpendicularity",
+    )
+    add_check(
+        "plot_audit_left_to_right_pass",
+        bool(plot_audit_rows) and all(row.get("left_to_right_pass") == "yes" for row in plot_audit_rows),
+        "all plot-view audit rows pass left-to-right projection",
+    )
+    add_check(
+        "plot_audit_arrow_clearance_pass",
+        bool(plot_audit_rows) and all(row.get("arrow_clearance_pass") == "yes" for row in plot_audit_rows),
+        "all plot-view audit rows pass arrow-clearance checks",
+    )
+
+    plot_audit_json = _load_json(plot_audit_json_path) if plot_audit_json_path.exists() else {}
+    add_check(
+        "plot_audit_json_status_pass",
+        bool(plot_audit_json) and plot_audit_json.get("status") == "pass",
+        f"plot_audit_json_status={plot_audit_json.get('status', 'missing')}",
     )
 
     weighted_csv_rows = _load_csv(weighted_csv_path)
@@ -574,6 +895,29 @@ def _run_report_consistency_audit(
                 f"solver refined node range={solver_mesh['node_min']}..{solver_mesh['node_max']} ; CAE integrity range={cae_min}..{cae_max}",
             )
 
+    scale_rows = [row for row in scale_audit_rows if row.get("case_variant", "comparison") == "comparison"]
+    add_check(
+        "scale_audit_present",
+        bool(scale_rows),
+        f"scale_audit_rows={len(scale_rows)}",
+    )
+    add_check(
+        "scale_audit_all_pass",
+        bool(scale_rows) and all(row.get("status") == "pass" for row in scale_rows),
+        "all comparison rows in scale_geometry_audit.csv are pass",
+    )
+
+    add_check(
+        "unit_contract_rows_cover_manifest",
+        len(unit_audit_rows) >= len(refined_rows),
+        f"unit_audit_rows={len(unit_audit_rows)}, refined_rows={len(refined_rows)}",
+    )
+    add_check(
+        "unit_contract_all_pass",
+        bool(unit_audit_rows) and all(row.get("status") == "pass" for row in unit_audit_rows),
+        "all rows in unit_load_contract_audit.csv are pass",
+    )
+
     all_pass = all(item["status"] == "pass" for item in checks)
     summary = {
         "status": "pass" if all_pass else "fail",
@@ -582,6 +926,8 @@ def _run_report_consistency_audit(
         "checks": checks,
         "solver_mesh_refined": solver_mesh,
         "cae_audit_path": str(cae_audit_json_path),
+        "plot_audit_csv_path": str(plot_audit_csv_path),
+        "plot_audit_json_path": str(plot_audit_json_path),
     }
     output_json_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
     with output_csv_path.open("w", newline="", encoding="utf-8") as handle:
@@ -625,7 +971,7 @@ def _criterion_value_for_plot(entry):
     if metric_key == "max_mises_pa":
         return value / 1e6, "MPa"
     if metric_key == "task6_area_m2":
-        return value, "m^2"
+        return value, "m²"
     return value, "-"
 
 
@@ -666,7 +1012,12 @@ def main():
     parser.add_argument("--mesh-csv", default=str(repo_root / "tasks" / "Task_07_Abaqus" / "results" / "data" / "mesh_sensitivity.csv"))
     parser.add_argument("--mesh-summary-csv", default=str(repo_root / "tasks" / "Task_07_Abaqus" / "results" / "data" / "mesh_summary.csv"))
     parser.add_argument("--geometry-csv", default=str(repo_root / "tasks" / "Task_07_Abaqus" / "results" / "data" / "geometry_verification.csv"))
+    parser.add_argument("--scale-audit-csv", default=str(repo_root / "tasks" / "Task_07_Abaqus" / "results" / "data" / "scale_geometry_audit.csv"))
+    parser.add_argument("--input-audit-csv", default=str(repo_root / "tasks" / "Task_07_Abaqus" / "results" / "data" / "input_contract_audit.csv"))
+    parser.add_argument("--unit-audit-csv", default=str(repo_root / "tasks" / "Task_07_Abaqus" / "results" / "data" / "unit_load_contract_audit.csv"))
     parser.add_argument("--cae-audit-json", default=str(repo_root / "tasks" / "Task_07_Abaqus" / "results" / "data" / "cae_integrity_audit.json"))
+    parser.add_argument("--plot-audit-csv", default=str(repo_root / "tasks" / "Task_07_Abaqus" / "results" / "data" / "plot_view_audit.csv"))
+    parser.add_argument("--plot-audit-json", default=str(repo_root / "tasks" / "Task_07_Abaqus" / "results" / "data" / "plot_view_audit.json"))
     parser.add_argument("--output-dir", default=str(repo_root / "tasks" / "Task_07_Abaqus"))
     args = parser.parse_args()
 
@@ -676,6 +1027,9 @@ def main():
     convergence_rows = _load_csv(Path(args.mesh_csv)) if Path(args.mesh_csv).exists() else []
     mesh_summary_rows = _load_csv(Path(args.mesh_summary_csv)) if Path(args.mesh_summary_csv).exists() else []
     geometry_rows = _load_csv(Path(args.geometry_csv)) if Path(args.geometry_csv).exists() else []
+    scale_audit_rows = _load_csv(Path(args.scale_audit_csv)) if Path(args.scale_audit_csv).exists() else []
+    input_audit_rows = _load_csv(Path(args.input_audit_csv)) if Path(args.input_audit_csv).exists() else []
+    unit_audit_rows = _load_csv(Path(args.unit_audit_csv)) if Path(args.unit_audit_csv).exists() else []
     row_map = _rows_by_case(rows)
     output_dir = Path(args.output_dir)
     results_data_dir = output_dir / "results" / "data"
@@ -705,12 +1059,17 @@ def main():
     criterion_engineering_figure_path = figures_dir / "task7_criterion_top3_engineering.png"
     consistency_audit_json_path = results_data_dir / "report_consistency_audit.json"
     consistency_audit_csv_path = results_data_dir / "report_consistency_audit.csv"
+    decomposition_csv_path = results_data_dir / "load_decomposition_refined.csv"
+    decomposition_summary_csv_path = results_data_dir / "load_dominance_summary.csv"
     _write_weighted_ranking_csv(weighted_csv_path, ranked_entries)
     _write_criterion_top_csv(criterion_csv_path, criterion_entries)
     _write_criterion_top_csv(criterion_engineering_csv_path, criterion_entries_engineering)
     _plot_weighted_ranking(ranked_entries, weighted_figure_path)
     _plot_criterion_top(criterion_entries, criterion_figure_path)
     _plot_criterion_top(criterion_entries_engineering, criterion_engineering_figure_path)
+    decomposition_entries = _build_decomposition_entries(refined_rows, rows)
+    _write_decomposition_csv(decomposition_csv_path, decomposition_entries)
+    decomposition_summary_rows = _write_decomposition_summary_csv(decomposition_summary_csv_path, decomposition_entries)
 
     consistency_audit = _run_report_consistency_audit(
         cases=cases,
@@ -723,7 +1082,12 @@ def main():
         criterion_csv_path=criterion_csv_path,
         criterion_engineering_csv_path=criterion_engineering_csv_path,
         mesh_summary_rows=mesh_summary_rows,
+        scale_audit_rows=scale_audit_rows,
+        unit_audit_rows=unit_audit_rows,
+        decomposition_entries=decomposition_entries,
         cae_audit_json_path=Path(args.cae_audit_json),
+        plot_audit_csv_path=Path(args.plot_audit_csv),
+        plot_audit_json_path=Path(args.plot_audit_json),
         output_json_path=consistency_audit_json_path,
         output_csv_path=consistency_audit_csv_path,
     )
@@ -734,6 +1098,18 @@ def main():
     warning_count = sum(1 for case in cases if case["selection_status"] == STATUS_WARNING)
     converged_count = sum(1 for row in convergence_rows if row["all_criteria_pass"] == "yes")
     provisional_winner = converged_count < len(convergence_rows)
+    decomp_summary_by_metric = {row["metric"]: row for row in decomposition_summary_rows}
+    disp_summary = decomp_summary_by_metric.get("displacement", {})
+    stress_summary = decomp_summary_by_metric.get("stress", {})
+    decomposition_by_case = _decomposition_map(decomposition_entries)
+    convergence_by_case = _convergence_map(convergence_rows)
+
+    disp_ratios = [float(entry["wind_to_gravity_disp_ratio"]) for entry in decomposition_entries if math.isfinite(float(entry["wind_to_gravity_disp_ratio"]))]
+    stress_ratios = [float(entry["wind_to_gravity_stress_ratio"]) for entry in decomposition_entries if math.isfinite(float(entry["wind_to_gravity_stress_ratio"]))]
+    disp_ratio_p25 = _percentile(disp_ratios, 0.25) if disp_ratios else float("nan")
+    disp_ratio_p75 = _percentile(disp_ratios, 0.75) if disp_ratios else float("nan")
+    stress_ratio_p25 = _percentile(stress_ratios, 0.25) if stress_ratios else float("nan")
+    stress_ratio_p75 = _percentile(stress_ratios, 0.75) if stress_ratios else float("nan")
 
     lines = []
     lines.append("# Task 7 Report: Abaqus Wind Loading on Cooling Towers")
@@ -763,72 +1139,67 @@ def main():
     lines.append("")
     lines.append("## 3. Material, Loading, and CAE Setup")
     lines.append("")
-    lines.append(f"The structural baseline keeps the same assumptions for every model: equivalent reinforced concrete with `E = 33 GPa`, `nu = 0.20`, and `rho = 2500 kg/m^3`, together with a constant shell thickness of `0.20 m`.")
-    lines.append(f"The reference wind speed is `{config['wind']['reference_speed_m_s']} m/s`, which gives a dynamic pressure of `{q_ref:.1f} Pa` through `q = 0.5 rho V^2`.")
+    lines.append("Each model is built from the selected Task 6 meridian profile and revolved into a thin-shell cooling-tower surface; Task 7 keeps the exact Task 6 geometry scale.")
+    lines.append("The global coordinate convention is `Y`-up, with `X/Z` as the horizontal plane.")
     lines.append(
-        "Wind loading is interpreted as one-direction external action: windward sectors receive positive external pressure and leeward sectors receive suction. This is not internal cabin-style pressurization."
+        "Material assumptions are uniform across all cases: equivalent reinforced concrete with `E = 33 GPa`, `nu = 0.20`, density `rho = 2500 kg/m³`, and shell thickness `t = 0.20 m`."
     )
-    lines.append("The directional pressure model is:")
+    lines.append(
+        f"Loading combines self-weight and one-direction wind. The reference wind speed is `{config['wind']['reference_speed_m_s']} m/s`, giving `q = {q_ref:.1f} Pa` from $q = 0.5\\,\\rho_{{air}}V^2$."
+    )
+    lines.append(
+        "Wind is modeled as external pressure on the shell with windward pressure and leeward suction (not internal cabin pressure). The circumferential pressure law is:"
+    )
     lines.append("$$")
     lines.append("C_p(\\theta) = \\mathrm{clip}(0.8\\cos\\theta, -0.5, 0.8), \\quad p(\\theta) = q\\,C_p(\\theta)")
     lines.append("$$")
-    lines.append("Task 7 uses a strict `Y`-up coordinate convention: `Y` is vertical, the horizontal wind plane is `X/Z`, and self-weight acts along `-Y`.")
-    lines.append("The clean user-facing Abaqus/CAE database contains the **24 refined models only**, with one gravity load and one wind load per model. The automated solver decks still use the same circumferential pressure law in sectorized form for coarse-versus-refined verification.")
-    lines.append(_mesh_policy_summary(mesh_summary_rows, config))
-    solver_mesh = consistency_audit.get("solver_mesh_refined") or {}
     lines.append(
-        f"Solver-deck mesh compliance (`mesh_summary.csv`) is tracked separately from CAE integrity: refined solver decks span `{solver_mesh.get('node_min', 'n/a')}` to `{solver_mesh.get('node_max', 'n/a')}` nodes and remain within the Abaqus LE cap."
+        "Boundary conditions represent the tower support at the foundation/piler ring: base nodes are fixed (`U_x = U_y = U_z = 0`), while the shell remains free elsewhere."
     )
-    cae_audit = _load_cae_audit(Path(args.cae_audit_json))
-    if cae_audit:
-        lines.append(
-            f"CAE-native integrity (`cae_integrity_audit.json`) reports a model-node range of `{cae_audit.get('node_count_min')}` to `{cae_audit.get('node_count_max')}`. This audit validates model-tree integrity and CAE consistency, not LE solve-cap compliance."
-        )
-    lines.append("A deterministic input-deck audit runs before solving and confirms that all 48 decks use identical material constants, gravity definition, and wind-pressure sector logic.")
-    lines.append("The towers look squat in Abaqus because the geometry is genuinely squat: the Task 6 cooling towers are about `36.5 m` tall for a base diameter of about `78.6 m`, so the aspect ratio is below one. This is source geometry, not an Abaqus distortion.")
+    lines.append(
+        "Each model uses one static step (`STATIC_WIND`) for combined loading and one linear buckling step (`BUCKLING`) to extract the first instability modes about the preloaded state."
+    )
     lines.append("")
-    lines.append("## 4. Geometry Integrity Check")
-    lines.append("")
-    lines.append("The Task 7 generator preserves the exact Task 6 meridian coordinates. A geometry verification pass is written before solving and checks the mesh rings against the selected Task 6 source profile for every coarse and refined job.")
-    lines.append("")
-    lines.append(_geometry_summary(geometry_rows))
-    lines.append("")
-    lines.append("## 5. Refined Structural Comparison Across All 24 Cases")
+    lines.append("## 4. Refined Structural Comparison Across All 24 Cases")
     lines.append("")
     lines.append(_refined_table(refined_rows))
     lines.append("")
     lines.append("![Task 7 refined comparison metrics](../figures/comparison_metrics.png)")
     lines.append("")
-    lines.append("## 6. Methodological Clarity and Global Ranking")
+    lines.append("Figure 4.1 stacks displacement, stress, and buckling vertically to improve visibility and avoid compressed labels.")
+    lines.append("The first reading pass should prioritize buckling spread, then check whether displacement and stress trends confirm the same structural leader.")
     lines.append("")
-    lines.append("### 6.1 Methodological Clarity")
+    lines.append("## 5. Methodological Clarity and Global Ranking")
+    lines.append("")
+    lines.append("### 5.1 Methodological Clarity")
     lines.append("")
     lines.append("The global ranking is a rank-based weighted score on the refined results, designed to stay robust when one or two cases have extreme values.")
     lines.append("For each metric, rank `1` is best and rank `24` is worst, with deterministic tie-breaks by scenario/algorithm identifiers.")
     lines.append("")
     lines.append("$$")
-    lines.append("R_{k,i} = \\\\text{rank of case } i \\\\text{ on metric } k")
+    lines.append("r_i^{(k)} = \\operatorname{rank}_k(i)")
     lines.append("$$")
     lines.append("")
     lines.append("$$")
-    lines.append("S_i = 0.45 R_{\\\\mathrm{buckling},i} + 0.25 R_{\\\\mathrm{disp},i} + 0.20 R_{\\\\mathrm{stress},i} + 0.10 R_{\\\\mathrm{area},i}")
+    lines.append("S_i = 0.45\\,r_i^{(b)} + 0.25\\,r_i^{(d)} + 0.20\\,r_i^{(s)} + 0.10\\,r_i^{(a)}")
     lines.append("$$")
     lines.append("")
     lines.append("$$")
-    lines.append("J_i = S_i + P_i, \\\\quad P_i \\\\in \\\\{0,10,20\\\\}")
+    lines.append("J_i = S_i + P_i, \\quad P_i \\in \\{0,10,20\\}")
     lines.append("$$")
     lines.append("")
+    lines.append("Here $r_i^{(b)}$ is the buckling rank (higher buckling is better), $r_i^{(d)}$ is the displacement rank, $r_i^{(s)}$ is the stress rank, and $r_i^{(a)}$ is the area rank (lower is better for the last three).")
     lines.append("Penalty points are `0` for engineering-feasible, `10` for mathematical fallback, and `20` for warning cases. The best model is the one with the lowest `J_i`.")
     lines.append("")
-    lines.append("### 6.2 Global Weighted Top-5")
+    lines.append("### 5.2 Global Weighted Top-5")
     lines.append("")
     lines.append(_weighted_top_table(top5_overall))
     lines.append("")
     lines.append("![Task 7 weighted ranking](../figures/task7_weighted_ranking.png)")
     lines.append("")
-    lines.append("### 6.3 Top-3 by Criterion")
+    lines.append("### 5.3 Top-3 by Criterion")
     lines.append("")
-    lines.append("#### 6.3.1 Raw Top-3 (all statuses)")
+    lines.append("#### 5.3.1 Raw Top-3 (all statuses)")
     lines.append("")
     lines.append("This raw criterion table keeps all statuses visible, so warning and fallback cases can appear if they are numerically extreme on a single indicator.")
     lines.append("")
@@ -836,7 +1207,7 @@ def main():
     lines.append("")
     lines.append("![Task 7 criterion leaders](../figures/task7_criterion_top3.png)")
     lines.append("")
-    lines.append("#### 6.3.2 Engineering-eligible Top-3")
+    lines.append("#### 5.3.2 Engineering-eligible Top-3")
     lines.append("")
     lines.append("This decision-grade table filters to engineering-feasible entries only.")
     lines.append("")
@@ -844,7 +1215,7 @@ def main():
     lines.append("")
     lines.append("![Task 7 engineering criterion leaders](../figures/task7_criterion_top3_engineering.png)")
     lines.append("")
-    lines.append("## 7. Scenario-by-Scenario Comparison")
+    lines.append("## 6. Scenario-by-Scenario Comparison")
     lines.append("")
     for scenario_id in config["selection"]["scenario_ids"]:
         scenario_rows = [row for row in refined_rows if row["scenario_id"] == scenario_id]
@@ -853,11 +1224,13 @@ def main():
         lines.append("")
         lines.append(_scenario_table(scenario_rows, ranking_by_case))
         lines.append("")
-        for scenario_line in _scenario_commentary_lines(scenario_rows, ranking_by_case):
+        for scenario_line in _scenario_commentary_lines(
+            scenario_rows, ranking_by_case, decomposition_by_case, convergence_by_case
+        ):
             lines.append(scenario_line)
         lines.append("")
 
-    lines.append("## 8. Convergence Summary")
+    lines.append("## 7. Convergence Summary")
     lines.append("")
     lines.append(
         "The verification workflow solves both coarse and refined meshes for every case. The acceptance criteria are: displacement change below `{0:.1f}%`, stress change below `{1:.1f}%`, and first buckling-factor change below `{2:.1f}%`.".format(
@@ -881,6 +1254,30 @@ def main():
     else:
         lines.append("The global winner is reported as **converged** under the current criteria.")
     lines.append("")
+    lines.append("## 8. Wind-vs-Self-Weight Decomposition (Refined Cases)")
+    lines.append("")
+    lines.append(
+        "To separate load influence explicitly, each refined comparison tower is re-solved with gravity-only and wind-only static steps."
+    )
+    lines.append("The combined-load ranking remains unchanged; decomposition is used as an interpretation layer.")
+    lines.append(
+        f"Across all `{len(decomposition_entries)}` cases, displacement is wind-dominant in `{disp_summary.get('wind_dominant_cases', 'n/a')}` cases and stress is wind-dominant in `{stress_summary.get('wind_dominant_cases', 'n/a')}` cases."
+    )
+    lines.append(
+        f"Median wind-to-gravity ratios are `{float(disp_summary.get('median_wind_to_gravity_ratio', float('nan'))):.3f}` for displacement and `{float(stress_summary.get('median_wind_to_gravity_ratio', float('nan'))):.3f}` for stress, with IQR ranges `{disp_ratio_p25:.3f}`-`{disp_ratio_p75:.3f}` (displacement) and `{stress_ratio_p25:.3f}`-`{stress_ratio_p75:.3f}` (stress)."
+    )
+    lines.append(
+        f"Tail sensitivity remains important: P90 wind-to-gravity ratios are `{float(disp_summary.get('p90_wind_to_gravity_ratio', float('nan'))):.3f}` for displacement and `{float(stress_summary.get('p90_wind_to_gravity_ratio', float('nan'))):.3f}` for stress."
+    )
+    lines.append(
+        "Critical interpretation: most towers remain gravity-led in global reaction, while wind can still control local displacement/stress behavior for specific geometries. This is why the report keeps both decomposition evidence and weighted ranking instead of collapsing to one indicator."
+    )
+    lines.append(
+        f"Because convergence is currently `{converged_count}/{len(convergence_rows)}` all-pass, decomposition trends are used as high-value screening evidence but not as final qualification proof."
+    )
+    lines.append("")
+    lines.append(_decomposition_table(decomposition_entries))
+    lines.append("")
     lines.append("## 9. Warning Cases from Scenario S8")
     lines.append("")
     lines.append("Scenario S8 is kept intentionally as a warning family. None of the Task 6 S8 runs are mathematically compliant or engineering-feasible, so these Abaqus models are useful only as structural cautionary examples and not as candidate towers for recommendation.")
@@ -890,7 +1287,9 @@ def main():
     lines.append("## 10. Field Visualizations of the Global Top-5")
     lines.append("")
     lines.append("All detailed field figures are rendered from actual Abaqus ODB data with Python, not from Abaqus screenshots.")
-    lines.append("Task 7 figures use a true-scale equal-axis policy (no axis stretching). This differs from some legacy Task 6 renderings that used a different plotting style.")
+    lines.append("Simulation geometry remains true-scale from Task 6. For readability, the rendered figures use a display-only vertical exaggeration of `1.35x` and a consistent left-to-right wind-view policy.")
+    lines.append(f"Wind arrows are bound to the configured physical wind axis (`{config['wind'].get('wind_direction_axis', '+X')}`), so they indicate actual load direction rather than decorative annotation.")
+    lines.append("Per-case camera/arrow verification is enforced numerically through `plot_view_audit.csv`: the camera is perpendicular to wind direction, wind projects left-to-right on screen, and arrows stay outside the tower silhouette.")
     lines.append("")
     for entry in top5_overall:
         row = entry["row"]
@@ -918,19 +1317,7 @@ def main():
         lines.append(discussion)
         lines.append("")
 
-    lines.append("## 11. Recommendation for Later Tasks")
-    lines.append("")
-    winner_entry = ranking_by_case[winner["case_id"]]
-    recommendation_status = "provisional" if provisional_winner else "converged"
-    lines.append(
-        f"The current Task 7 recommendation is **{winner['case_label']}** with a `{recommendation_status}` status. Its weighted score is `{winner_entry['weighted_score']:.3f}` and its refined response gives a first buckling factor of `{float(winner['buckling_factor_1']):.3f}`, a maximum displacement of `{1000.0 * float(winner['max_displacement_m']):.3f} mm`, and a maximum stress of `{float(winner['max_mises_pa']) / 1e6:.3f} MPa`."
-    )
-    lines.append("")
-    lines.append(
-        "The main practical outcome for the project is that Task 6 geometric alternatives can now be compared with one consistent structural score, explicit warning handling, and scenario-level interpretation suitable for Task 9 communication."
-    )
-    lines.append("")
-    lines.append("## 12. Annex: Complete Field Visualizations")
+    lines.append("## 11. Annex: Complete Field Visualizations")
     lines.append("")
     lines.append("This section contains the field visualizations for the remaining 19 candidates out of the total 24 refined presentation models, organized by Scenario.")
     lines.append("")
@@ -963,3 +1350,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

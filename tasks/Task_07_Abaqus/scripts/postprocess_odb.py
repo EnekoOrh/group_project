@@ -43,9 +43,12 @@ def _process_case(case):
         max_mises = max(float(value.mises) for value in s_field.values)
         reaction = _sum_field_vectors(static_frame.fieldOutputs["RF"].values) if "RF" in static_frame.fieldOutputs.keys() else [float("nan")] * 3
 
-        buckle_step = odb.steps["BUCKLING"]
-        first_mode = buckle_step.frames[1] if len(buckle_step.frames) > 1 else buckle_step.frames[0]
-        buckling_factor = _extract_eigenvalue(first_mode)
+        has_buckling_step = bool(case.get("has_buckling_step", True))
+        buckling_factor = float("nan")
+        if has_buckling_step and "BUCKLING" in odb.steps.keys():
+            buckle_step = odb.steps["BUCKLING"]
+            first_mode = buckle_step.frames[1] if len(buckle_step.frames) > 1 else buckle_step.frames[0]
+            buckling_factor = _extract_eigenvalue(first_mode)
 
         return {
             "job_name": case["job_name"],
@@ -59,7 +62,9 @@ def _process_case(case):
             "selection_note": case["selection_note"],
             "is_warning_case": case["is_warning_case"],
             "case_variant": case["case_variant"],
+            "load_case": case.get("load_case", "combined"),
             "mesh_level": case.get("mesh_level", "coarse"),
+            "has_buckling_step": "yes" if has_buckling_step else "no",
             "task6_area_m2": float(case["task6_area_m2"]),
             "task6_penalized_objective": float(case["task6_penalized_objective"]),
             "max_displacement_m": max_disp,
@@ -161,7 +166,17 @@ def main():
     manifest = _load_manifest(args.manifest)
     rows = [_process_case(case) for case in manifest["cases"]]
     mesh_order = {"coarse": 0, "refined": 1, "confirmation": 2}
-    rows.sort(key=lambda row: (int(row["scenario_id"][1:]), row["algorithm"], mesh_order.get(row["mesh_level"], 99)))
+    variant_order = {"comparison": 0, "load_decomposition": 1}
+    load_case_order = {"combined": 0, "gravity_only": 1, "wind_only": 2}
+    rows.sort(
+        key=lambda row: (
+            int(row["scenario_id"][1:]),
+            row["algorithm"],
+            variant_order.get(row.get("case_variant", "comparison"), 99),
+            mesh_order.get(row["mesh_level"], 99),
+            load_case_order.get(row.get("load_case", "combined"), 99),
+        )
+    )
     _write_csv(args.output_csv, rows)
     _write_mesh_sensitivity(args.mesh_csv, rows, manifest.get("convergence_criteria_percent", {}))
     print(f"Postprocessed {len(rows)} ODB file(s).")

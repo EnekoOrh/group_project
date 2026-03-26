@@ -1,0 +1,4 @@
+metric,cases_total,wind_dominant_cases,gravity_dominant_cases,median_wind_to_gravity_ratio,p90_wind_to_gravity_ratio
+displacement,24,1,23,0.04752716320354415,0.17882369255316655
+stress,24,0,24,0.04263562217849813,0.08094981778541409
+reaction_resultant,24,0,24,0.028827945621997052,0.03145192353554256

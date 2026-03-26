@@ -9,6 +9,7 @@ from task7_common import load_json, pressure_coefficient
 
 
 MATERIAL_RE = re.compile(r"^\*MATERIAL\s*,\s*NAME\s*=\s*([^,]+)\s*$", re.IGNORECASE)
+SHELL_SECTION_RE = re.compile(r"^\*SHELL SECTION\b", re.IGNORECASE)
 ELSET_WIND_RE = re.compile(r"^\*ELSET\s*,\s*ELSET\s*=\s*WIND_SEC_(\d+)\s*$", re.IGNORECASE)
 GRAV_RE = re.compile(
     r"^EALL\s*,\s*GRAV\s*,\s*([+\-0-9.eE]+)\s*,\s*([+\-0-9.eE]+)\s*,\s*([+\-0-9.eE]+)\s*,\s*([+\-0-9.eE]+)\s*$",
@@ -62,13 +63,25 @@ def _parse_input_contract(input_path):
     material_name = None
     elastic_pair = None
     density_value = None
+    shell_thickness_value = None
     sector_ids = set()
     grav_entries = []
     wind_entries = []
+    node_coords = []
+    in_node_block = False
 
     for idx, raw in enumerate(lines):
         line = raw.strip()
         if not line or line.startswith("**"):
+            continue
+
+        if line.startswith("*"):
+            in_node_block = line.upper().startswith("*NODE")
+
+        if in_node_block and not line.startswith("*"):
+            parts = [part.strip() for part in line.split(",")]
+            if len(parts) >= 4:
+                node_coords.append((float(parts[1]), float(parts[2]), float(parts[3])))
             continue
 
         material_match = MATERIAL_RE.match(line)
@@ -82,6 +95,10 @@ def _parse_input_contract(input_path):
 
         if line.upper() == "*DENSITY":
             density_value = _parse_single(_next_data_line(lines, idx + 1))
+            continue
+
+        if SHELL_SECTION_RE.match(line):
+            shell_thickness_value = _parse_single(_next_data_line(lines, idx + 1))
             continue
 
         wind_elset_match = ELSET_WIND_RE.match(line)
@@ -105,13 +122,30 @@ def _parse_input_contract(input_path):
         if wind_match:
             wind_entries.append((int(wind_match.group(1)), float(wind_match.group(2))))
 
+    bounds = None
+    if node_coords:
+        xs = [value[0] for value in node_coords]
+        ys = [value[1] for value in node_coords]
+        zs = [value[2] for value in node_coords]
+        bounds = {
+            "x_min": min(xs),
+            "x_max": max(xs),
+            "y_min": min(ys),
+            "y_max": max(ys),
+            "z_min": min(zs),
+            "z_max": max(zs),
+            "max_abs_coord": max(abs(value) for triplet in node_coords for value in triplet),
+        }
+
     return {
         "material_name": material_name,
         "elastic_pair": elastic_pair,
         "density_value": density_value,
+        "shell_thickness_value": shell_thickness_value,
         "sector_ids": sector_ids,
         "grav_entries": grav_entries,
         "wind_entries": wind_entries,
+        "node_bounds": bounds,
     }
 
 
@@ -130,6 +164,7 @@ def _validate_case(case, config, repo_root):
     input_path = _resolve(case["input_path"], repo_root)
     parsed = _parse_input_contract(input_path)
     material = config["material"]
+    shell = config["shell"]
     gravity = config["gravity"]
     wind = config["wind"]
     q_ref = 0.5 * float(wind["air_density_kg_m3"]) * float(wind["reference_speed_m_s"]) ** 2
@@ -137,6 +172,13 @@ def _validate_case(case, config, repo_root):
     n_theta = int(case["circumferential_divisions"])
     expected_sectors = set(range(1, n_theta + 1))
     expected_pressures = _expected_pressure_map(n_theta, q_ref)
+    step_count = 2 if case.get("has_buckling_step", True) else 1
+    load_case = str(case.get("load_case", "combined"))
+    include_gravity = load_case in ("combined", "gravity_only")
+    include_wind = load_case in ("combined", "wind_only")
+    expected_gravity_entry_count = step_count if include_gravity else 0
+    expected_wind_entry_count = step_count if include_wind else 0
+    expected_wind_sector_ids = set(expected_pressures.keys()) if include_wind else set()
 
     errors = []
 
@@ -158,12 +200,18 @@ def _validate_case(case, config, repo_root):
     elif not _close(density, float(material["density_kg_m3"])):
         errors.append(f"density={density} expected={material['density_kg_m3']}")
 
+    shell_thickness = parsed["shell_thickness_value"]
+    if shell_thickness is None:
+        errors.append("missing_shell_section")
+    elif not _close(shell_thickness, float(shell["thickness_m"])):
+        errors.append(f"shell_thickness={shell_thickness} expected={shell['thickness_m']}")
+
     if parsed["sector_ids"] != expected_sectors:
         errors.append(f"wind_sector_ids={sorted(parsed['sector_ids'])} expected={list(range(1, n_theta + 1))}")
 
     grav_entries = parsed["grav_entries"]
-    if len(grav_entries) != 2:
-        errors.append(f"gravity_entry_count={len(grav_entries)} expected=2")
+    if len(grav_entries) != expected_gravity_entry_count:
+        errors.append(f"gravity_entry_count={len(grav_entries)} expected={expected_gravity_entry_count}")
     expected_grav = (
         float(gravity["acceleration_m_s2"]),
         float(gravity["direction"][0]),
@@ -179,37 +227,99 @@ def _validate_case(case, config, repo_root):
     for sector_id, pressure_value in wind_entries:
         by_sector[int(sector_id)].append(float(pressure_value))
 
-    expected_sector_ids = set(expected_pressures.keys())
-    if set(by_sector.keys()) != expected_sector_ids:
+    if set(by_sector.keys()) != expected_wind_sector_ids:
         errors.append(
             "wind_dload_sectors={0} expected_nonzero={1}".format(
                 sorted(by_sector.keys()),
-                sorted(expected_sector_ids),
+                sorted(expected_wind_sector_ids),
             )
         )
 
     for sector_id, expected_pressure in expected_pressures.items():
         observed = by_sector.get(sector_id, [])
-        if len(observed) != 2:
-            errors.append(f"wind_sector_{sector_id:02d}_count={len(observed)} expected=2")
+        if len(observed) != expected_wind_entry_count:
+            errors.append(f"wind_sector_{sector_id:02d}_count={len(observed)} expected={expected_wind_entry_count}")
+            continue
+        if not include_wind:
             continue
         for observed_value in observed:
             if not _close(observed_value, expected_pressure, tol=1.0e-5):
-                errors.append(
-                    f"wind_sector_{sector_id:02d}_pressure={observed_value} expected={expected_pressure}"
-                )
+                errors.append(f"wind_sector_{sector_id:02d}_pressure={observed_value} expected={expected_pressure}")
 
-    return {
+    bounds = parsed["node_bounds"] or {}
+    max_abs_coord = float(bounds.get("max_abs_coord", float("nan")))
+    geometry_scale_m_ok = math.isfinite(max_abs_coord) and 1.0 <= max_abs_coord <= 500.0
+
+    unit_checks = {
+        "unit_declared_si": str(config.get("units", "")).upper() == "SI",
+        "geometry_scale_m_ok": geometry_scale_m_ok,
+        "shell_thickness_m_ok": shell_thickness is not None and 0.05 <= float(shell_thickness) <= 2.0,
+        "elastic_pa_ok": elastic is not None and 1.0e9 <= float(elastic[0]) <= 1.0e12,
+        "poisson_ratio_ok": elastic is not None and 0.0 < float(elastic[1]) < 0.5,
+        "density_kg_m3_ok": density is not None and 500.0 <= float(density) <= 6000.0,
+        "gravity_m_s2_ok": _close(float(gravity["acceleration_m_s2"]), 9.81, tol=1.0e-3),
+        "gravity_direction_ok": all(
+            _close(float(value), expected, tol=1.0e-6)
+            for value, expected in zip(gravity["direction"], [0.0, -1.0, 0.0])
+        ),
+        "wind_speed_m_s_ok": 1.0 <= float(wind["reference_speed_m_s"]) <= 100.0,
+        "wind_pressure_basis_ok": q_ref > 0.0 and bool(expected_pressures),
+    }
+    unit_status = "pass" if all(unit_checks.values()) else "fail"
+
+    contract_row = {
         "job_name": case["job_name"],
         "case_id": case["case_id"],
         "mesh_level": case["mesh_level"],
+        "case_variant": case.get("case_variant", "comparison"),
+        "load_case": case.get("load_case", "combined"),
         "input_path": str(input_path),
         "material_ok": "yes" if not any("material" in err or "youngs_modulus" in err or "poisson_ratio" in err or "density" in err for err in errors) else "no",
         "gravity_ok": "yes" if not any(err.startswith("gravity") for err in errors) else "no",
         "wind_ok": "yes" if not any(err.startswith("wind_") for err in errors) else "no",
         "status": "pass" if not errors else "fail",
         "details": "; ".join(errors),
-    }, errors
+    }
+
+    unit_row = {
+        "job_name": case["job_name"],
+        "case_id": case["case_id"],
+        "mesh_level": case["mesh_level"],
+        "case_variant": case.get("case_variant", "comparison"),
+        "load_case": case.get("load_case", "combined"),
+        "unit_system": config.get("units", ""),
+        "q_ref_pa": f"{q_ref:.6f}",
+        "max_abs_coord_m": f"{max_abs_coord:.6f}" if math.isfinite(max_abs_coord) else "nan",
+        "shell_thickness_m": f"{shell_thickness:.6f}" if shell_thickness is not None else "",
+        "youngs_modulus_pa": f"{elastic[0]:.6f}" if elastic else "",
+        "poisson_ratio": f"{elastic[1]:.6f}" if elastic else "",
+        "density_kg_m3": f"{density:.6f}" if density is not None else "",
+        "gravity_acceleration_m_s2": f"{gravity['acceleration_m_s2']:.6f}",
+        "gravity_direction": ",".join(f"{float(value):.6f}" for value in gravity["direction"]),
+        "wind_speed_m_s": f"{float(wind['reference_speed_m_s']):.6f}",
+        "wind_direction_axis": str(wind.get("wind_direction_axis", "")),
+        "unit_declared_si_ok": "yes" if unit_checks["unit_declared_si"] else "no",
+        "geometry_scale_m_ok": "yes" if unit_checks["geometry_scale_m_ok"] else "no",
+        "shell_thickness_m_ok": "yes" if unit_checks["shell_thickness_m_ok"] else "no",
+        "elastic_pa_ok": "yes" if unit_checks["elastic_pa_ok"] else "no",
+        "poisson_ratio_ok": "yes" if unit_checks["poisson_ratio_ok"] else "no",
+        "density_kg_m3_ok": "yes" if unit_checks["density_kg_m3_ok"] else "no",
+        "gravity_m_s2_ok": "yes" if unit_checks["gravity_m_s2_ok"] else "no",
+        "gravity_direction_ok": "yes" if unit_checks["gravity_direction_ok"] else "no",
+        "wind_speed_m_s_ok": "yes" if unit_checks["wind_speed_m_s_ok"] else "no",
+        "wind_pressure_basis_ok": "yes" if unit_checks["wind_pressure_basis_ok"] else "no",
+        "status": unit_status,
+    }
+
+    return contract_row, unit_row, errors
+
+
+def _write_csv(path, fieldnames, rows):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(rows)
 
 
 def main():
@@ -218,38 +328,91 @@ def main():
     parser.add_argument("--manifest", default=str(repo_root / "tasks" / "Task_07_Abaqus" / "results" / "data" / "job_manifest.json"))
     parser.add_argument("--config", default=str(repo_root / "tasks" / "Task_07_Abaqus" / "config" / "study_config.json"))
     parser.add_argument("--output-csv", default=str(repo_root / "tasks" / "Task_07_Abaqus" / "results" / "data" / "input_contract_audit.csv"))
+    parser.add_argument(
+        "--unit-output-csv",
+        default=str(repo_root / "tasks" / "Task_07_Abaqus" / "results" / "data" / "unit_load_contract_audit.csv"),
+    )
     args = parser.parse_args()
 
     config = load_json(Path(args.config))
     manifest = load_json(Path(args.manifest))
 
-    rows = []
+    contract_rows = []
+    unit_rows = []
     failures = []
+    unit_failures = []
     for case in manifest["cases"]:
-        row, errors = _validate_case(case, config, repo_root)
-        rows.append(row)
+        contract_row, unit_row, errors = _validate_case(case, config, repo_root)
+        contract_rows.append(contract_row)
+        unit_rows.append(unit_row)
         if errors:
             failures.append((case["job_name"], errors))
+        if unit_row["status"] != "pass":
+            unit_failures.append(case["job_name"])
 
-    output_path = Path(args.output_csv)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    with output_path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(
-            handle,
-            fieldnames=["job_name", "case_id", "mesh_level", "input_path", "material_ok", "gravity_ok", "wind_ok", "status", "details"],
-        )
-        writer.writeheader()
-        writer.writerows(rows)
+    _write_csv(
+        Path(args.output_csv),
+        [
+            "job_name",
+            "case_id",
+            "mesh_level",
+            "case_variant",
+            "load_case",
+            "input_path",
+            "material_ok",
+            "gravity_ok",
+            "wind_ok",
+            "status",
+            "details",
+        ],
+        contract_rows,
+    )
 
-    if failures:
+    _write_csv(
+        Path(args.unit_output_csv),
+        [
+            "job_name",
+            "case_id",
+            "mesh_level",
+            "case_variant",
+            "load_case",
+            "unit_system",
+            "q_ref_pa",
+            "max_abs_coord_m",
+            "shell_thickness_m",
+            "youngs_modulus_pa",
+            "poisson_ratio",
+            "density_kg_m3",
+            "gravity_acceleration_m_s2",
+            "gravity_direction",
+            "wind_speed_m_s",
+            "wind_direction_axis",
+            "unit_declared_si_ok",
+            "geometry_scale_m_ok",
+            "shell_thickness_m_ok",
+            "elastic_pa_ok",
+            "poisson_ratio_ok",
+            "density_kg_m3_ok",
+            "gravity_m_s2_ok",
+            "gravity_direction_ok",
+            "wind_speed_m_s_ok",
+            "wind_pressure_basis_ok",
+            "status",
+        ],
+        unit_rows,
+    )
+
+    if failures or unit_failures:
         print("Task 7 input contract validation FAILED:")
         for job_name, errors in failures:
             print(f"  - {job_name}:")
             for error in errors:
                 print(f"      {error}")
+        if unit_failures:
+            print("Unit/load chain checks failed for: " + ", ".join(unit_failures[:10]))
         raise SystemExit(1)
 
-    print(f"Validated {len(rows)} Task 7 input deck(s) successfully.")
+    print(f"Validated {len(contract_rows)} Task 7 input deck(s) successfully.")
 
 
 if __name__ == "__main__":

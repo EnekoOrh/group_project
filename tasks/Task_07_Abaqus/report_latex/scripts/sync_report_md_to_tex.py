@@ -18,10 +18,18 @@ def _clean_heading(text: str) -> str:
 
 
 def _convert_inline(text: str) -> str:
+    math_chunks: List[str] = []
+
+    def _stash_math(match: re.Match[str]) -> str:
+        math_chunks.append(match.group(1))
+        return f"@@MATH{len(math_chunks) - 1}@@"
+
+    text = MATH_RE.sub(_stash_math, text)
     text = text.replace("%", r"\%").replace("&", r"\&").replace("#", r"\#").replace("_", r"\_").replace("^", r"\textasciicircum{}")
     text = BOLD_RE.sub(r"\\textbf{\1}", text)
     text = CODE_RE.sub(r"\\texttt{\1}", text)
-    text = MATH_RE.sub(r"\\(\1\\)", text)
+    for idx, chunk in enumerate(math_chunks):
+        text = text.replace(f"@@MATH{idx}@@", r"\(" + chunk + r"\)")
     return text
 
 
@@ -204,7 +212,7 @@ def convert_markdown_to_tex(md_text: str) -> str:
         if in_list:
             out.append(r"\end{itemize}")
             in_list = False
-        out.append(_convert_inline(stripped))
+        out.append(r"\noindent " + _convert_inline(stripped))
         out.append("")
         i += 1
 

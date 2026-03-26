@@ -1,15 +1,15 @@
-# Task 7: Abaqus Wind Loading on Cooling Towers
+﻿# Task 7: Abaqus Wind Loading on Cooling Towers
 
 This workspace turns the Task 6 cooling-tower optimization results into a full Task 7 structural comparison in Abaqus.
 
 ## Scope
 
-The Task 7 study now compares the full `8 scenarios x 3 optimizers` matrix:
+The Task 7 study compares the full `8 scenarios x 3 optimizers` matrix:
 
 - scenarios: `S1` to `S8`
 - optimizers: `SA`, `PSO`, `BFGS`
 - total refined presentation models in the clean CAE: `24`
-- total verification jobs in the automated solver path: `48` (`coarse + refined` for each case)
+- total verification jobs in the automated solver path: `96` (`coarse + refined + refined gravity-only + refined wind-only` for each case)
 
 Selection rules:
 
@@ -80,18 +80,24 @@ Full run:
 powershell -ExecutionPolicy Bypass -File tasks/Task_07_Abaqus/scripts/run_task7_pipeline.ps1
 ```
 
-The pipeline now validates every generated `.inp` immediately after deck creation and fails fast if material, gravity, or wind contracts drift from the config.
-It also enforces CAE integrity with a candidate-to-canonical promotion flow:
-- preserve canonical CAE to `Task7_Montresor_WindStudy_last_good*.cae`,
-- quarantine stale `*_staged.cae` and `ABQcae*.exception` artifacts,
-- build `Task7_Montresor_WindStudy_candidate.cae`,
-- validate candidate contracts and mesh density headlessly,
-- promote candidate to canonical only after successful validation.
+The pipeline validates every generated `.inp` immediately after deck creation and fails fast if contracts drift from config.
+It also writes strict scale and unit audits:
+
+- `scale_geometry_audit.csv` (Task 6 to Task 7 geometry-scale preservation)
+- `unit_load_contract_audit.csv` (SI-chain consistency in unitless Abaqus context)
+
+The CAE flow is candidate-to-canonical with integrity gating:
+
+- preserve canonical CAE to `Task7_Montresor_WindStudy_last_good*.cae`
+- quarantine stale `*_staged.cae` and `ABQcae*.exception` artifacts
+- build `Task7_Montresor_WindStudy_candidate.cae`
+- validate candidate contracts and mesh density headlessly
+- promote candidate to canonical only after successful validation
 
 Useful modes:
 
 ```powershell
-# Export Task 6 selections, build 48 input decks, and build the clean CAE only
+# Export Task 6 selections, build 96 input decks, and build the clean CAE only
 powershell -ExecutionPolicy Bypass -File tasks/Task_07_Abaqus/scripts/run_task7_pipeline.ps1 -BuildOnly -SkipAbaqus -SkipReport -SkipPlots -SkipLatex
 
 # Reuse existing ODB results and rebuild figures/report/PDF only
@@ -108,11 +114,15 @@ Key outputs after a successful run:
 - `tasks/Task_07_Abaqus/candidates/selected_cases.json`
 - `tasks/Task_07_Abaqus/results/data/job_manifest.json`
 - `tasks/Task_07_Abaqus/results/data/geometry_verification.csv`
+- `tasks/Task_07_Abaqus/results/data/scale_geometry_audit.csv`
 - `tasks/Task_07_Abaqus/results/data/input_contract_audit.csv`
+- `tasks/Task_07_Abaqus/results/data/unit_load_contract_audit.csv`
 - `tasks/Task_07_Abaqus/results/data/cae_integrity_audit.csv`
 - `tasks/Task_07_Abaqus/results/data/cae_integrity_audit.json`
 - `tasks/Task_07_Abaqus/results/data/abaqus_summary.csv`
 - `tasks/Task_07_Abaqus/results/data/mesh_sensitivity.csv`
+- `tasks/Task_07_Abaqus/results/data/load_decomposition_refined.csv`
+- `tasks/Task_07_Abaqus/results/data/load_dominance_summary.csv`
 - `tasks/Task_07_Abaqus/results/data/weighted_ranking.csv`
 - `tasks/Task_07_Abaqus/results/data/criterion_top3.csv`
 - `tasks/Task_07_Abaqus/results/data/criterion_top3_engineering.csv`
@@ -120,10 +130,12 @@ Key outputs after a successful run:
 - `tasks/Task_07_Abaqus/results/data/report_consistency_audit.json`
 - `tasks/Task_07_Abaqus/results/data/fields/*`
 - `tasks/Task_07_Abaqus/results/cae/Task7_Montresor_WindStudy.cae`
-- `tasks/Task_07_Abaqus/results/cae/Task7_Montresor_WindStudy_last_good.cae` (latest backup of canonical before regeneration)
-- `tasks/Task_07_Abaqus/results/cae/quarantine/<timestamp>/...` (staged/corrupt artifacts moved aside)
+- `tasks/Task_07_Abaqus/results/cae/Task7_Montresor_WindStudy_last_good.cae`
+- `tasks/Task_07_Abaqus/results/cae/quarantine/<timestamp>/...`
 - `tasks/Task_07_Abaqus/results/inputs/task7_*_coarse.inp`
 - `tasks/Task_07_Abaqus/results/inputs/task7_*_refined.inp`
+- `tasks/Task_07_Abaqus/results/inputs/task7_*_refined_gravity_only.inp`
+- `tasks/Task_07_Abaqus/results/inputs/task7_*_refined_wind_only.inp`
 - `tasks/Task_07_Abaqus/results/figures/candidate_profiles.png`
 - `tasks/Task_07_Abaqus/results/figures/comparison_metrics.png`
 - `tasks/Task_07_Abaqus/results/figures/s8_warning_metrics.png`
@@ -146,23 +158,13 @@ abaqus cae database="tasks\Task_07_Abaqus\results\cae\Task7_Montresor_WindStudy.
 ```
 
 If the canonical file fails to open after an interrupted run, use:
+
 - `tasks\Task_07_Abaqus\results\cae\Task7_Montresor_WindStudy_last_good.cae`
 - then rerun the pipeline with Abaqus fully closed to regenerate and re-promote.
 
-The clean CAE contains the `24 refined models` only, named as:
+The clean CAE contains the `24 refined models` only (`S1_SA` ... `S8_BFGS`).
 
-- `S1_SA`, `S1_PSO`, `S1_BFGS`
-- `S2_SA`, `S2_PSO`, `S2_BFGS`
-- ...
-- `S8_SA`, `S8_PSO`, `S8_BFGS`
-
-Refined job names follow the same mapping, for example:
-
-- `task7_s1_sa_refined`
-- `task7_s4_pso_refined`
-- `task7_s8_bfgs_refined`
-
-Use the `.odb` files in `tasks/Task_07_Abaqus/results/jobs/` for solved results in the Visualization module.
+Use `.odb` files in `tasks/Task_07_Abaqus/results/jobs/` for solved results in the Visualization module.
 
 Example direct viewer launch:
 
@@ -175,7 +177,7 @@ Recommended review workflow:
 1. Open the clean `.cae` first.
 2. Inspect the chosen model tree for section, steps, BCs, and the single `SelfWeight` + single `Wind` load objects.
 3. Switch to the Visualization module and open the corresponding solved `.odb`.
-4. For the static result, inspect `STATIC_WIND`, last frame.
+4. For static response, inspect `STATIC_WIND`, last frame.
 5. Use `Plot -> Contours on Deformed Shape`.
 6. For stress, set `Result -> Field Output` to `S` and choose invariant `Mises`.
 7. For displacement, set `Result -> Field Output` to `U` and choose magnitude.
@@ -185,12 +187,15 @@ Recommended review workflow:
 ## Notes
 
 - The clean CAE is a presentation database with refined models only.
-- The automated verification path still runs coarse and refined solver decks for all `24` cases.
+- The automated verification path runs coarse + refined + refined gravity-only + refined wind-only solver decks for all `24` cases.
 - Task 7 uses a strict `Y-up` convention in both CAE models and solver decks.
-- Geometry integrity is checked before solving in `results/data/geometry_verification.csv`.
-- Material and load consistency is checked before solving in `results/data/input_contract_audit.csv`.
-- Report ranking is generated from refined results with explicit weighted-score settings in `config/study_config.json` under `ranking`.
-- Report generation enforces a consistency audit in `results/data/report_consistency_audit.{csv,json}` and fails if ranking or mesh narratives drift from source data.
+- Geometry integrity is checked in `results/data/geometry_verification.csv`.
+- Scale preservation is checked in `results/data/scale_geometry_audit.csv`.
+- Material/load contract consistency is checked in `results/data/input_contract_audit.csv`.
+- Unit/load-chain consistency is checked in `results/data/unit_load_contract_audit.csv`.
+- Report ranking is generated from refined results with weighted-score settings in `config/study_config.json` under `ranking`.
+- Report generation enforces a consistency audit in `results/data/report_consistency_audit.{csv,json}`.
 - The towers are visually squat because the Task 6 source geometry is squat; there is no aspect-ratio normalization in the structural model.
-- All stress, displacement, and buckling figures are rendered from exported Abaqus ODB field data in Python, not from Abaqus screenshots, with a true-scale equal-axis visual policy.
+- All stress, displacement, and buckling figures are rendered from exported Abaqus ODB field data in Python, not from Abaqus screenshots.
+- Simulation geometry remains true-scale; rendered figures use display-only vertical exaggeration (`1.35x`) and physical wind-direction arrows for readability.
 - Warning-only cases, especially all of `S8`, are included for structural awareness and comparison, not as recommended designs.
