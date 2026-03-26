@@ -12,6 +12,8 @@
 \usepackage{hyperref}
 \usepackage[nameinlink]{cleveref}
 \usepackage{float}
+\usepackage{needspace}
+\usepackage{microtype}
 \usepackage{array}
 \usepackage{longtable}
 \usepackage{enumitem}
@@ -29,6 +31,10 @@
 \setcounter{secnumdepth}{2}
 \setlength{\cftbeforechapskip}{2pt}
 \setlength{\cftbeforesecskip}{1pt}
+\widowpenalty=10000
+\clubpenalty=10000
+\displaywidowpenalty=10000
+\raggedbottom
 \pagestyle{fancy}
 \fancyhf{}
 \fancyfoot[L]{Montr\'esor group}

@@ -40,6 +40,26 @@ Across the 24 selected cases, there are **16 engineering-feasible selections**, 
 
 ![Task 7 candidate profiles](results/figures/candidate_profiles.png)
 
+### 2.1 Selection and Compliance Semantics
+
+To keep Task 6 -> Task 7 interpretation unambiguous, each selected case carries its original status tier.
+Task 6 mathematical compliance is tied to normalized target constraints:
+$$
+g_V = \frac{|V - V^*|}{V^*}, \qquad g_H = \frac{|H - H^*|}{H^*}
+$$
+A mathematically compliant case satisfies $g_V \le \varepsilon_V$ and $g_H \le \varepsilon_H$.
+Engineering-feasible means mathematically compliant **and** passing the additional engineering plausibility checks from Task 6.
+The Task 7 selection rule per scenario/optimizer pair is:
+$$
+\begin{aligned}
+r^* &= \arg\min A(r) && \text{over engineering-feasible runs} \\
+&\text{else }= \arg\min A(r) && \text{over mathematically compliant runs} \\
+&\text{else }= \arg\min F_{pen}(r) && \text{(warning fallback only)}
+\end{aligned}
+$$
+where `A` is shell area and `F_{pen}` is the penalized Task 6 objective.
+This defines exactly what "best" means in this report and why fallback/warning statuses appear in some scenario rows.
+
 ## 3. Material, Loading, and CAE Setup
 
 Each model is built from the selected Task 6 meridian profile and revolved into a thin-shell cooling-tower surface; Task 7 keeps the exact Task 6 geometry scale.
@@ -164,6 +184,12 @@ This decision-grade table filters to engineering-feasible entries only.
 | Task 6 area | 3 | S3 / BFGS | Engineering-feasible | 7741.69 m² |
 
 ![Task 7 engineering criterion leaders](results/figures/task7_criterion_top3_engineering.png)
+
+### 5.4 Reproducibility and Fairness Controls
+
+Task 7 ranking is deterministic: every score is computed from the latest refined Abaqus results with fixed tie-breaks, so repeated report generation gives the same ordering.
+Fairness is handled in two layers: warning/fallback cases remain visible in the global ranking through explicit penalties, while the engineering-eligible Top-3 table isolates decision-grade candidates.
+This avoids the presentation ambiguity highlighted in Task 6 feedback by defining "best" as the minimum penalized weighted rank `J_i` and by keeping compliance status explicit in every comparison table.
 
 ## 6. Scenario-by-Scenario Comparison
 
@@ -360,10 +386,18 @@ Scenario S8 is kept intentionally as a warning family. None of the Task 6 S8 run
 
 ![Scenario S8 warning metrics](results/figures/s8_warning_metrics.png)
 
-## 10. Field Visualizations of the Global Top-5
+## 10. Final Critical Conclusions
+
+The current global leader is `S7 / BFGS` (Engineering-feasible) with weighted score `6.750`.
+Convergence confidence is still limited (`0/24` all-pass), so the current winner must be treated as provisional screening output rather than final structural qualification.
+Load decomposition shows the action split clearly: displacement is wind-dominant in `1/24` cases and stress is wind-dominant in `0/24` cases.
+Median wind/gravity ratios are `0.048` for displacement and `0.043` for stress, which indicates a predominantly self-weight-driven response in this dataset with wind becoming locally decisive only in a small displacement subset.
+The ranking remains fair for screening because buckling, displacement, stress, and area are combined with explicit compliance penalties; final design lock-in should wait for stronger convergence closure and, if schedule allows, a higher-fidelity wind-standard calibration.
+
+## 11. Field Visualizations of the Global Top-5
 
 All detailed field figures are rendered from actual Abaqus ODB data with Python, not from Abaqus screenshots.
-Simulation geometry remains true-scale from Task 6. For readability, the rendered figures use a display-only vertical exaggeration of `1.35x` and a consistent left-to-right wind-view policy.
+Simulation geometry remains true-scale from Task 6. Rendered views use consistent camera framing and a left-to-right wind-view policy for direct cross-case comparison.
 Wind arrows are bound to the configured physical wind axis (`+X`), so they indicate actual load direction rather than decorative annotation.
 Per-case camera/arrow verification is enforced numerically through `plot_view_audit.csv`: the camera is perpendicular to wind direction, wind projects left-to-right on screen, and arrows stay outside the tower silhouette.
 
@@ -371,33 +405,33 @@ Per-case camera/arrow verification is enforced numerically through `plot_view_au
 
 ![S7 / BFGS stress](results/figures/task7_s7_bfgs_stress.png) ![S7 / BFGS displacement](results/figures/task7_s7_bfgs_displacement.png) ![S7 / BFGS buckling](results/figures/task7_s7_bfgs_buckling_mode1.png)
 
-**Performance Discussion (Rank 1):** The `S7 / BFGS` model (Engineering-feasible) achieved an overall weighted score of `6.750`. It demonstrates strong structural integrity with a first buckling factor of `24.948`. Under the applied wind load, the maximum observed displacement is bounded at `10.105 mm`, and peak von Mises stresses reach `4.134 MPa`. As the top-ranked candidate, this geometry offers the most convincing balance of minimal material footprint, acceptable deflection, and a high margin against linear buckling.
+**Rank/Status:** Rank `1`, `Engineering-feasible`, weighted score `6.750`. **Metrics:** buckling `24.948`, max displacement `10.105 mm`, max stress `4.134 MPa`. **Interpretation:** best current compromise across stability, stiffness, and stress.
 
 ### S3 / SA
 
 ![S3 / SA stress](results/figures/task7_s3_sa_stress.png) ![S3 / SA displacement](results/figures/task7_s3_sa_displacement.png) ![S3 / SA buckling](results/figures/task7_s3_sa_buckling_mode1.png)
 
-**Performance Discussion (Rank 2):** The `S3 / SA` model (Engineering-feasible) achieved an overall weighted score of `7.050`. It demonstrates strong structural integrity with a first buckling factor of `23.834`. Under the applied wind load, the maximum observed displacement is bounded at `9.036 mm`, and peak von Mises stresses reach `3.526 MPa`. As a high-ranking runner-up, it presents an extremely competitive alternative, trading minimal surface area differences for robust stress and displacement behavior.
+**Rank/Status:** Rank `2`, `Engineering-feasible`, weighted score `7.050`. **Metrics:** buckling `23.834`, max displacement `9.036 mm`, max stress `3.526 MPa`. **Interpretation:** high-value runner-up with a narrow gap to the leader.
 
 ### S2 / SA
 
 ![S2 / SA stress](results/figures/task7_s2_sa_stress.png) ![S2 / SA displacement](results/figures/task7_s2_sa_displacement.png) ![S2 / SA buckling](results/figures/task7_s2_sa_buckling_mode1.png)
 
-**Performance Discussion (Rank 3):** The `S2 / SA` model (Engineering-feasible) achieved an overall weighted score of `7.500`. It demonstrates strong structural integrity with a first buckling factor of `24.549`. Under the applied wind load, the maximum observed displacement is bounded at `9.968 mm`, and peak von Mises stresses reach `3.818 MPa`. As a high-ranking runner-up, it presents an extremely competitive alternative, trading minimal surface area differences for robust stress and displacement behavior.
+**Rank/Status:** Rank `3`, `Engineering-feasible`, weighted score `7.500`. **Metrics:** buckling `24.549`, max displacement `9.968 mm`, max stress `3.818 MPa`. **Interpretation:** high-value runner-up with a narrow gap to the leader.
 
 ### S3 / PSO
 
 ![S3 / PSO stress](results/figures/task7_s3_pso_stress.png) ![S3 / PSO displacement](results/figures/task7_s3_pso_displacement.png) ![S3 / PSO buckling](results/figures/task7_s3_pso_buckling_mode1.png)
 
-**Performance Discussion (Rank 4):** The `S3 / PSO` model (Engineering-feasible) achieved an overall weighted score of `9.650`. It demonstrates strong structural integrity with a first buckling factor of `23.496`. Under the applied wind load, the maximum observed displacement is bounded at `9.850 mm`, and peak von Mises stresses reach `3.794 MPa`. Although ranking slightly lower within the top 5, it remains a structurally sound and convincing concept that safely satisfies engineering constraints.
+**Rank/Status:** Rank `4`, `Engineering-feasible`, weighted score `9.650`. **Metrics:** buckling `23.496`, max displacement `9.850 mm`, max stress `3.794 MPa`. **Interpretation:** structurally credible but less balanced than the first three ranks.
 
 ### S2 / BFGS
 
 ![S2 / BFGS stress](results/figures/task7_s2_bfgs_stress.png) ![S2 / BFGS displacement](results/figures/task7_s2_bfgs_displacement.png) ![S2 / BFGS buckling](results/figures/task7_s2_bfgs_buckling_mode1.png)
 
-**Performance Discussion (Rank 5):** The `S2 / BFGS` model (Engineering-feasible) achieved an overall weighted score of `9.850`. It demonstrates strong structural integrity with a first buckling factor of `23.563`. Under the applied wind load, the maximum observed displacement is bounded at `10.202 mm`, and peak von Mises stresses reach `3.867 MPa`. Although ranking slightly lower within the top 5, it remains a structurally sound and convincing concept that safely satisfies engineering constraints.
+**Rank/Status:** Rank `5`, `Engineering-feasible`, weighted score `9.850`. **Metrics:** buckling `23.563`, max displacement `10.202 mm`, max stress `3.867 MPa`. **Interpretation:** structurally credible but less balanced than the first three ranks.
 
-## 11. Annex: Complete Field Visualizations
+## 12. Annex: Complete Field Visualizations
 
 This section contains the field visualizations for the remaining 19 candidates out of the total 24 refined presentation models, organized by Scenario.
 

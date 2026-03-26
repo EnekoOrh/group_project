@@ -1,5 +1,6 @@
 
-\chapter{1. Objective}
+\Needspace{10\baselineskip}
+\chapter{Objective}
 
 
 \noindent This Task 7 study expands the previous three-tower screening into a full structural comparison across the eight Task 6 scenarios and the three optimization algorithms SA, PSO, and BFGS.
@@ -7,7 +8,8 @@
 \noindent The engineering objective is to identify which Task 6 concepts remain convincing once the towers are checked under self-weight, one-direction wind loading, and linear buckling in Abaqus.
 
 
-\chapter{2. Selection Rule and Scenario Matrix}
+\Needspace{10\baselineskip}
+\chapter{Selection Rule and Scenario Matrix}
 
 
 \noindent The Task 7 matrix contains \textbf{24 refined presentation models}. For scenarios S1 to S7, the preferred choice is the lowest-area engineering-feasible Task 6 run for each scenario/algorithm pair. If no engineering-feasible run exists, the workflow falls back to the lowest-area mathematically compliant run. If neither exists, the best penalized run is kept only as a warning case. Scenario S8 is intentionally carried as warning-only because it has no compliant Task 6 solution in the current study.
@@ -63,16 +65,48 @@ S8 / SA & Warning case & best\_penalized\_warning & 0 & joint & 7718.27 \\
 \end{figure}
 
 
-\chapter{3. Material, Loading, and CAE Setup}
+\Needspace{8\baselineskip}
+\section{Selection and Compliance Semantics}
+
+
+\noindent To keep Task 6 -> Task 7 interpretation unambiguous, each selected case carries its original status tier.
+
+\noindent Task 6 mathematical compliance is tied to normalized target constraints:
+
+\[
+g_V = \frac{|V - V^*|}{V^*}, \qquad g_H = \frac{|H - H^*|}{H^*}
+\]
+
+\noindent A mathematically compliant case satisfies \(g_V \le \varepsilon_V\) and \(g_H \le \varepsilon_H\).
+
+\noindent Engineering-feasible means mathematically compliant \textbf{and} passing the additional engineering plausibility checks from Task 6.
+
+\noindent The Task 7 selection rule per scenario/optimizer pair is:
+
+\[
+\begin{aligned}
+r^* &= \arg\min A(r) && \text{over engineering-feasible runs} \\
+&\text{else }= \arg\min A(r) && \text{over mathematically compliant runs} \\
+&\text{else }= \arg\min F_{pen}(r) && \text{(warning fallback only)}
+\end{aligned}
+\]
+
+\noindent where \textit{A} is shell area and \textit{F\_{pen}} is the penalized Task 6 objective.
+
+\noindent This defines exactly what "best" means in this report and why fallback/warning statuses appear in some scenario rows.
+
+
+\Needspace{10\baselineskip}
+\chapter{Material, Loading, and CAE Setup}
 
 
 \noindent Each model is built from the selected Task 6 meridian profile and revolved into a thin-shell cooling-tower surface; Task 7 keeps the exact Task 6 geometry scale.
 
-\noindent The global coordinate convention is \texttt{Y}-up, with \texttt{X/Z} as the horizontal plane.
+\noindent The global coordinate convention is \textit{Y}-up, with \textit{X/Z} as the horizontal plane.
 
-\noindent Material assumptions are uniform across all cases: equivalent reinforced concrete with \texttt{E = 33 GPa}, \texttt{nu = 0.20}, density \texttt{rho = 2500 kg/m³}, and shell thickness \texttt{t = 0.20 m}.
+\noindent Material assumptions are uniform across all cases: equivalent reinforced concrete with \textit{E = 33 GPa}, \textit{nu = 0.20}, density \textit{rho = 2500 kg/m³}, and shell thickness \textit{t = 0.20 m}.
 
-\noindent Loading combines self-weight and one-direction wind. The reference wind speed is \texttt{30.0 m/s}, giving \texttt{q = 562.5 Pa} from \(q = 0.5\,\rho_{air}V^2\).
+\noindent Loading combines self-weight and one-direction wind. The reference wind speed is \textit{30.0 m/s}, giving \textit{q = 562.5 Pa} from \(q = 0.5\,\rho_{air}V^2\).
 
 \noindent Wind is modeled as external pressure on the shell with windward pressure and leeward suction (not internal cabin pressure). The circumferential pressure law is:
 
@@ -80,12 +114,13 @@ S8 / SA & Warning case & best\_penalized\_warning & 0 & joint & 7718.27 \\
 C_p(\theta) = \mathrm{clip}(0.8\cos\theta, -0.5, 0.8), \quad p(\theta) = q\,C_p(\theta)
 \]
 
-\noindent Boundary conditions represent the tower support at the foundation/piler ring: base nodes are fixed (\texttt{U\_x = U\_y = U\_z = 0}), while the shell remains free elsewhere.
+\noindent Boundary conditions represent the tower support at the foundation/piler ring: base nodes are fixed (\textit{U\_x = U\_y = U\_z = 0}), while the shell remains free elsewhere.
 
-\noindent Each model uses one static step (\texttt{STATIC\_WIND}) for combined loading and one linear buckling step (\texttt{BUCKLING}) to extract the first instability modes about the preloaded state.
+\noindent Each model uses one static step (\textit{STATIC\_WIND}) for combined loading and one linear buckling step (\textit{BUCKLING}) to extract the first instability modes about the preloaded state.
 
 
-\chapter{4. Refined Structural Comparison Across All 24 Cases}
+\Needspace{10\baselineskip}
+\chapter{Refined Structural Comparison Across All 24 Cases}
 
 
 \begin{table}[H]
@@ -140,15 +175,17 @@ S8 / SA & Warning case & 7718.27 & 8.163 & 4.955 & 23.837 \\
 \noindent The first reading pass should prioritize buckling spread, then check whether displacement and stress trends confirm the same structural leader.
 
 
-\chapter{5. Methodological Clarity and Global Ranking}
+\Needspace{10\baselineskip}
+\chapter{Methodological Clarity and Global Ranking}
 
 
-\section{5.1 Methodological Clarity}
+\Needspace{8\baselineskip}
+\section{Methodological Clarity}
 
 
 \noindent The global ranking is a rank-based weighted score on the refined results, designed to stay robust when one or two cases have extreme values.
 
-\noindent For each metric, rank \texttt{1} is best and rank \texttt{24} is worst, with deterministic tie-breaks by scenario/algorithm identifiers.
+\noindent For each metric, rank \textit{1} is best and rank \textit{24} is worst, with deterministic tie-breaks by scenario/algorithm identifiers.
 
 
 \[
@@ -168,10 +205,11 @@ J_i = S_i + P_i, \quad P_i \in \{0,10,20\}
 
 \noindent Here \(r_i^{(b)}\) is the buckling rank (higher buckling is better), \(r_i^{(d)}\) is the displacement rank, \(r_i^{(s)}\) is the stress rank, and \(r_i^{(a)}\) is the area rank (lower is better for the last three).
 
-\noindent Penalty points are \texttt{0} for engineering-feasible, \texttt{10} for mathematical fallback, and \texttt{20} for warning cases. The best model is the one with the lowest \texttt{J\_i}.
+\noindent Penalty points are \textit{0} for engineering-feasible, \textit{10} for mathematical fallback, and \textit{20} for warning cases. The best model is the one with the lowest \textit{J\_i}.
 
 
-\section{5.2 Global Weighted Top-5}
+\Needspace{8\baselineskip}
+\section{Global Weighted Top-5}
 
 
 \begin{table}[H]
@@ -202,10 +240,12 @@ Rank & Case & Status & Weighted score & Penalty & Buckling factor & Max disp. (m
 \end{figure}
 
 
-\section{5.3 Top-3 by Criterion}
+\Needspace{8\baselineskip}
+\section{Top-3 by Criterion}
 
 
-\subsection{5.3.1 Raw Top-3 (all statuses)}
+\Needspace{6\baselineskip}
+\subsection{Raw Top-3 (all statuses)}
 
 
 \noindent This raw criterion table keeps all statuses visible, so warning and fallback cases can appear if they are numerically extreme on a single indicator.
@@ -246,7 +286,8 @@ Task 6 area & 3 & S2 / BFGS & Engineering-feasible & 7741.67 m² \\
 \end{figure}
 
 
-\subsection{5.3.2 Engineering-eligible Top-3}
+\Needspace{6\baselineskip}
+\subsection{Engineering-eligible Top-3}
 
 
 \noindent This decision-grade table filters to engineering-feasible entries only.
@@ -287,9 +328,22 @@ Task 6 area & 3 & S3 / BFGS & Engineering-feasible & 7741.69 m² \\
 \end{figure}
 
 
-\chapter{6. Scenario-by-Scenario Comparison}
+\Needspace{8\baselineskip}
+\section{Reproducibility and Fairness Controls}
 
 
+\noindent Task 7 ranking is deterministic: every score is computed from the latest refined Abaqus results with fixed tie-breaks, so repeated report generation gives the same ordering.
+
+\noindent Fairness is handled in two layers: warning/fallback cases remain visible in the global ranking through explicit penalties, while the engineering-eligible Top-3 table isolates decision-grade candidates.
+
+\noindent This avoids the presentation ambiguity highlighted in Task 6 feedback by defining "best" as the minimum penalized weighted rank \textit{J\_i} and by keeping compliance status explicit in every comparison table.
+
+
+\Needspace{10\baselineskip}
+\chapter{Scenario-by-Scenario Comparison}
+
+
+\Needspace{8\baselineskip}
 \section{S1}
 
 
@@ -312,17 +366,16 @@ SA & Engineering-feasible & 10.950 & 7780.73 & 4.627 & 2.368 & 21.481 \\
 \end{table}
 
 
-\noindent \textbf{Winner:} S1 / PSO with weighted score \texttt{10.150}; gap to second place (S1 / SA) is \texttt{0.800}.
-
-\noindent \textbf{Spread/Risk:} displacement spans \texttt{4.126} to \texttt{4.627} mm, stress spans \texttt{2.244} to \texttt{2.368} MPa, and buckling spans \texttt{20.907} to \texttt{21.481}.
-
-\noindent \textbf{Status caveat:} warning-only entries are present for BFGS and are not decision-grade designs.
-
-\noindent \textbf{Load dominance:} winner ratios are disp wind/gravity \texttt{0.107} and stress wind/gravity \texttt{0.073}; dominant drivers are displacement \texttt{gravity} and stress \texttt{gravity}.
-
+\begin{samepage}
+\noindent \textbf{Winner:} S1 / PSO with weighted score \textit{10.150}; gap to second place (S1 / SA) is \textit{0.800}.\\
+\noindent \textbf{Spread/Risk:} displacement spans \textit{4.126} to \textit{4.627} mm, stress spans \textit{2.244} to \textit{2.368} MPa, and buckling spans \textit{20.907} to \textit{21.481}.\\
+\noindent \textbf{Status caveat:} warning-only entries are present for BFGS and are not decision-grade designs.\\
+\noindent \textbf{Load dominance:} winner ratios are disp wind/gravity \textit{0.107} and stress wind/gravity \textit{0.073}; dominant drivers are displacement \textit{gravity} and stress \textit{gravity}.\\
 \noindent \textbf{Critical note:} scenario fairness is reduced by mixed compliance statuses; ranking penalties keep the comparison visible but do not make warning/fallback cases equivalent to engineering-feasible designs.
+\end{samepage}
 
 
+\Needspace{8\baselineskip}
 \section{S2}
 
 
@@ -345,17 +398,16 @@ SA & Engineering-feasible & 7.500 & 7744.01 & 9.968 & 3.818 & 24.549 \\
 \end{table}
 
 
-\noindent \textbf{Winner:} S2 / SA with weighted score \texttt{7.500}; gap to second place (S2 / BFGS) is \texttt{2.350}.
-
-\noindent \textbf{Spread/Risk:} displacement spans \texttt{9.968} to \texttt{94.040} mm, stress spans \texttt{3.818} to \texttt{10.268} MPa, and buckling spans \texttt{-3.229} to \texttt{24.549}.
-
-\noindent \textbf{Status caveat:} mathematical fallback entries are present for PSO.
-
-\noindent \textbf{Load dominance:} winner ratios are disp wind/gravity \texttt{0.028} and stress wind/gravity \texttt{0.042}; dominant drivers are displacement \texttt{gravity} and stress \texttt{gravity}.
-
+\begin{samepage}
+\noindent \textbf{Winner:} S2 / SA with weighted score \textit{7.500}; gap to second place (S2 / BFGS) is \textit{2.350}.\\
+\noindent \textbf{Spread/Risk:} displacement spans \textit{9.968} to \textit{94.040} mm, stress spans \textit{3.818} to \textit{10.268} MPa, and buckling spans \textit{-3.229} to \textit{24.549}.\\
+\noindent \textbf{Status caveat:} mathematical fallback entries are present for PSO.\\
+\noindent \textbf{Load dominance:} winner ratios are disp wind/gravity \textit{0.028} and stress wind/gravity \textit{0.042}; dominant drivers are displacement \textit{gravity} and stress \textit{gravity}.\\
 \noindent \textbf{Critical note:} scenario fairness is reduced by mixed compliance statuses; ranking penalties keep the comparison visible but do not make warning/fallback cases equivalent to engineering-feasible designs.
+\end{samepage}
 
 
+\Needspace{8\baselineskip}
 \section{S3}
 
 
@@ -378,17 +430,16 @@ SA & Engineering-feasible & 7.050 & 7742.77 & 9.036 & 3.526 & 23.834 \\
 \end{table}
 
 
-\noindent \textbf{Winner:} S3 / SA with weighted score \texttt{7.050}; gap to second place (S3 / PSO) is \texttt{2.600}.
-
-\noindent \textbf{Spread/Risk:} displacement spans \texttt{9.036} to \texttt{10.153} mm, stress spans \texttt{3.526} to \texttt{3.834} MPa, and buckling spans \texttt{23.496} to \texttt{23.834}.
-
-\noindent \textbf{Status caveat:} all three entries are engineering-feasible.
-
-\noindent \textbf{Load dominance:} winner ratios are disp wind/gravity \texttt{0.034} and stress wind/gravity \texttt{0.049}; dominant drivers are displacement \texttt{gravity} and stress \texttt{gravity}.
-
+\begin{samepage}
+\noindent \textbf{Winner:} S3 / SA with weighted score \textit{7.050}; gap to second place (S3 / PSO) is \textit{2.600}.\\
+\noindent \textbf{Spread/Risk:} displacement spans \textit{9.036} to \textit{10.153} mm, stress spans \textit{3.526} to \textit{3.834} MPa, and buckling spans \textit{23.496} to \textit{23.834}.\\
+\noindent \textbf{Status caveat:} all three entries are engineering-feasible.\\
+\noindent \textbf{Load dominance:} winner ratios are disp wind/gravity \textit{0.034} and stress wind/gravity \textit{0.049}; dominant drivers are displacement \textit{gravity} and stress \textit{gravity}.\\
 \noindent \textbf{Critical note:} winner ranking is not yet convergence-locked on this scenario; keep this as screening guidance until mesh convergence is improved.
+\end{samepage}
 
 
+\Needspace{8\baselineskip}
 \section{S4}
 
 
@@ -411,17 +462,16 @@ SA & Engineering-feasible & 12.100 & 7769.88 & 4.287 & 2.296 & 19.753 \\
 \end{table}
 
 
-\noindent \textbf{Winner:} S4 / BFGS with weighted score \texttt{10.800}; gap to second place (S4 / SA) is \texttt{1.300}.
-
-\noindent \textbf{Spread/Risk:} displacement spans \texttt{3.831} to \texttt{12.073} mm, stress spans \texttt{2.282} to \texttt{4.541} MPa, and buckling spans \texttt{19.753} to \texttt{22.491}.
-
-\noindent \textbf{Status caveat:} warning-only entries are present for PSO and are not decision-grade designs.
-
-\noindent \textbf{Load dominance:} winner ratios are disp wind/gravity \texttt{0.078} and stress wind/gravity \texttt{0.079}; dominant drivers are displacement \texttt{gravity} and stress \texttt{gravity}.
-
+\begin{samepage}
+\noindent \textbf{Winner:} S4 / BFGS with weighted score \textit{10.800}; gap to second place (S4 / SA) is \textit{1.300}.\\
+\noindent \textbf{Spread/Risk:} displacement spans \textit{3.831} to \textit{12.073} mm, stress spans \textit{2.282} to \textit{4.541} MPa, and buckling spans \textit{19.753} to \textit{22.491}.\\
+\noindent \textbf{Status caveat:} warning-only entries are present for PSO and are not decision-grade designs.\\
+\noindent \textbf{Load dominance:} winner ratios are disp wind/gravity \textit{0.078} and stress wind/gravity \textit{0.079}; dominant drivers are displacement \textit{gravity} and stress \textit{gravity}.\\
 \noindent \textbf{Critical note:} scenario fairness is reduced by mixed compliance statuses; ranking penalties keep the comparison visible but do not make warning/fallback cases equivalent to engineering-feasible designs.
+\end{samepage}
 
 
+\Needspace{8\baselineskip}
 \section{S5}
 
 
@@ -444,17 +494,16 @@ SA & Engineering-feasible & 13.350 & 7749.52 & 10.229 & 4.642 & 23.232 \\
 \end{table}
 
 
-\noindent \textbf{Winner:} S5 / BFGS with weighted score \texttt{10.600}; gap to second place (S5 / SA) is \texttt{2.750}.
-
-\noindent \textbf{Spread/Risk:} displacement spans \texttt{8.695} to \texttt{11.481} mm, stress spans \texttt{4.148} to \texttt{4.941} MPa, and buckling spans \texttt{19.566} to \texttt{23.232}.
-
-\noindent \textbf{Status caveat:} all three entries are engineering-feasible.
-
-\noindent \textbf{Load dominance:} winner ratios are disp wind/gravity \texttt{0.034} and stress wind/gravity \texttt{0.044}; dominant drivers are displacement \texttt{gravity} and stress \texttt{gravity}.
-
+\begin{samepage}
+\noindent \textbf{Winner:} S5 / BFGS with weighted score \textit{10.600}; gap to second place (S5 / SA) is \textit{2.750}.\\
+\noindent \textbf{Spread/Risk:} displacement spans \textit{8.695} to \textit{11.481} mm, stress spans \textit{4.148} to \textit{4.941} MPa, and buckling spans \textit{19.566} to \textit{23.232}.\\
+\noindent \textbf{Status caveat:} all three entries are engineering-feasible.\\
+\noindent \textbf{Load dominance:} winner ratios are disp wind/gravity \textit{0.034} and stress wind/gravity \textit{0.044}; dominant drivers are displacement \textit{gravity} and stress \textit{gravity}.\\
 \noindent \textbf{Critical note:} winner ranking is not yet convergence-locked on this scenario; keep this as screening guidance until mesh convergence is improved.
+\end{samepage}
 
 
+\Needspace{8\baselineskip}
 \section{S6}
 
 
@@ -477,17 +526,16 @@ SA & Engineering-feasible & 21.950 & 7783.24 & 14.270 & 7.690 & 19.128 \\
 \end{table}
 
 
-\noindent \textbf{Winner:} S6 / BFGS with weighted score \texttt{10.150}; gap to second place (S6 / PSO) is \texttt{6.450}.
-
-\noindent \textbf{Spread/Risk:} displacement spans \texttt{10.522} to \texttt{14.270} mm, stress spans \texttt{5.312} to \texttt{7.690} MPa, and buckling spans \texttt{19.128} to \texttt{24.772}.
-
-\noindent \textbf{Status caveat:} all three entries are engineering-feasible.
-
-\noindent \textbf{Load dominance:} winner ratios are disp wind/gravity \texttt{0.026} and stress wind/gravity \texttt{0.030}; dominant drivers are displacement \texttt{gravity} and stress \texttt{gravity}.
-
+\begin{samepage}
+\noindent \textbf{Winner:} S6 / BFGS with weighted score \textit{10.150}; gap to second place (S6 / PSO) is \textit{6.450}.\\
+\noindent \textbf{Spread/Risk:} displacement spans \textit{10.522} to \textit{14.270} mm, stress spans \textit{5.312} to \textit{7.690} MPa, and buckling spans \textit{19.128} to \textit{24.772}.\\
+\noindent \textbf{Status caveat:} all three entries are engineering-feasible.\\
+\noindent \textbf{Load dominance:} winner ratios are disp wind/gravity \textit{0.026} and stress wind/gravity \textit{0.030}; dominant drivers are displacement \textit{gravity} and stress \textit{gravity}.\\
 \noindent \textbf{Critical note:} winner ranking is not yet convergence-locked on this scenario; keep this as screening guidance until mesh convergence is improved.
+\end{samepage}
 
 
+\Needspace{8\baselineskip}
 \section{S7}
 
 
@@ -510,17 +558,16 @@ SA & Math fallback & 22.350 & 7890.85 & 12.541 & 6.711 & 26.587 \\
 \end{table}
 
 
-\noindent \textbf{Winner:} S7 / BFGS with weighted score \texttt{6.750}; gap to second place (S7 / SA) is \texttt{15.600}.
-
-\noindent \textbf{Spread/Risk:} displacement spans \texttt{10.105} to \texttt{28.467} mm, stress spans \texttt{4.134} to \texttt{9.258} MPa, and buckling spans \texttt{23.712} to \texttt{26.587}.
-
-\noindent \textbf{Status caveat:} mathematical fallback entries are present for PSO, SA.
-
-\noindent \textbf{Load dominance:} winner ratios are disp wind/gravity \texttt{0.029} and stress wind/gravity \texttt{0.036}; dominant drivers are displacement \texttt{gravity} and stress \texttt{gravity}.
-
+\begin{samepage}
+\noindent \textbf{Winner:} S7 / BFGS with weighted score \textit{6.750}; gap to second place (S7 / SA) is \textit{15.600}.\\
+\noindent \textbf{Spread/Risk:} displacement spans \textit{10.105} to \textit{28.467} mm, stress spans \textit{4.134} to \textit{9.258} MPa, and buckling spans \textit{23.712} to \textit{26.587}.\\
+\noindent \textbf{Status caveat:} mathematical fallback entries are present for PSO, SA.\\
+\noindent \textbf{Load dominance:} winner ratios are disp wind/gravity \textit{0.029} and stress wind/gravity \textit{0.036}; dominant drivers are displacement \textit{gravity} and stress \textit{gravity}.\\
 \noindent \textbf{Critical note:} scenario fairness is reduced by mixed compliance statuses; ranking penalties keep the comparison visible but do not make warning/fallback cases equivalent to engineering-feasible designs.
+\end{samepage}
 
 
+\Needspace{8\baselineskip}
 \section{S8}
 
 
@@ -543,26 +590,25 @@ SA & Warning case & 27.700 & 7718.27 & 8.163 & 4.955 & 23.837 \\
 \end{table}
 
 
-\noindent \textbf{Winner:} S8 / PSO with weighted score \texttt{27.400}; gap to second place (S8 / SA) is \texttt{0.300}.
-
-\noindent \textbf{Spread/Risk:} displacement spans \texttt{8.163} to \texttt{10.319} mm, stress spans \texttt{4.493} to \texttt{5.446} MPa, and buckling spans \texttt{19.273} to \texttt{27.335}.
-
-\noindent \textbf{Status caveat:} warning-only entries are present for BFGS, PSO, SA and are not decision-grade designs.
-
-\noindent \textbf{Load dominance:} winner ratios are disp wind/gravity \texttt{0.069} and stress wind/gravity \texttt{0.041}; dominant drivers are displacement \texttt{gravity} and stress \texttt{gravity}.
-
+\begin{samepage}
+\noindent \textbf{Winner:} S8 / PSO with weighted score \textit{27.400}; gap to second place (S8 / SA) is \textit{0.300}.\\
+\noindent \textbf{Spread/Risk:} displacement spans \textit{8.163} to \textit{10.319} mm, stress spans \textit{4.493} to \textit{5.446} MPa, and buckling spans \textit{19.273} to \textit{27.335}.\\
+\noindent \textbf{Status caveat:} warning-only entries are present for BFGS, PSO, SA and are not decision-grade designs.\\
+\noindent \textbf{Load dominance:} winner ratios are disp wind/gravity \textit{0.069} and stress wind/gravity \textit{0.041}; dominant drivers are displacement \textit{gravity} and stress \textit{gravity}.\\
 \noindent \textbf{Critical note:} winner ranking is not yet convergence-locked on this scenario; keep this as screening guidance until mesh convergence is improved.
+\end{samepage}
 
 
-\chapter{7. Convergence Summary}
+\Needspace{10\baselineskip}
+\chapter{Convergence Summary}
 
 
-\noindent The verification workflow solves both coarse and refined meshes for every case. The acceptance criteria are: displacement change below \texttt{5.0\%}, stress change below \texttt{5.0\%}, and first buckling-factor change below \texttt{10.0\%}.
+\noindent The verification workflow solves both coarse and refined meshes for every case. The acceptance criteria are: displacement change below \textit{5.0\%}, stress change below \textit{5.0\%}, and first buckling-factor change below \textit{10.0\%}.
 
 
 \noindent At the current stage, \textbf{0 of 24 comparison pairs} satisfy all three convergence criteria.
 
-\noindent Because the study is currently at \texttt{0/24} all-pass convergence, the ranking should be interpreted as comparative screening quality, not final structural qualification.
+\noindent Because the study is currently at \textit{0/24} all-pass convergence, the ranking should be interpreted as comparative screening quality, not final structural qualification.
 
 
 \begin{table}[H]
@@ -615,22 +661,23 @@ S8 / SA & Warning case & 5.04 & no & 15.88 & no & -53.02 & no & no \\
 \noindent The global winner is therefore reported as \textbf{provisional}: the ranking is valid for comparative screening, but convergence evidence is not yet strong enough for a final structural sign-off.
 
 
-\chapter{8. Wind-vs-Self-Weight Decomposition (Refined Cases)}
+\Needspace{10\baselineskip}
+\chapter{Wind-vs-Self-Weight Decomposition (Refined Cases)}
 
 
 \noindent To separate load influence explicitly, each refined comparison tower is re-solved with gravity-only and wind-only static steps.
 
 \noindent The combined-load ranking remains unchanged; decomposition is used as an interpretation layer.
 
-\noindent Across all \texttt{24} cases, displacement is wind-dominant in \texttt{1} cases and stress is wind-dominant in \texttt{0} cases.
+\noindent Across all \textit{24} cases, displacement is wind-dominant in \textit{1} cases and stress is wind-dominant in \textit{0} cases.
 
-\noindent Median wind-to-gravity ratios are \texttt{0.048} for displacement and \texttt{0.043} for stress, with IQR ranges \texttt{0.028}-\texttt{0.083} (displacement) and \texttt{0.040}-\texttt{0.072} (stress).
+\noindent Median wind-to-gravity ratios are \textit{0.048} for displacement and \textit{0.043} for stress, with IQR ranges \textit{0.028}-\textit{0.083} (displacement) and \textit{0.040}-\textit{0.072} (stress).
 
-\noindent Tail sensitivity remains important: P90 wind-to-gravity ratios are \texttt{0.179} for displacement and \texttt{0.081} for stress.
+\noindent Tail sensitivity remains important: P90 wind-to-gravity ratios are \textit{0.179} for displacement and \textit{0.081} for stress.
 
 \noindent Critical interpretation: most towers remain gravity-led in global reaction, while wind can still control local displacement/stress behavior for specific geometries. This is why the report keeps both decomposition evidence and weighted ranking instead of collapsing to one indicator.
 
-\noindent Because convergence is currently \texttt{0/24} all-pass, decomposition trends are used as high-value screening evidence but not as final qualification proof.
+\noindent Because convergence is currently \textit{0/24} all-pass, decomposition trends are used as high-value screening evidence but not as final qualification proof.
 
 
 \begin{table}[H]
@@ -673,7 +720,8 @@ S8 / SA & Warning case & 8.019 & 0.489 & 0.061 & gravity & 4.888 & 0.228 & 0.047
 \end{table}
 
 
-\chapter{9. Warning Cases from Scenario S8}
+\Needspace{10\baselineskip}
+\chapter{Warning Cases from Scenario S8}
 
 
 \noindent Scenario S8 is kept intentionally as a warning family. None of the Task 6 S8 runs are mathematically compliant or engineering-feasible, so these Abaqus models are useful only as structural cautionary examples and not as candidate towers for recommendation.
@@ -686,18 +734,35 @@ S8 / SA & Warning case & 8.019 & 0.489 & 0.061 & gravity & 4.888 & 0.228 & 0.047
 \end{figure}
 
 
-\chapter{10. Field Visualizations of the Global Top-5}
+\Needspace{10\baselineskip}
+\chapter{Final Critical Conclusions}
+
+
+\noindent The current global leader is \textit{S7 / BFGS} (Engineering-feasible) with weighted score \textit{6.750}.
+
+\noindent Convergence confidence is still limited (\textit{0/24} all-pass), so the current winner must be treated as provisional screening output rather than final structural qualification.
+
+\noindent Load decomposition shows the action split clearly: displacement is wind-dominant in \textit{1/24} cases and stress is wind-dominant in \textit{0/24} cases.
+
+\noindent Median wind/gravity ratios are \textit{0.048} for displacement and \textit{0.043} for stress, which indicates a predominantly self-weight-driven response in this dataset with wind becoming locally decisive only in a small displacement subset.
+
+\noindent The ranking remains fair for screening because buckling, displacement, stress, and area are combined with explicit compliance penalties; final design lock-in should wait for stronger convergence closure and, if schedule allows, a higher-fidelity wind-standard calibration.
+
+
+\Needspace{10\baselineskip}
+\chapter{Field Visualizations of the Global Top-5}
 
 
 \noindent All detailed field figures are rendered from actual Abaqus ODB data with Python, not from Abaqus screenshots.
 
-\noindent Simulation geometry remains true-scale from Task 6. For readability, the rendered figures use a display-only vertical exaggeration of \texttt{1.35x} and a consistent left-to-right wind-view policy.
+\noindent Simulation geometry remains true-scale from Task 6. Rendered views use consistent camera framing and a left-to-right wind-view policy for direct cross-case comparison.
 
-\noindent Wind arrows are bound to the configured physical wind axis (\texttt{+X}), so they indicate actual load direction rather than decorative annotation.
+\noindent Wind arrows are bound to the configured physical wind axis (\textit{+X}), so they indicate actual load direction rather than decorative annotation.
 
-\noindent Per-case camera/arrow verification is enforced numerically through \texttt{plot\_view\_audit.csv}: the camera is perpendicular to wind direction, wind projects left-to-right on screen, and arrows stay outside the tower silhouette.
+\noindent Per-case camera/arrow verification is enforced numerically through \textit{plot\_view\_audit.csv}: the camera is perpendicular to wind direction, wind projects left-to-right on screen, and arrows stay outside the tower silhouette.
 
 
+\Needspace{8\baselineskip}
 \section{S7 / BFGS}
 
 
@@ -722,9 +787,10 @@ S8 / SA & Warning case & 8.019 & 0.489 & 0.061 & gravity & 4.888 & 0.228 & 0.047
 \end{figure}
 
 
-\noindent \textbf{Performance Discussion (Rank 1):} The \texttt{S7 / BFGS} model (Engineering-feasible) achieved an overall weighted score of \texttt{6.750}. It demonstrates strong structural integrity with a first buckling factor of \texttt{24.948}. Under the applied wind load, the maximum observed displacement is bounded at \texttt{10.105 mm}, and peak von Mises stresses reach \texttt{4.134 MPa}. As the top-ranked candidate, this geometry offers the most convincing balance of minimal material footprint, acceptable deflection, and a high margin against linear buckling.
+\noindent \textbf{Rank/Status:} Rank \textit{1}, \textit{Engineering-feasible}, weighted score \textit{6.750}. \textbf{Metrics:} buckling \textit{24.948}, max displacement \textit{10.105 mm}, max stress \textit{4.134 MPa}. \textbf{Interpretation:} best current compromise across stability, stiffness, and stress.
 
 
+\Needspace{8\baselineskip}
 \section{S3 / SA}
 
 
@@ -749,9 +815,10 @@ S8 / SA & Warning case & 8.019 & 0.489 & 0.061 & gravity & 4.888 & 0.228 & 0.047
 \end{figure}
 
 
-\noindent \textbf{Performance Discussion (Rank 2):} The \texttt{S3 / SA} model (Engineering-feasible) achieved an overall weighted score of \texttt{7.050}. It demonstrates strong structural integrity with a first buckling factor of \texttt{23.834}. Under the applied wind load, the maximum observed displacement is bounded at \texttt{9.036 mm}, and peak von Mises stresses reach \texttt{3.526 MPa}. As a high-ranking runner-up, it presents an extremely competitive alternative, trading minimal surface area differences for robust stress and displacement behavior.
+\noindent \textbf{Rank/Status:} Rank \textit{2}, \textit{Engineering-feasible}, weighted score \textit{7.050}. \textbf{Metrics:} buckling \textit{23.834}, max displacement \textit{9.036 mm}, max stress \textit{3.526 MPa}. \textbf{Interpretation:} high-value runner-up with a narrow gap to the leader.
 
 
+\Needspace{8\baselineskip}
 \section{S2 / SA}
 
 
@@ -776,9 +843,10 @@ S8 / SA & Warning case & 8.019 & 0.489 & 0.061 & gravity & 4.888 & 0.228 & 0.047
 \end{figure}
 
 
-\noindent \textbf{Performance Discussion (Rank 3):} The \texttt{S2 / SA} model (Engineering-feasible) achieved an overall weighted score of \texttt{7.500}. It demonstrates strong structural integrity with a first buckling factor of \texttt{24.549}. Under the applied wind load, the maximum observed displacement is bounded at \texttt{9.968 mm}, and peak von Mises stresses reach \texttt{3.818 MPa}. As a high-ranking runner-up, it presents an extremely competitive alternative, trading minimal surface area differences for robust stress and displacement behavior.
+\noindent \textbf{Rank/Status:} Rank \textit{3}, \textit{Engineering-feasible}, weighted score \textit{7.500}. \textbf{Metrics:} buckling \textit{24.549}, max displacement \textit{9.968 mm}, max stress \textit{3.818 MPa}. \textbf{Interpretation:} high-value runner-up with a narrow gap to the leader.
 
 
+\Needspace{8\baselineskip}
 \section{S3 / PSO}
 
 
@@ -803,9 +871,10 @@ S8 / SA & Warning case & 8.019 & 0.489 & 0.061 & gravity & 4.888 & 0.228 & 0.047
 \end{figure}
 
 
-\noindent \textbf{Performance Discussion (Rank 4):} The \texttt{S3 / PSO} model (Engineering-feasible) achieved an overall weighted score of \texttt{9.650}. It demonstrates strong structural integrity with a first buckling factor of \texttt{23.496}. Under the applied wind load, the maximum observed displacement is bounded at \texttt{9.850 mm}, and peak von Mises stresses reach \texttt{3.794 MPa}. Although ranking slightly lower within the top 5, it remains a structurally sound and convincing concept that safely satisfies engineering constraints.
+\noindent \textbf{Rank/Status:} Rank \textit{4}, \textit{Engineering-feasible}, weighted score \textit{9.650}. \textbf{Metrics:} buckling \textit{23.496}, max displacement \textit{9.850 mm}, max stress \textit{3.794 MPa}. \textbf{Interpretation:} structurally credible but less balanced than the first three ranks.
 
 
+\Needspace{8\baselineskip}
 \section{S2 / BFGS}
 
 
@@ -830,18 +899,21 @@ S8 / SA & Warning case & 8.019 & 0.489 & 0.061 & gravity & 4.888 & 0.228 & 0.047
 \end{figure}
 
 
-\noindent \textbf{Performance Discussion (Rank 5):} The \texttt{S2 / BFGS} model (Engineering-feasible) achieved an overall weighted score of \texttt{9.850}. It demonstrates strong structural integrity with a first buckling factor of \texttt{23.563}. Under the applied wind load, the maximum observed displacement is bounded at \texttt{10.202 mm}, and peak von Mises stresses reach \texttt{3.867 MPa}. Although ranking slightly lower within the top 5, it remains a structurally sound and convincing concept that safely satisfies engineering constraints.
+\noindent \textbf{Rank/Status:} Rank \textit{5}, \textit{Engineering-feasible}, weighted score \textit{9.850}. \textbf{Metrics:} buckling \textit{23.563}, max displacement \textit{10.202 mm}, max stress \textit{3.867 MPa}. \textbf{Interpretation:} structurally credible but less balanced than the first three ranks.
 
 
-\chapter{11. Annex: Complete Field Visualizations}
+\Needspace{10\baselineskip}
+\chapter{Annex: Complete Field Visualizations}
 
 
 \noindent This section contains the field visualizations for the remaining 19 candidates out of the total 24 refined presentation models, organized by Scenario.
 
 
+\Needspace{8\baselineskip}
 \section{Scenario S1}
 
 
+\Needspace{6\baselineskip}
 \subsection{S1 / BFGS}
 
 
@@ -866,6 +938,7 @@ S8 / SA & Warning case & 8.019 & 0.489 & 0.061 & gravity & 4.888 & 0.228 & 0.047
 \end{figure}
 
 
+\Needspace{6\baselineskip}
 \subsection{S1 / PSO}
 
 
@@ -890,6 +963,7 @@ S8 / SA & Warning case & 8.019 & 0.489 & 0.061 & gravity & 4.888 & 0.228 & 0.047
 \end{figure}
 
 
+\Needspace{6\baselineskip}
 \subsection{S1 / SA}
 
 
@@ -914,9 +988,11 @@ S8 / SA & Warning case & 8.019 & 0.489 & 0.061 & gravity & 4.888 & 0.228 & 0.047
 \end{figure}
 
 
+\Needspace{8\baselineskip}
 \section{Scenario S2}
 
 
+\Needspace{6\baselineskip}
 \subsection{S2 / PSO}
 
 
@@ -941,9 +1017,11 @@ S8 / SA & Warning case & 8.019 & 0.489 & 0.061 & gravity & 4.888 & 0.228 & 0.047
 \end{figure}
 
 
+\Needspace{8\baselineskip}
 \section{Scenario S3}
 
 
+\Needspace{6\baselineskip}
 \subsection{S3 / BFGS}
 
 
@@ -968,9 +1046,11 @@ S8 / SA & Warning case & 8.019 & 0.489 & 0.061 & gravity & 4.888 & 0.228 & 0.047
 \end{figure}
 
 
+\Needspace{8\baselineskip}
 \section{Scenario S4}
 
 
+\Needspace{6\baselineskip}
 \subsection{S4 / BFGS}
 
 
@@ -995,6 +1075,7 @@ S8 / SA & Warning case & 8.019 & 0.489 & 0.061 & gravity & 4.888 & 0.228 & 0.047
 \end{figure}
 
 
+\Needspace{6\baselineskip}
 \subsection{S4 / PSO}
 
 
@@ -1019,6 +1100,7 @@ S8 / SA & Warning case & 8.019 & 0.489 & 0.061 & gravity & 4.888 & 0.228 & 0.047
 \end{figure}
 
 
+\Needspace{6\baselineskip}
 \subsection{S4 / SA}
 
 
@@ -1043,9 +1125,11 @@ S8 / SA & Warning case & 8.019 & 0.489 & 0.061 & gravity & 4.888 & 0.228 & 0.047
 \end{figure}
 
 
+\Needspace{8\baselineskip}
 \section{Scenario S5}
 
 
+\Needspace{6\baselineskip}
 \subsection{S5 / BFGS}
 
 
@@ -1070,6 +1154,7 @@ S8 / SA & Warning case & 8.019 & 0.489 & 0.061 & gravity & 4.888 & 0.228 & 0.047
 \end{figure}
 
 
+\Needspace{6\baselineskip}
 \subsection{S5 / PSO}
 
 
@@ -1094,6 +1179,7 @@ S8 / SA & Warning case & 8.019 & 0.489 & 0.061 & gravity & 4.888 & 0.228 & 0.047
 \end{figure}
 
 
+\Needspace{6\baselineskip}
 \subsection{S5 / SA}
 
 
@@ -1118,9 +1204,11 @@ S8 / SA & Warning case & 8.019 & 0.489 & 0.061 & gravity & 4.888 & 0.228 & 0.047
 \end{figure}
 
 
+\Needspace{8\baselineskip}
 \section{Scenario S6}
 
 
+\Needspace{6\baselineskip}
 \subsection{S6 / BFGS}
 
 
@@ -1145,6 +1233,7 @@ S8 / SA & Warning case & 8.019 & 0.489 & 0.061 & gravity & 4.888 & 0.228 & 0.047
 \end{figure}
 
 
+\Needspace{6\baselineskip}
 \subsection{S6 / PSO}
 
 
@@ -1169,6 +1258,7 @@ S8 / SA & Warning case & 8.019 & 0.489 & 0.061 & gravity & 4.888 & 0.228 & 0.047
 \end{figure}
 
 
+\Needspace{6\baselineskip}
 \subsection{S6 / SA}
 
 
@@ -1193,9 +1283,11 @@ S8 / SA & Warning case & 8.019 & 0.489 & 0.061 & gravity & 4.888 & 0.228 & 0.047
 \end{figure}
 
 
+\Needspace{8\baselineskip}
 \section{Scenario S7}
 
 
+\Needspace{6\baselineskip}
 \subsection{S7 / PSO}
 
 
@@ -1220,6 +1312,7 @@ S8 / SA & Warning case & 8.019 & 0.489 & 0.061 & gravity & 4.888 & 0.228 & 0.047
 \end{figure}
 
 
+\Needspace{6\baselineskip}
 \subsection{S7 / SA}
 
 
@@ -1244,9 +1337,11 @@ S8 / SA & Warning case & 8.019 & 0.489 & 0.061 & gravity & 4.888 & 0.228 & 0.047
 \end{figure}
 
 
+\Needspace{8\baselineskip}
 \section{Scenario S8}
 
 
+\Needspace{6\baselineskip}
 \subsection{S8 / BFGS}
 
 
@@ -1271,6 +1366,7 @@ S8 / SA & Warning case & 8.019 & 0.489 & 0.061 & gravity & 4.888 & 0.228 & 0.047
 \end{figure}
 
 
+\Needspace{6\baselineskip}
 \subsection{S8 / PSO}
 
 
@@ -1295,6 +1391,7 @@ S8 / SA & Warning case & 8.019 & 0.489 & 0.061 & gravity & 4.888 & 0.228 & 0.047
 \end{figure}
 
 
+\Needspace{6\baselineskip}
 \subsection{S8 / SA}
 
 

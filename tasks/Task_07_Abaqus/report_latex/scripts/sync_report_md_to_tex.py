@@ -10,10 +10,20 @@ CODE_RE = re.compile(r"`(.*?)`")
 MATH_RE = re.compile(r"\$(.*?)\$")
 # Standard markdown image ![caption](path)
 IMAGE_RE = re.compile(r"!\[(.*?)\]\((.*?)\)")
+SCENARIO_NOTE_PREFIXES = (
+    "**Winner:**",
+    "**Spread/Risk:**",
+    "**Spread:**",
+    "**Status caveat:**",
+    "**Load dominance:**",
+    "**Critical note:**",
+)
 
 
 def _clean_heading(text: str) -> str:
     text = text.replace("[Annex]", "").strip()
+    # Avoid duplicated numbering in LaTeX (e.g., "5.1 5.1 Methodological...")
+    text = re.sub(r"^\d+(?:\.\d+)*\.?\s+", "", text)
     return text
 
 
@@ -27,7 +37,7 @@ def _convert_inline(text: str) -> str:
     text = MATH_RE.sub(_stash_math, text)
     text = text.replace("%", r"\%").replace("&", r"\&").replace("#", r"\#").replace("_", r"\_").replace("^", r"\textasciicircum{}")
     text = BOLD_RE.sub(r"\\textbf{\1}", text)
-    text = CODE_RE.sub(r"\\texttt{\1}", text)
+    text = CODE_RE.sub(r"\\textit{\1}", text)
     for idx, chunk in enumerate(math_chunks):
         text = text.replace(f"@@MATH{idx}@@", r"\(" + chunk + r"\)")
     return text
@@ -137,6 +147,7 @@ def convert_markdown_to_tex(md_text: str) -> str:
             if in_list:
                 out.append(r"\end{itemize}")
                 in_list = False
+            out.append(r"\Needspace{10\baselineskip}")
             out.append(r"\chapter{" + _convert_inline(_clean_heading(stripped[3:])) + "}")
             out.append("")
             i += 1
@@ -145,6 +156,7 @@ def convert_markdown_to_tex(md_text: str) -> str:
             if in_list:
                 out.append(r"\end{itemize}")
                 in_list = False
+            out.append(r"\Needspace{8\baselineskip}")
             out.append(r"\section{" + _convert_inline(_clean_heading(stripped[4:])) + "}")
             out.append("")
             i += 1
@@ -153,6 +165,7 @@ def convert_markdown_to_tex(md_text: str) -> str:
             if in_list:
                 out.append(r"\end{itemize}")
                 in_list = False
+            out.append(r"\Needspace{6\baselineskip}")
             out.append(r"\subsection{" + _convert_inline(_clean_heading(stripped[5:])) + "}")
             out.append("")
             i += 1
@@ -206,6 +219,27 @@ def convert_markdown_to_tex(md_text: str) -> str:
                 in_list = False
             out.append("")
             i += 1
+            continue
+
+        # Scenario interpretation blocks (winner/spread/status/critical) should stay together.
+        if any(stripped.startswith(prefix) for prefix in SCENARIO_NOTE_PREFIXES):
+            if in_list:
+                out.append(r"\end{itemize}")
+                in_list = False
+            note_lines: List[str] = []
+            while i < len(lines):
+                candidate = lines[i].strip()
+                if any(candidate.startswith(prefix) for prefix in SCENARIO_NOTE_PREFIXES):
+                    note_lines.append(_convert_inline(candidate))
+                    i += 1
+                    continue
+                break
+            out.append(r"\begin{samepage}")
+            for note_index, note_line in enumerate(note_lines):
+                suffix = r"\\" if note_index < len(note_lines) - 1 else ""
+                out.append(r"\noindent " + note_line + suffix)
+            out.append(r"\end{samepage}")
+            out.append("")
             continue
 
         # Normal paragraph text.

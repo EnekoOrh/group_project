@@ -1103,6 +1103,7 @@ def main():
     stress_summary = decomp_summary_by_metric.get("stress", {})
     decomposition_by_case = _decomposition_map(decomposition_entries)
     convergence_by_case = _convergence_map(convergence_rows)
+    top_engineering_entry = next((entry for entry in ranked_entries if entry["row"]["selection_status"] == STATUS_ENGINEERING), None)
 
     disp_ratios = [float(entry["wind_to_gravity_disp_ratio"]) for entry in decomposition_entries if math.isfinite(float(entry["wind_to_gravity_disp_ratio"]))]
     stress_ratios = [float(entry["wind_to_gravity_stress_ratio"]) for entry in decomposition_entries if math.isfinite(float(entry["wind_to_gravity_stress_ratio"]))]
@@ -1136,6 +1137,26 @@ def main():
     lines.append(_selection_matrix(cases))
     lines.append("")
     lines.append("![Task 7 candidate profiles](../figures/candidate_profiles.png)")
+    lines.append("")
+    lines.append("### 2.1 Selection and Compliance Semantics")
+    lines.append("")
+    lines.append("To keep Task 6 -> Task 7 interpretation unambiguous, each selected case carries its original status tier.")
+    lines.append("Task 6 mathematical compliance is tied to normalized target constraints:")
+    lines.append("$$")
+    lines.append("g_V = \\frac{|V - V^*|}{V^*}, \\qquad g_H = \\frac{|H - H^*|}{H^*}")
+    lines.append("$$")
+    lines.append("A mathematically compliant case satisfies $g_V \\le \\varepsilon_V$ and $g_H \\le \\varepsilon_H$.")
+    lines.append("Engineering-feasible means mathematically compliant **and** passing the additional engineering plausibility checks from Task 6.")
+    lines.append("The Task 7 selection rule per scenario/optimizer pair is:")
+    lines.append("$$")
+    lines.append("\\begin{aligned}")
+    lines.append("r^* &= \\arg\\min A(r) && \\text{over engineering-feasible runs} \\\\")
+    lines.append("&\\text{else }= \\arg\\min A(r) && \\text{over mathematically compliant runs} \\\\")
+    lines.append("&\\text{else }= \\arg\\min F_{pen}(r) && \\text{(warning fallback only)}")
+    lines.append("\\end{aligned}")
+    lines.append("$$")
+    lines.append("where `A` is shell area and `F_{pen}` is the penalized Task 6 objective.")
+    lines.append("This defines exactly what \"best\" means in this report and why fallback/warning statuses appear in some scenario rows.")
     lines.append("")
     lines.append("## 3. Material, Loading, and CAE Setup")
     lines.append("")
@@ -1215,6 +1236,12 @@ def main():
     lines.append("")
     lines.append("![Task 7 engineering criterion leaders](../figures/task7_criterion_top3_engineering.png)")
     lines.append("")
+    lines.append("### 5.4 Reproducibility and Fairness Controls")
+    lines.append("")
+    lines.append("Task 7 ranking is deterministic: every score is computed from the latest refined Abaqus results with fixed tie-breaks, so repeated report generation gives the same ordering.")
+    lines.append("Fairness is handled in two layers: warning/fallback cases remain visible in the global ranking through explicit penalties, while the engineering-eligible Top-3 table isolates decision-grade candidates.")
+    lines.append("This avoids the presentation ambiguity highlighted in Task 6 feedback by defining \"best\" as the minimum penalized weighted rank `J_i` and by keeping compliance status explicit in every comparison table.")
+    lines.append("")
     lines.append("## 6. Scenario-by-Scenario Comparison")
     lines.append("")
     for scenario_id in config["selection"]["scenario_ids"]:
@@ -1284,10 +1311,35 @@ def main():
     lines.append("")
     lines.append("![Scenario S8 warning metrics](../figures/s8_warning_metrics.png)")
     lines.append("")
-    lines.append("## 10. Field Visualizations of the Global Top-5")
+    lines.append("## 10. Final Critical Conclusions")
+    lines.append("")
+    winner_entry = ranking_by_case[winner["case_id"]]
+    winner_status = STATUS_TEXT[winner["selection_status"]]
+    lines.append(
+        f"The current global leader is `{winner['case_label']}` ({winner_status}) with weighted score `{winner_entry['weighted_score']:.3f}`."
+    )
+    if top_engineering_entry is not None and top_engineering_entry["row"]["case_id"] != winner["case_id"]:
+        top_eng_row = top_engineering_entry["row"]
+        lines.append(
+            f"The strongest engineering-feasible alternative is `{top_eng_row['case_label']}` at overall rank `{top_engineering_entry['overall_rank']}`, which remains the primary backup if compliance-only filtering is enforced."
+        )
+    lines.append(
+        f"Convergence confidence is still limited (`{converged_count}/{len(convergence_rows)}` all-pass), so the current winner must be treated as provisional screening output rather than final structural qualification."
+    )
+    lines.append(
+        f"Load decomposition shows the action split clearly: displacement is wind-dominant in `{disp_summary.get('wind_dominant_cases', 'n/a')}/{len(decomposition_entries)}` cases and stress is wind-dominant in `{stress_summary.get('wind_dominant_cases', 'n/a')}/{len(decomposition_entries)}` cases."
+    )
+    lines.append(
+        f"Median wind/gravity ratios are `{float(disp_summary.get('median_wind_to_gravity_ratio', float('nan'))):.3f}` for displacement and `{float(stress_summary.get('median_wind_to_gravity_ratio', float('nan'))):.3f}` for stress, which indicates a predominantly self-weight-driven response in this dataset with wind becoming locally decisive only in a small displacement subset."
+    )
+    lines.append(
+        "The ranking remains fair for screening because buckling, displacement, stress, and area are combined with explicit compliance penalties; final design lock-in should wait for stronger convergence closure and, if schedule allows, a higher-fidelity wind-standard calibration."
+    )
+    lines.append("")
+    lines.append("## 11. Field Visualizations of the Global Top-5")
     lines.append("")
     lines.append("All detailed field figures are rendered from actual Abaqus ODB data with Python, not from Abaqus screenshots.")
-    lines.append("Simulation geometry remains true-scale from Task 6. For readability, the rendered figures use a display-only vertical exaggeration of `1.35x` and a consistent left-to-right wind-view policy.")
+    lines.append("Simulation geometry remains true-scale from Task 6. Rendered views use consistent camera framing and a left-to-right wind-view policy for direct cross-case comparison.")
     lines.append(f"Wind arrows are bound to the configured physical wind axis (`{config['wind'].get('wind_direction_axis', '+X')}`), so they indicate actual load direction rather than decorative annotation.")
     lines.append("Per-case camera/arrow verification is enforced numerically through `plot_view_audit.csv`: the camera is perpendicular to wind direction, wind projects left-to-right on screen, and arrows stay outside the tower silhouette.")
     lines.append("")
@@ -1305,19 +1357,20 @@ def main():
         stress = float(row["max_mises_pa"]) / 1e6
         status_text = STATUS_TEXT[row["selection_status"]]
         
-        discussion = f"**Performance Discussion (Rank {rank}):** The `{row['case_label']}` model ({status_text}) achieved an overall weighted score of `{score:.3f}`. It demonstrates strong structural integrity with a first buckling factor of `{buckling:.3f}`. Under the applied wind load, the maximum observed displacement is bounded at `{disp:.3f} mm`, and peak von Mises stresses reach `{stress:.3f} MPa`."
-        
+        discussion = f"**Rank/Status:** Rank `{rank}`, `{status_text}`, weighted score `{score:.3f}`."
+        discussion += f" **Metrics:** buckling `{buckling:.3f}`, max displacement `{disp:.3f} mm`, max stress `{stress:.3f} MPa`."
+
         if rank == 1:
-            discussion += " As the top-ranked candidate, this geometry offers the most convincing balance of minimal material footprint, acceptable deflection, and a high margin against linear buckling."
+            discussion += " **Interpretation:** best current compromise across stability, stiffness, and stress."
         elif rank in [2, 3]:
-            discussion += " As a high-ranking runner-up, it presents an extremely competitive alternative, trading minimal surface area differences for robust stress and displacement behavior."
+            discussion += " **Interpretation:** high-value runner-up with a narrow gap to the leader."
         else:
-            discussion += " Although ranking slightly lower within the top 5, it remains a structurally sound and convincing concept that safely satisfies engineering constraints."
+            discussion += " **Interpretation:** structurally credible but less balanced than the first three ranks."
         
         lines.append(discussion)
         lines.append("")
 
-    lines.append("## 11. Annex: Complete Field Visualizations")
+    lines.append("## 12. Annex: Complete Field Visualizations")
     lines.append("")
     lines.append("This section contains the field visualizations for the remaining 19 candidates out of the total 24 refined presentation models, organized by Scenario.")
     lines.append("")
