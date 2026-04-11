@@ -1,0 +1,9 @@
+date,event,artifact,who_involved,confidence
+2026-02-25,Task 6 reporting and pipeline hardening milestone,git commits on tasks/Task_06_Cooling_Tower (531e4bc; 6e63ac8; dbd9784),Group-level integration (multi-contributor),H
+2026-03-15,Task 6/7 bridge with field-based plotting integration,git commit ef96479,Integration-focused contribution across task boundary,H
+2026-03-24,Task 7 simulation/report infrastructure milestone,git commit 3c35aec on tasks/Task_07_Abaqus,Group-level technical delivery,H
+2026-03-25,Task 7 results/report iteration milestone,git commit a3778d1 on tasks/Task_07_Abaqus,Group-level technical delivery,H
+2026-03-26,Task 7 report source and PDF pipeline completion,git commits 2c06e1e and 727d30e on tasks/Task_07_Abaqus,Group-level finalization,H
+2026-02 (approx),Task 6 planning and scenario framing cadence,Notion meeting/action traces and report evolution,Coordination and reporting contributors,M
+2026-03 (approx),Late-task hybrid role mode became explicit in practice,Meeting follow-ups and integration decisions around Task 7,All members with role overlap,M
+2026-03 (approx),Non-repo integration work intensified near deadlines,Coordination notes and report correction loops,Coordination/report maintainers,M

@@ -1,0 +1,7 @@
+Criterion,Weight (%),What to assess,Scoring guide (0-5)
+Technical Quality,25,Correctness and rigor of technical outputs,0=Frequent weak output; 3=Solid work; 5=High-quality and robust
+Delivery Reliability,20,Commitment follow-through and closure consistency,0=Frequent misses; 3=Generally reliable; 5=Consistently accountable
+Integration and Handover Quality,15,How reusable and handoff-ready outputs are,0=Hard to reuse; 3=Usable with rework; 5=Cleanly reusable by others
+Problem-Solving Under Constraints,15,Response quality under blockers and deadline pressure,0=Reactive only; 3=Often proactive; 5=Consistently resolves blockers
+Collaboration Quality,15,Teamwork clarity and constructive communication,0=Low collaboration; 3=Constructive collaboration; 5=Strong collaborative driver
+Adaptability and Learning,10,Ability to adjust quickly to changing scope/tools,0=Struggles to adapt; 3=Adapts with support; 5=Adapts quickly and effectively

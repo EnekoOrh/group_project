@@ -1,0 +1,24 @@
+Week ending (Sunday),Hours,Workstream split (L/C/R/TO/TA),Main outputs,Confidence
+2025-10-26,3,"35/25/20/20/0","Kickoff reading of assignment brief; initial role reflection notes",L
+2025-11-02,4,"35/20/25/20/0","Task 1 drafting pass; Skills Matrix/Strengths alignment",M
+2025-11-09,5,"40/20/20/20/0","Group setup coordination and role-discussion prep",M
+2025-11-16,7,"45/25/20/10/0","Task 1 finalization and first role-allocation meeting support",H
+2025-11-23,6,"40/25/20/15/0","Task planning follow-up and meeting summary consolidation",M
+2025-11-30,5,"35/25/20/20/0","Task 3 preparation and workflow organization",M
+2025-12-07,8,"30/15/25/30/0","Task 3 result iteration and report updates",H
+2025-12-14,4,"30/20/30/20/0","Quality pass on output consistency and communication",M
+2025-12-21,2,"40/30/20/10/0","Coordination check-ins before holiday period",L
+2025-12-28,1,"40/30/20/10/0","Low activity week; asynchronous planning notes",L
+2026-01-04,3,"35/25/20/20/0","Task 4 ramp-up planning and technical scope sync",L
+2026-01-11,7,"25/15/25/35/0","BFGS/task orchestration support and experiment framing",H
+2026-01-18,12,"20/10/20/50/0","Task 4 implementation drive and report evidence integration",H
+2026-01-25,11,"25/10/25/40/0","Task 4 completion loop (scripts, outputs, report quality)",H
+2026-02-01,6,"35/20/25/20/0","Transition planning toward Task 6",M
+2026-02-08,6,"35/20/25/20/0","Scenario planning and report structure preparation for Task 6",M
+2026-02-15,5,"30/20/30/20/0","Task 6 methodology clarifications and writing support",M
+2026-02-22,14,"20/10/35/35/0","Task 6 heavy iteration: scenarios, tables, compliance framing",H
+2026-03-01,16,"20/10/40/30/0","Task 6 final integration, LaTeX pipeline, and quality corrections",H
+2026-03-08,9,"25/15/30/20/10","Task 6->7 transition and Abaqus setup participation",M
+2026-03-15,15,"20/10/30/15/25","Task 7 workflow shaping; data-to-report linkage; simulation support",H
+2026-03-22,20,"20/10/35/10/25","Task 7 full integration cycle (figures, report, QA, consistency checks)",H
+2026-03-29,18,"20/10/45/5/20","Task 8 reflection drafting, evidence consolidation, final proofreading",H

@@ -1,0 +1,7 @@
+﻿use utf8;
+$pdf_mode = 1;
+$pdflatex = 'pdflatex -interaction=nonstopmode -file-line-error %O %S';
+$bibtex = 'biber %O %B';
+$jobname = 'Task8_Achille_Individual_Report';
+$out_dir = '..';
+$aux_dir = 'build';
