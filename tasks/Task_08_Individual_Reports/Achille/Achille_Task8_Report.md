@@ -158,10 +158,10 @@ Overall score is the weighted score from these six criteria.
 
 | Member | Technical Quality | Delivery Reliability | Integration and Handover | Problem-Solving Under Constraints | Collaboration Quality | Adaptability and Learning | Weighted score (/5) |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| Achille Larregle | 4.2 | 4.5 | 4.6 | 4.6 | 4.1 | 4.3 | 4.38 |
-| Eneko Orhategaray | 4.2 | 3.9 | 4.0 | 3.8 | 4.0 | 4.1 | 4.01 |
-| Aiert Ceccon | 3.9 | 3.6 | 3.6 | 3.7 | 3.8 | 3.9 | 3.75 |
-| Paul Brocvielle | 4.0 | 3.8 | 3.8 | 3.7 | 3.9 | 3.8 | 3.85 |
+| Achille Larregle | 4.0 | 4.5 | 4.6 | 4.1 | 4.1 | 4.2 | 4.25 |
+| Eneko Orhategaray | 4.8 | 3.9 | 4.2 | 3.8 | 4.0 | 4.3 | 4.17 |
+| Aiert Ceccon | 4.7 | 3.6 | 4.2 | 3.7 | 4.4 | 4.3 | 4.15 |
+| Paul Brocvielle | 4.6 | 3.8 | 3.7 | 4.0 | 4.1 | 4.5 | 4.12 |
 
 ### 7.3 Individual analyses
 
