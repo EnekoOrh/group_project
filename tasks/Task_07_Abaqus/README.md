@@ -50,6 +50,9 @@ Task_07_Abaqus/
     cae/
     data/
     figures/
+    models/
+      stl/
+      stl_manifest.csv
     inputs/
     jobs/
     report/
@@ -106,6 +109,17 @@ powershell -ExecutionPolicy Bypass -File tasks/Task_07_Abaqus/scripts/run_task7_
 # Reuse existing ODB results but skip the final PDF compile
 powershell -ExecutionPolicy Bypass -File tasks/Task_07_Abaqus/scripts/run_task7_pipeline.ps1 -SkipAbaqus -SkipCae -SkipLatex
 ```
+
+STL export for all `24` selected towers:
+
+```powershell
+python tasks/Task_07_Abaqus/scripts/export_tower_stl.py
+```
+
+Default STL output location:
+
+- `tasks/Task_07_Abaqus/results/models/stl/`
+- `tasks/Task_07_Abaqus/results/models/stl_manifest.csv`
 
 ## Expected outputs
 
