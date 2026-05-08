@@ -1,0 +1,9 @@
+claim,evidence_type,evidence_location,confidence
+Task 6 cooling-tower geometry and surface-area derivation,git commits,tasks/Task_06_Cooling_Tower/ (2026-02-25 integration window),H
+Task 6 plotting pipeline and figure generation,git commits + generated figures,tasks/Task_06_Cooling_Tower/results/figures/ (2026-02-25),H
+Task 6 scenario definitions and penalty-function experiments,git commits,tasks/Task_06_Cooling_Tower/run_experiments.py and config,H
+Task 7 geometry scale and unit verification,generated audit files,tasks/Task_07_Abaqus/results/data/scale_geometry_audit.csv,M
+Task 7 figure-to-report alignment support,non-repo coordination,Meeting notes and report review (2026-03-24 to 2026-03-26),M
+Quality assurance and sanity checks on convergence plots,non-repo actions,Design discussions and code review comments,M
+Communication bridge between visuals and report narrative,non-repo actions,Report drafting sessions and caption review,M
+Late-stage integration support Task 7,git commits,tasks/Task_07_Abaqus/ report finalisation (2026-03-26),M

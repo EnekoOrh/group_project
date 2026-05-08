@@ -1,0 +1,249 @@
+
+\Needspace{10\baselineskip}
+\chapter{Context and Task 1 Baseline}
+
+
+\noindent In Task 1 I described myself as an INFP-T "Mediator" with Evaluator and Innovator strengths. I said I would take a supporting role as a 	extbf{Technical Designer \& Quality Analyst}, focusing on code review, system design, and keeping the team working well together. I also said I was not naturally suited to highly visible leadership or front-facing coordination.
+
+
+\noindent Those were my starting assumptions. This report looks back at whether they held up.
+
+
+\noindent High-level summary: I did bring the analytical and quality-focused mindset I promised, but I ended up doing a lot more hands-on coding and visualisation than I expected. Task 1 got my working style roughly right, but underestimated how much technical ownership I would take on.
+
+
+\Needspace{10\baselineskip}
+\chapter{Hindsight on Personality Fit}
+
+
+\noindent The INFP-T label was not wrong. I do think before I speak, I do notice when team debates are going nowhere, and I do prefer to understand the big picture before diving into details. Those traits helped me catch issues in our cooling-tower geometry for example, and in keeping discussions constructive.
+
+
+\noindent But Task 1 also made it sound like I would stay in the background. In reality, when the group needed someone to build the Task 6 visual pipeline and generate the figures, I proposed myself and took ownership of the task since it seemed like an interesting and challenging task. So the "Mediator" idea that I would only contribute after careful reflection was partly true, but it did not capture that I would also jump in and do technical work directly.
+
+
+\noindent One thing Task 1 got right was my weakness with documentation. I prioritised writing code and making plots over writing long report sections, which meant my contribution was sometimes clearer in the repository than in the written deliverables.
+
+
+\Needspace{10\baselineskip}
+\chapter{My Contribution Across the Project}
+
+
+\Needspace{8\baselineskip}
+\section{Technical implementation}
+
+
+\noindent My biggest technical contribution was in Task 6. I wrote a large part of the optimisation pipeline, including the frustum surface-area and volume calculations, the scenario definitions, and the parameter bounds that kept the cooling-tower shapes realistic. I also worked on the convergence logic and the penalty-function experiments so we could compare SA, PSO, and BFGS fairly across all eight scenarios.
+
+
+\Needspace{8\baselineskip}
+\section{Visualisation and figure generation}
+
+
+\noindent I spent a lot of time on the plotting scripts for Task 6. I built the code that generated the cooling-tower cross-sections, 3D renders, and convergence trajectory plots. Those figures went into the Task 6 report and were reused in Task 7. My view was that good optimisation results do not matter if nobody can see what the tower looks like or how the algorithms behaved, so I treated the visual output as a core deliverable to make it easier to understand the results.
+
+
+\Needspace{8\baselineskip}
+\section{Quality assurance and analytical review}
+
+
+\noindent I kept the "Evaluator" habit of checking things. I verified that our scenario definitions were mathematically consistent, that unit conversions were correct, and that the Abaqus inputs in Task 7 kept the same geometry scales as Task 6. I also sanity-checked convergence plots and flagged cases where penalty tuning gave unrealistic shapes. This was the quality-analyst role I was expected to have in Task 1, except it happened in parallel with my coding rather than as a separate review step afterwards.
+
+
+\Needspace{8\baselineskip}
+\section{Communication and alignment}
+
+
+\noindent I participated in meetings a decent amount and I contributed when i thought it would be beneficial: summarising technical options when discussions went in circles, asking questions about constraints to set the direction, and making sure coding decisions were written down enough for others to follow. I also acted as the link between the figures and the report text, explaining what the plots meant so the report writers could caption them accurately.
+
+
+\Needspace{8\baselineskip}
+\section{Late-stage integration support}
+
+
+\noindent During the final Task 7 push from 2026-03-24 to 2026-03-26, I helped validate that our figures matched the Abaqus outputs and that the report text aligned with the visual evidence. This was not my main area, but everyone was helping wherever needed at that point.
+
+
+\noindent Overall, my actual contribution matched what I promised in Task 1 \textemdash{}  analytical thinking, quality checks, creative problem-solving \textemdash{}  but with much more coding and visualisation than I originally planned.
+
+
+\Needspace{10\baselineskip}
+\chapter{Group Performance and Agile Review}
+
+
+\Needspace{8\baselineskip}
+\section{What worked}
+
+
+\noindent 	extbf{Early tools and structure helped.} We set up Notion, a Kanban board, and a Gantt chart in Task 2, and we actually used them in the first phase. That gave everyone a shared view of deadlines and stopped the early tasks from drifting.
+
+
+\noindent 	extbf{Iteration got faster in the later tasks.} By Tasks 6 and 7 we were running short cycles: generate plots, review them, fix colours or labels, regenerate. That tight loop was essential for turning raw optimisation outputs into report-quality figures.
+
+
+\noindent 	extbf{Open task allocation kept people engaged.} When tasks stopped being strictly tied to the roles we defined in Task 2, everyone felt free to work on whatever needed doing. I think that kept motivation up and prevented the bottlenecks you get when one person owns a task and they are busy, or zhen one person gets tired of doing the same thing over and over.
+
+
+\Needspace{8\baselineskip}
+\section{What did not work well}
+
+
+\noindent 	extbf{Ownership got fuzzy.} When everyone does a bit of everything, it becomes harder to say who exactly built what. That did not hurt our delivery, but it does make organisation more difficult.
+
+
+\noindent 	extbf{Documentation lagged behind code.} Because we were all jumping between tasks, comments and handover notes were sometimes thin. I was guilty of this: my plotting scripts were clean, but I did not always explain why I chose certain viewing angles or colour scales and we didn't always have time for meetings to discuss it.
+
+
+\noindent 	extbf{Stand-ups got shorter near deadlines.} We still talked, but the formal Agile rituals became less reflective as the pressure increased. We were iterating, but without the explicit retrospectives you are supposed to have.
+
+
+\Needspace{8\baselineskip}
+\section{Agile conclusion}
+
+
+\noindent Our Agile process worked because it was flexible. The shift from fixed roles to open tasks was a natural evolution, and in my view it was a good one. The downside was that we lost some ownership clarity. Next time I would keep the flexibility but update the task tracker more often so everyone knows who is doing what.
+
+
+\Needspace{10\baselineskip}
+\chapter{Role Evolution: Planned vs Real}
+
+
+\noindent At the start, assigning roles made sense. It reduced ambiguity and let us agree on tools and timelines quickly. I was happy with the Technical Designer \& Quality Analyst role because it matched how I naturally work.
+
+
+\noindent Later on, strict roles became unrealistic. The tasks were too complex and the deadlines too tight for everyone to stay in their lane. I ended up writing more core code than I expected, generating more figures than planned, and spending less time in "pure review" mode than my Task 1 self had predicted.
+
+
+\noindent I think this shift was a good thing. It meant broader skill development, faster problem-solving, and a stronger sense of shared ownership. The cost was that occasionally two people started the same thing because nobody had claimed it.
+
+
+\noindent My own trajectory:
+
+\begin{itemize}[leftmargin=1.5em]
+\item 	extbf{Planned:} Technical Designer \& Quality Analyst.
+\item 	extbf{Real:} Developer / visualiser, quality checker, and late-stage integrator.
+\end{itemize}
+
+\noindent That worked well for me. In future projects I would still welcome that fluidity, but I would make a habit of explicitly claiming tasks at the start of each sprint so contributions stay traceable.
+
+
+\Needspace{10\baselineskip}
+\chapter{Lessons Learned and Career Transfer}
+
+
+\noindent 	extbf{Visual communication is an important and technical skill.} Building the plotting pipeline early, with reproducible scripts, saved us a lot of time in Tasks 6 and 7.
+
+
+\noindent 	extbf{Quality checking works better when it is built in.} Catching geometry issues while I was coding them was more effective than reviewing everything at the end.
+
+
+\noindent 	extbf{I need to make my work more visible.} I assumed the output would speak for itself, but in a team project a quick update in the shared tracker or a brief note in stand-up helps people understand what you are doing.
+
+
+\noindent 	extbf{Fluid teams need lightweight ownership signals.} A simple "I will take this" comment in Notion prevents overlap without reintroducing rigid bureaucracy.
+
+
+\Needspace{8\baselineskip}
+\section{Career transfer}
+
+
+\noindent I am aiming for a career in data science in production or CAD design engineering. I plan to apply these lessons by:
+
+\begin{itemize}[leftmargin=1.5em]
+\item building reproducible visual pipelines from the start,
+\item embedding sanity checks in modelling scripts so quality is automatic,
+\item documenting design decisions in commit messages or short decision logs,
+\item staying flexible about roles but using task trackers to keep ownership clear.
+\end{itemize}
+
+\Needspace{10\baselineskip}
+\chapter{Peer Assessment (0-5)}
+
+
+\Needspace{8\baselineskip}
+\section{Scoring rubric}
+
+
+\noindent Each member is scored on six criteria (0-5 each):
+
+\begin{itemize}[leftmargin=1.5em]
+\item Technical Quality (25\%)
+\item Delivery Reliability (20\%)
+\item Integration and Handover Quality (15\%)
+\item Problem-Solving Under Constraints (15\%)
+\item Collaboration Quality (15\%)
+\item Adaptability and Learning (10\%)
+\end{itemize}
+
+\Needspace{8\baselineskip}
+\section{Scores table}
+
+
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}llllllll@{}}
+\toprule
+Member & Technical Quality & Delivery Reliability & Integration and Handover & Problem-Solving Under Constraints & Collaboration Quality & Adaptability and Learning & Weighted score (/5) \\
+\midrule
+Achille Larregle & 4.6 & 4.6 & 4.7 & 4.3 & 4.5 & 4.3 & 4.53 \\
+Eneko Orhategaray & 4.6 & 4.1 & 4.3 & 4.0 & 4.2 & 4.4 & 4.29 \\
+Aiert Ceccon & 4.7 & 3.8 & 4.3 & 4.2 & 4.5 & 4.4 & 4.33 \\
+Paul Brocvielle & 4.6 & 4.0 & 3.9 & 4.2 & 3.9 & 4.6 & 4.21 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+
+\Needspace{8\baselineskip}
+\section{Individual analyses}
+
+
+\noindent 	extbf{Achille Larregle (4.53/5)}
+
+\noindent Strengths: he kept the project organised, handled reporting and integration under deadline pressure, and made sure things got submitted.
+
+\noindent Improvement area: delegating integration work earlier would spread the load and give others more ownership of final packaging.
+
+\noindent Evidence: high-ownership integration in Task 6 and Task 7.
+
+
+\noindent 	extbf{Aiert Ceccon (4.33/5)}
+
+\noindent Strengths: reliable technical support, good collaboration, and flexible when priorities changed. Solid day-to-day coding and meeting facilitation.
+
+\noindent Improvement area: clearer end-to-end ownership from coding through to final report formatting would make his contribution easier to trace.
+
+\noindent Evidence: consistent support across delivery phases, strong in early technical sprints.
+
+
+\noindent 	extbf{Paul Brocvielle (4.21/5)}
+
+\noindent Strengths: good conceptual problem-solving and analytical thinking, especially in Tasks 3 and 4. Helped us avoid weak design choices early on.
+
+\noindent Improvement area: maintaining initiative during the high-pressure finalisation phases would help the team converge faster near deadlines.
+
+\noindent Evidence: meaningful participation in Tasks 3-4, more variable visibility in Tasks 6-7 integration.
+
+
+\noindent 	extbf{Self-assessment: Eneko Orhategaray (4.29/5)}
+
+\noindent Strengths: strong analytical and visual contribution in Task 6, particularly geometry, plotting, and quality checks. I combined creative problem-solving with rigorous sanity-checking.
+
+\noindent Improvement area: I need to claim tasks more explicitly in real time and document my reasoning so my contribution trace is easier to follow.
+
+\noindent Evidence: sustained technical and visual work during Task 6 and support in the late Task 7 integration window.
+
+
+\Needspace{10\baselineskip}
+\chapter{Conclusion}
+
+
+\noindent Task 1 predicted my direction reasonably well: I contributed through analytical thinking, creative problem-solving, and quality awareness. Task 8 shows that I also took on more direct technical ownership than I expected. The project moved from fixed roles to a more fluid way of working, and I found that shift worked well for me.
+
+
+\noindent My main takeaway is that my value is highest when I combine technical building with visual clarity and analytical rigour. My main improvement target is to keep building, but make the process more visible to the team through better documentation and explicit task claiming.

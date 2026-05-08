@@ -1,0 +1,26 @@
+week_start_date,estimated_hours,main_activity,confidence_tag
+2025-10-20,4,Task 1 self-assessment and personality review,M
+2025-10-27,3,Group formation and initial planning,L
+2025-11-03,5,Task 1 finalisation and group discussion,M
+2025-11-10,6,Task 2 meeting preparation and role agreement,H
+2025-11-17,4,Tool setup and project onboarding,M
+2025-11-24,5,Background reading on optimisation methods,M
+2025-12-01,8,Task 3 research and early coding,H
+2025-12-08,10,Task 3 implementation and testing,H
+2025-12-15,6,Task 3 wrap-up and report support,M
+2025-12-22,2,Light review and planning,L
+2025-12-29,2,Holiday period planning,L
+2026-01-05,8,Task 4 research and BFGS exploration,H
+2026-01-12,10,Task 4 implementation and comparison runs,H
+2026-01-19,6,Task 4 report support and figure generation,M
+2026-01-26,8,Task 5 presentation preparation and rehearsal,H
+2026-02-02,6,Task 6 planning and geometry derivation,H
+2026-02-09,12,Task 6 core coding and scenario setup,H
+2026-02-16,10,Task 6 plotting pipeline and visual generation,H
+2026-02-23,14,Task 6 finalisation and report integration,H
+2026-03-02,8,Task 7 Abaqus bridge and input validation,H
+2026-03-09,6,Task 7 figure alignment and consistency checks,M
+2026-03-16,10,Task 7 integration and report support,H
+2026-03-23,12,Task 7 final push and validation,H
+2026-03-30,5,Task 8 reflection and report drafting,M
+2026-04-06,4,Task 8 peer assessment and final edits,M
