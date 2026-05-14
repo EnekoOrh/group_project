@@ -1,0 +1,24 @@
+Week ending (Sunday),Hours,Workstream split (L/C/R/TO/TA),Main outputs,Confidence
+2025-10-26,3,"20/30/30/20/0","Assignment reading; Task 1 personality and role reflection started",L
+2025-11-02,4,"20/30/25/25/0","Task 1 ENTP-A profile, strengths ticklist, and skills matrix interpretation",M
+2025-11-09,5,"25/30/25/20/0","Task 1 finalisation; proposed Technical Lead and Meeting Chair role",M
+2025-11-16,6,"30/35/10/25/0","Task 2 role allocation; Technical Lead assignment; meeting-facilitation planning",H
+2025-11-23,4,"20/25/10/45/0","Initial project planning; Task 3 and Task 4 methodological research",M
+2025-11-30,5,"15/20/15/50/0","SA and PSO benchmark comparison preparation; experiment-design discussion",M
+2025-12-07,8,"10/20/20/50/0","Task 3 surface plotting, benchmark figures, and evaluation material",H
+2025-12-14,10,"10/15/25/50/0","Task 3 evaluation-budget refinement, statistical analysis, reporting expansion",H
+2025-12-21,3,"10/20/20/50/0","Task 3 consolidation and feedback review",L
+2026-01-11,5,"10/20/15/55/0","Task 4 BFGS planning and deterministic versus stochastic comparison framing",M
+2026-01-18,7,"10/20/20/50/0","Task 4 convergence interpretation and technical review",M
+2026-01-25,10,"10/15/25/50/0","Task 4 constrained Rosenbrock and penalty-factor fix plan; results and report-backbone update",H
+2026-02-01,4,"10/20/20/50/0","Task 4 handover and discussion of feedback implications",M
+2026-02-08,4,"10/20/15/55/0","Task 6 transfer planning from benchmark optimisation to engineering constraints",M
+2026-02-15,5,"10/20/15/55/0","Task 6 scenario and feasibility discussion; coding/logic review support",M
+2026-02-22,6,"10/20/20/50/0","Task 6 method-comparison review and report interpretation support",M
+2026-03-01,4,"10/20/25/45/0","Task 6 final report review and consistency checking",M
+2026-03-08,3,"10/20/20/50/0","Task 6 feedback discussion and lessons review",L
+2026-03-15,4,"10/20/15/40/15","Task 6 to Task 7 bridge; geometry and Abaqus-validation discussion",M
+2026-03-22,4,"10/20/10/35/25","Task 7 concept review; material/loading and ranking discussion",M
+2026-03-29,5,"10/20/20/25/25","Task 7 final review support; Task 8 evidence collection started",M
+2026-04-05,6,"15/20/35/20/10","Task 8 reflection drafting, peer scoring, and reconstructed timesheet",M
+2026-05-10,5,"10/15/50/20/5","Task 8 final report completion, evidence appendices, and PDF packaging",H
